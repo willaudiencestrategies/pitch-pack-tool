@@ -8,6 +8,9 @@ import { AudienceRequest, AudienceResponse, Segment } from '@/lib/types';
 export async function POST(request: NextRequest) {
   try {
     const body: AudienceRequest = await request.json();
+    if (!body.brief) {
+      return NextResponse.json({ error: 'brief is required' }, { status: 400 });
+    }
     const { brief, additionalContext, selectedSegment } = body;
 
     const promptConfig = loadPrompt('audience');

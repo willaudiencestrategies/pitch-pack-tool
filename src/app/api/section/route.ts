@@ -8,6 +8,12 @@ import { SectionRequest, SectionResponse } from '@/lib/types';
 export async function POST(request: NextRequest) {
   try {
     const body: SectionRequest = await request.json();
+    if (!body.sectionKey || !body.brief) {
+      return NextResponse.json({ error: 'sectionKey and brief are required' }, { status: 400 });
+    }
+    if (!['reassess', 'generate'].includes(body.action)) {
+      return NextResponse.json({ error: 'action must be reassess or generate' }, { status: 400 });
+    }
     const { sectionKey, brief, currentContent, additionalContext, action } = body;
 
     // Map section key to prompt file name

@@ -8,6 +8,9 @@ import { OutputRequest, OutputResponse } from '@/lib/types';
 export async function POST(request: NextRequest) {
   try {
     const body: OutputRequest = await request.json();
+    if (!body.sections || !Array.isArray(body.sections)) {
+      return NextResponse.json({ error: 'sections array is required' }, { status: 400 });
+    }
     const { sections, audience, personification, selectedTruths } = body;
 
     const promptConfig = loadPrompt('output');
