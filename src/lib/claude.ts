@@ -15,19 +15,30 @@ export async function callClaude(
   systemPrompt: string,
   userMessage: string
 ): Promise<string> {
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
-    system: systemPrompt,
-    messages: [{ role: 'user', content: userMessage }],
-  });
-
-  const textBlock = response.content.find((block) => block.type === 'text');
-  if (!textBlock || textBlock.type !== 'text') {
-    throw new Error('No text response from Claude');
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY environment variable is not set');
   }
 
-  return textBlock.text;
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+
+    const textBlock = response.content.find((block) => block.type === 'text');
+    if (!textBlock || textBlock.type !== 'text') {
+      throw new Error('No text response from Claude');
+    }
+
+    return textBlock.text;
+  } catch (error) {
+    if (error instanceof Anthropic.APIError) {
+      throw new Error(`Claude API error (${error.status}): ${error.message}`);
+    }
+    throw error;
+  }
 }
 
 export async function callClaudeJSON<T>(
@@ -51,5 +62,9 @@ export async function callClaudeJSON<T>(
     jsonStr = jsonStr.slice(0, -3);
   }
 
-  return JSON.parse(jsonStr.trim()) as T;
+  try {
+    return JSON.parse(jsonStr.trim()) as T;
+  } catch {
+    throw new Error(`Failed to parse Claude response as JSON: ${jsonStr.substring(0, 200)}...`);
+  }
 }
