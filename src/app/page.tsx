@@ -383,6 +383,10 @@ export default function Home() {
             </body>
           </html>
         `);
+      } else {
+        // Popup was blocked, show in alert or copy to clipboard
+        alert('Popup blocked. Your Pitch Pack has been copied to clipboard.');
+        navigator.clipboard.writeText(data.markdown);
       }
     } catch (err) {
       updateState({
@@ -462,6 +466,7 @@ export default function Home() {
       </div>
 
       <textarea
+        aria-label="Paste your brief content here"
         className="w-full h-64 p-4 border rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         placeholder="Paste your brief here..."
         value={state.brief}
@@ -504,6 +509,7 @@ export default function Home() {
           Do you have any additional information to share? (Other documents, website content, notes from client)
         </p>
         <textarea
+          aria-label="Additional context for the brief"
           className="w-full h-24 p-3 border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Paste additional context here (optional)..."
           value={state.additionalContext}
@@ -555,6 +561,7 @@ export default function Home() {
 
           <div className="border rounded-lg p-4">
             <textarea
+              aria-label="Audience personification"
               className="w-full min-h-[200px] p-3 bg-gray-50 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={state.personification}
               onChange={(e) => updateState({ personification: e.target.value })}
@@ -597,6 +604,14 @@ export default function Home() {
               key={segment.id}
               className="border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
               onClick={() => handleSelectAudience(segment)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectAudience(segment);
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold text-lg">{segment.name}</h3>
@@ -781,7 +796,11 @@ export default function Home() {
           Export Pitch Pack
         </button>
         <button
-          onClick={() => setState(createInitialState())}
+          onClick={() => {
+            if (window.confirm('Are you sure? This will clear all your work.')) {
+              setState(createInitialState());
+            }
+          }}
           className="px-6 py-3 border rounded-lg hover:bg-gray-50"
         >
           Start Over
