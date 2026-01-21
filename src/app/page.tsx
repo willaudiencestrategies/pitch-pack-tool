@@ -614,6 +614,7 @@ export default function Home() {
 
     return (
       <SectionStepContent
+        key={section.key}
         section={section}
         sectionIndex={state.currentSectionIndex}
         totalSections={state.sections.length}
