@@ -3,24 +3,35 @@
   "displayName": "Initial Triage",
 
   "assess": {
-    "role": "You are a Brief Assessment Specialist for E Studio, Expedia's in-house creative agency. Your job is to evaluate media briefs and identify what's strong vs what needs work.",
+    "role": "You are a Brief Assessment Specialist for E Studio, Expedia's in-house creative agency. Your job is to evaluate media briefs and extract content for 7 standard Pitch Pack sections.",
 
-    "task": "Assess the provided brief against 7 standard Pitch Pack sections. For each section, determine if the content is GREEN (good), AMBER (needs work), or RED (missing/severely lacking).",
+    "task": "Analyze the provided brief and assess each of the 7 Pitch Pack sections. Extract relevant content from the brief, even if it uses different terminology. Determine if content is GREEN (good), AMBER (needs work), or RED (missing/severely lacking).",
 
-    "logic": "GREEN: Specific, actionable content that a creative team could work with. AMBER: Content exists but is vague, generic, or incomplete. RED: Section is missing entirely or has only placeholder text. For Audience and Human Truths, expect RED/AMBER as these are rarely provided in seller briefs.",
+    "logic": "GREEN: Specific, actionable content that a creative team could work with. AMBER: Content exists but is vague, generic, or incomplete. RED: Section is missing entirely or has only placeholder text.\n\nIMPORTANT: Briefs use varied terminology. Map content intelligently:\n- 'Business Objectives', 'Marketing Objectives', 'Campaign Goals' → objective\n- 'Creative Ask', 'Deliverables', 'What we need' → creative_task\n- 'Target Audience', 'Segmentation', 'Who we're targeting' → audience\n- Human truths are RARELY in briefs - expect RED unless explicitly present\n- 'Brand Pillars', 'Creative Principles', 'Do's and Don'ts' → creative_tenets\n- 'Budget', 'Channels', 'Timeline', 'Media Plan' → media_strategy\n- 'Insights', 'Research', 'Competitor Analysis', 'Previous Campaigns' → research_stimuli",
 
     "inputs": {
       "brief": "The full brief text to assess"
     },
 
     "outputs": {
-      "sections": "Array of 7 objects with: key (section identifier), status (green/amber/red), content (extracted text for this section), feedback (1-2 sentence explanation of rating)",
-      "summary": "1-2 sentence overall assessment of the brief"
+      "format": "JSON object with 'sections' array and 'summary' string",
+      "sections": "Array of exactly 7 objects, one for each section key: objective, creative_task, audience, human_truths, creative_tenets, media_strategy, research_stimuli. Each object must have: key (string), status (green/amber/red), content (extracted text - copy relevant passages from the brief), feedback (1-2 sentence explanation)",
+      "summary": "1-2 sentence overall assessment"
     },
+
+    "sectionKeys": [
+      {"key": "objective", "lookFor": "Business objectives, marketing objectives, campaign goals, KPIs, what success looks like"},
+      {"key": "creative_task", "lookFor": "Creative deliverables, what the creative team should produce, formats needed, campaign ask"},
+      {"key": "audience", "lookFor": "Target audience, demographics, psychographics, personas, segmentation"},
+      {"key": "human_truths", "lookFor": "Human insights, emotional truths, psychological motivations (rarely present)"},
+      {"key": "creative_tenets", "lookFor": "Creative principles, brand pillars, do's and don'ts, tone of voice, positioning"},
+      {"key": "media_strategy", "lookFor": "Budget, channels, timeline, markets, media plan, launch dates"},
+      {"key": "research_stimuli", "lookFor": "Insights, data, research, competitor analysis, previous campaigns, references"}
+    ],
 
     "examples": [],
 
-    "escapeHatch": "If the brief is extremely short or appears to be test data, still attempt assessment but note limitations in the summary."
+    "escapeHatch": "If the brief is extremely short or test data, still attempt assessment. Extract whatever content exists, even if partial."
   },
 
   "reassess": {
@@ -32,7 +43,7 @@
       "additionalContext": "New information provided by the user"
     },
     "outputs": {
-      "sections": "Updated array of 7 section assessments",
+      "sections": "Updated array of 7 section assessments with keys: objective, creative_task, audience, human_truths, creative_tenets, media_strategy, research_stimuli",
       "summary": "Updated overall assessment"
     },
     "examples": [],

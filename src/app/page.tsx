@@ -23,47 +23,126 @@ import {
 
 function StatusBadge({ status }: { status: Status }) {
   const config = {
-    green: { bg: 'bg-green-500', label: 'Good' },
-    amber: { bg: 'bg-amber-500', label: 'Needs Work' },
-    red: { bg: 'bg-red-500', label: 'Missing' },
+    green: { className: 'status-green', label: 'Good', icon: '✓' },
+    amber: { className: 'status-amber', label: 'Needs Work', icon: '!' },
+    red: { className: 'status-red', label: 'Missing', icon: '✗' },
   };
-  const { bg, label } = config[status];
+  const { className, label, icon } = config[status];
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-white ${bg}`}>
-      <span className={`w-2 h-2 rounded-full bg-white opacity-60`} />
+    <span className={`status-badge ${className}`}>
+      <span className="text-xs">{icon}</span>
       {label}
     </span>
   );
 }
 
-function Spinner() {
-  return <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-300 border-t-blue-600" />;
+function Spinner({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      className={`animate-spin h-5 w-5 ${className}`}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      />
+    </svg>
+  );
+}
+
+function LoadingOverlay({ message, subMessage }: { message: string; subMessage?: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-8">
+      {/* Animated dots */}
+      <div className="flex gap-2 mb-6">
+        <div
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
+          style={{ animationDelay: '0ms' }}
+        />
+        <div
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
+          style={{ animationDelay: '150ms' }}
+        />
+        <div
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
+          style={{ animationDelay: '300ms' }}
+        />
+      </div>
+
+      {/* Main message */}
+      <p className="text-lg font-medium text-[var(--text-primary)] text-center">{message}</p>
+
+      {/* Sub message */}
+      {subMessage && (
+        <p className="text-sm text-[var(--text-muted)] mt-2 text-center">{subMessage}</p>
+      )}
+
+      {/* Progress bar animation */}
+      <div className="w-48 h-1 bg-[var(--bg-tertiary)] rounded-full mt-6 overflow-hidden">
+        <div
+          className="h-full bg-[var(--expedia-navy)] rounded-full animate-pulse"
+          style={{
+            width: '60%',
+            animation: 'loading-progress 2s ease-in-out infinite',
+          }}
+        />
+      </div>
+
+      <style jsx>{`
+        @keyframes loading-progress {
+          0% {
+            width: 10%;
+            margin-left: 0%;
+          }
+          50% {
+            width: 60%;
+            margin-left: 20%;
+          }
+          100% {
+            width: 10%;
+            margin-left: 90%;
+          }
+        }
+      `}</style>
+    </div>
+  );
 }
 
 function ErrorBanner({
   message,
   onRetry,
-  onSkip
+  onSkip,
 }: {
   message: string;
   onRetry: () => void;
   onSkip?: () => void;
 }) {
   return (
-    <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <p className="text-red-700 text-sm mb-3">{message}</p>
-      <div className="flex gap-2">
+    <div className="mb-6 p-4 rounded-xl bg-[var(--status-red-bg)] border border-[var(--status-red)]">
+      <p className="text-[var(--status-red)] text-sm mb-3 font-medium">{message}</p>
+      <div className="flex gap-3">
         <button
           onClick={onRetry}
-          className="px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+          className="px-4 py-2 text-sm font-medium bg-[var(--status-red)] text-white rounded-lg hover:opacity-90 transition-opacity"
         >
           Retry
         </button>
         {onSkip && (
           <button
             onClick={onSkip}
-            className="px-3 py-1.5 text-sm border border-red-300 text-red-700 rounded hover:bg-red-50"
+            className="px-4 py-2 text-sm font-medium border border-[var(--status-red)] text-[var(--status-red)] rounded-lg hover:bg-[var(--status-red-bg)] transition-colors"
           >
             Skip
           </button>
@@ -75,15 +154,27 @@ function ErrorBanner({
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
   return (
-    <div className="flex gap-1 mt-6">
-      {Array.from({ length: total }, (_, i) => (
-        <div
-          key={i}
-          className={`h-2 flex-1 rounded ${
-            i < current ? 'bg-green-500' : i === current ? 'bg-blue-600' : 'bg-gray-200'
-          }`}
-        />
-      ))}
+    <div className="mt-8">
+      <div className="flex justify-between text-sm text-[var(--text-muted)] mb-2">
+        <span>Progress</span>
+        <span>
+          {current + 1} of {total}
+        </span>
+      </div>
+      <div className="flex gap-1.5">
+        {Array.from({ length: total }, (_, i) => (
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full transition-colors ${
+              i < current
+                ? 'bg-[var(--status-green)]'
+                : i === current
+                ? 'bg-[var(--expedia-navy)]'
+                : 'bg-[var(--border-color)]'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -115,68 +206,82 @@ function SectionStepContent({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
-          Section {sectionIndex + 1}: {section.name}
-        </h2>
+      {/* Section Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
+        <div>
+          <p className="text-sm text-[var(--text-muted)] mb-1">
+            Section {sectionIndex + 1} of {totalSections}
+          </p>
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)]">{section.name}</h2>
+        </div>
         <StatusBadge status={section.status} />
       </div>
 
       {/* Current Content */}
-      <div className="border rounded-lg p-4">
-        <p className="text-sm text-gray-500 mb-2">Current content:</p>
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-[var(--text-secondary)]">
+          Current Content
+        </label>
         <textarea
           aria-label={`Current content for ${section.name}`}
-          className="w-full min-h-[100px] p-3 bg-gray-50 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={section.content || '(No content found)'}
+          className="textarea-field"
+          style={{ minHeight: '140px' }}
+          value={section.content || '(No content found in brief)'}
           onChange={(e) => onUpdateContent(e.target.value)}
         />
-        <p className="mt-3 text-sm text-gray-600">{section.feedback}</p>
+        {section.feedback && (
+          <p className="text-sm text-[var(--text-secondary)] bg-[var(--bg-secondary)] p-3 rounded-lg">
+            {section.feedback}
+          </p>
+        )}
       </div>
 
-      {/* Suggestion */}
+      {/* AI Suggestion */}
       {section.suggestion && (
-        <div className="border border-purple-200 rounded-lg p-4 bg-purple-50">
-          <p className="text-sm text-purple-600 mb-2 font-medium">Suggestion:</p>
+        <div className="space-y-3 p-4 rounded-xl bg-[var(--expedia-navy)]/5 border border-[var(--expedia-navy)]/20">
+          <label className="block text-sm font-medium text-[var(--expedia-navy)]">
+            AI Suggestion
+          </label>
           <textarea
             aria-label={`AI suggestion for ${section.name}`}
-            className="w-full min-h-[100px] p-3 bg-white rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="textarea-field border-[var(--expedia-navy)]/30"
+            style={{ minHeight: '140px' }}
             value={section.suggestion}
             onChange={(e) => onUpdateSuggestion(e.target.value)}
           />
-          <button
-            onClick={onAcceptSuggestion}
-            className="mt-2 px-4 py-2 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
-          >
+          <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-4 py-2">
             Accept Suggestion
           </button>
         </div>
       )}
 
-      {/* Add More Info */}
+      {/* Additional Info (for non-green sections) */}
       {section.status !== 'green' && (
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <p className="font-medium mb-2">Do you have any additional info?</p>
+        <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
+          <label className="block text-sm font-medium text-[var(--text-secondary)]">
+            Do you have any additional information?
+          </label>
           <textarea
             aria-label="Additional information for this section"
-            className="w-full h-24 p-3 border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Add information here..."
+            className="textarea-field"
+            style={{ minHeight: '100px' }}
+            placeholder="Add any extra context, notes, or information that might help..."
             value={additionalInfo}
             onChange={(e) => setAdditionalInfo(e.target.value)}
           />
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-3">
             <button
               onClick={() => onReassess(additionalInfo)}
               disabled={loading || !additionalInfo.trim()}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+              className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
             >
-              {loading && <Spinner />}
-              Reassess
+              {loading && <Spinner className="text-white" />}
+              Re-assess with Info
             </button>
             <button
               onClick={onGenerate}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 border border-purple-300 text-purple-700 rounded text-sm hover:bg-purple-50"
+              className="btn-outline text-sm px-4 py-2 flex items-center gap-2"
             >
               {loading && <Spinner />}
               Generate Suggestion
@@ -185,13 +290,11 @@ function SectionStepContent({
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex gap-3">
-        <button
-          onClick={onNext}
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-        >
-          {sectionIndex < totalSections - 1 ? 'Confirm & Continue →' : 'Finish →'}
+      {/* Continue Button */}
+      <div className="pt-4">
+        <button onClick={onNext} className="btn-secondary flex items-center gap-2">
+          {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
+          <span>→</span>
         </button>
       </div>
 
@@ -537,75 +640,107 @@ export default function Home() {
   // Step Renderers
   // ============================================
 
-  const renderUploadStep = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Upload Your Brief</h2>
-        <p className="text-gray-600 text-sm">
-          Paste the full brief content below. I'll review it and identify what's strong vs what needs work.
-        </p>
+  const renderUploadStep = () => {
+    if (state.loading) {
+      return (
+        <LoadingOverlay
+          message="Analyzing your brief..."
+          subMessage="Extracting content and assessing each section"
+        />
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Upload Your Brief
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            Paste your brief below and I'll assess each section, highlighting what's strong and what
+            needs work.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-[var(--text-secondary)]">
+            Brief Content
+          </label>
+          <textarea
+            aria-label="Paste your brief content here"
+            className="textarea-field font-mono text-sm"
+            style={{ minHeight: '280px' }}
+            placeholder="Paste the full brief content here..."
+            value={state.brief}
+            onChange={(e) => updateState({ brief: e.target.value })}
+          />
+        </div>
+
+        <button
+          onClick={handleTriage}
+          disabled={!state.brief.trim()}
+          className="btn-secondary flex items-center gap-2 w-full justify-center"
+        >
+          Assess Brief →
+        </button>
       </div>
-
-      <textarea
-        aria-label="Paste your brief content here"
-        className="w-full h-64 p-4 border rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Paste your brief here..."
-        value={state.brief}
-        onChange={(e) => updateState({ brief: e.target.value })}
-      />
-
-      <button
-        onClick={handleTriage}
-        disabled={state.loading || !state.brief.trim()}
-        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {state.loading && <Spinner />}
-        {state.loading ? 'Assessing...' : 'Upload Brief →'}
-      </button>
-    </div>
-  );
+    );
+  };
 
   const renderTriageStep = () => (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Initial Assessment</h2>
-        <p className="text-gray-600 text-sm">Here's my review of your brief:</p>
+      <div className="text-center pb-6 border-b border-[var(--border-color)]">
+        <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+          Initial Assessment
+        </h2>
+        <p className="text-[var(--text-secondary)]">
+          Here's my review of your brief across the 7 Pitch Pack sections.
+        </p>
       </div>
 
-      <div className="border rounded-lg divide-y">
+      <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
         {state.sections.map((section, index) => (
-          <div key={section.key} className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <span className="text-gray-500 font-mono text-sm">{index + 1}.</span>
-              <span className="font-medium">{section.name}</span>
+          <div
+            key={section.key}
+            className={`flex items-center justify-between p-4 ${
+              index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-medium text-[var(--text-muted)]">
+                {index + 1}
+              </span>
+              <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
             </div>
             <StatusBadge status={section.status} />
           </div>
         ))}
       </div>
 
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <p className="font-medium mb-2">Before we go section by section:</p>
-        <p className="text-gray-600 text-sm mb-3">
-          Do you have any additional information to share? (Other documents, website content, notes from client)
+      <div className="p-4 rounded-xl bg-[var(--bg-secondary)]">
+        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+          Before we go section by section...
+        </label>
+        <p className="text-sm text-[var(--text-muted)] mb-3">
+          Do you have any additional context? (Other documents, website content, client notes)
         </p>
         <textarea
           aria-label="Additional context for the brief"
-          className="w-full h-24 p-3 border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Paste additional context here (optional)..."
+          className="textarea-field"
+          style={{ minHeight: '100px' }}
+          placeholder="Paste any additional context here (optional)..."
           value={state.additionalContext}
           onChange={(e) => updateState({ additionalContext: e.target.value })}
         />
       </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={() => updateState({ step: 'sections', currentSectionIndex: 0 })}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Continue to Sections →
-        </button>
-      </div>
+      <button
+        onClick={() => updateState({ step: 'sections', currentSectionIndex: 0 })}
+        className="btn-secondary flex items-center gap-2 w-full justify-center"
+      >
+        Continue to Sections
+        <span>→</span>
+      </button>
     </div>
   );
 
@@ -630,21 +765,56 @@ export default function Home() {
   };
 
   const renderAudienceStep = () => {
+    // Loading state for audience generation or personification
+    if (state.loading && state.audienceOptions.length === 0) {
+      return (
+        <LoadingOverlay
+          message="Generating audience segments..."
+          subMessage="Creating 5 distinct audience profiles based on your brief"
+        />
+      );
+    }
+
+    if (state.loading && state.selectedAudience && !state.personification) {
+      return (
+        <LoadingOverlay
+          message={`Developing ${state.selectedAudience.name}...`}
+          subMessage="Creating a rich personification of this audience segment"
+        />
+      );
+    }
+
+    if (state.loading && state.personification) {
+      return (
+        <LoadingOverlay
+          message="Generating human truths..."
+          subMessage="Creating 12 psychological insights for your audience"
+        />
+      );
+    }
+
     if (state.selectedAudience && state.personification) {
       // Personification review
       return (
         <div className="space-y-6">
-          <div>
-            <h2 className="text-xl font-semibold mb-2">Review Personification</h2>
-            <p className="text-gray-600 text-sm">
-              Here's the expanded audience sketch for <strong>{state.selectedAudience.name}</strong>:
+          <div className="text-center pb-6 border-b border-[var(--border-color)]">
+            <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+              Review Audience Profile
+            </h2>
+            <p className="text-[var(--text-secondary)]">
+              Here's the expanded profile for{' '}
+              <strong className="text-[var(--expedia-navy)]">{state.selectedAudience.name}</strong>
             </p>
           </div>
 
-          <div className="border rounded-lg p-4">
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-[var(--text-secondary)]">
+              Audience Personification
+            </label>
             <textarea
               aria-label="Audience personification"
-              className="w-full min-h-[200px] p-3 bg-gray-50 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="textarea-field"
+              style={{ minHeight: '240px' }}
               value={state.personification}
               onChange={(e) => updateState({ personification: e.target.value })}
             />
@@ -653,17 +823,16 @@ export default function Home() {
           <div className="flex gap-3">
             <button
               onClick={handleGenerateTruths}
-              disabled={state.loading}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="btn-secondary flex items-center gap-2"
             >
-              {state.loading && <Spinner />}
-              Confirm & Generate Human Truths →
+              Confirm & Generate Human Truths
+              <span>→</span>
             </button>
             <button
               onClick={() => updateState({ selectedAudience: null, personification: '' })}
-              className="px-6 py-3 border rounded-lg hover:bg-gray-50"
+              className="btn-outline"
             >
-              ← Back to Segments
+              ← Back
             </button>
           </div>
         </div>
@@ -673,18 +842,21 @@ export default function Home() {
     // Segment selection
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Choose Your Audience Segment</h2>
-          <p className="text-gray-600 text-sm">
-            Based on your brief, here are 5 potential audience segments. Click one to develop further.
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Choose Your Audience
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            Based on your brief, here are 5 potential audience segments. Click one to develop
+            further.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {state.audienceOptions.map((segment) => (
             <div
               key={segment.id}
-              className="border rounded-lg p-4 hover:border-blue-500 cursor-pointer transition-colors"
+              className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--expedia-navy)] hover:shadow-md cursor-pointer transition-all group"
               onClick={() => handleSelectAudience(segment)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -695,12 +867,13 @@ export default function Home() {
               role="button"
               tabIndex={0}
             >
-              <div className="flex justify-between items-start">
-                <h3 className="font-semibold text-lg">{segment.name}</h3>
-                {state.loading && state.selectedAudience?.id === segment.id && <Spinner />}
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="font-semibold text-lg text-[var(--expedia-navy)] group-hover:underline">
+                  {segment.name}
+                </h3>
               </div>
-              <p className="text-gray-700 mt-1">{segment.description}</p>
-              <p className="text-gray-500 text-sm mt-2">{segment.demographics}</p>
+              <p className="text-[var(--text-primary)] mb-2">{segment.description}</p>
+              <p className="text-sm text-[var(--text-muted)]">{segment.demographics}</p>
             </div>
           ))}
         </div>
@@ -708,7 +881,7 @@ export default function Home() {
         <button
           onClick={handleGenerateAudience}
           disabled={state.loading}
-          className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+          className="btn-outline text-sm"
         >
           Regenerate Options
         </button>
@@ -717,6 +890,15 @@ export default function Home() {
   };
 
   const renderTruthsStep = () => {
+    if (state.loading && state.truthOptions.length === 0) {
+      return (
+        <LoadingOverlay
+          message="Generating human truths..."
+          subMessage="Creating 12 psychological insights across safer, sharper, and bolder levels"
+        />
+      );
+    }
+
     const toggleTruth = (truth: Truth) => {
       const isSelected = state.selectedTruths.some((t) => t.id === truth.id);
       if (isSelected) {
@@ -731,15 +913,11 @@ export default function Home() {
     };
 
     const updateTruthText = (id: number, text: string) => {
-      const updatedTruths = state.truthOptions.map((t) =>
-        t.id === id ? { ...t, text } : t
-      );
+      const updatedTruths = state.truthOptions.map((t) => (t.id === id ? { ...t, text } : t));
       updateState({ truthOptions: updatedTruths });
 
       // Also update in selected if present
-      const updatedSelected = state.selectedTruths.map((t) =>
-        t.id === id ? { ...t, text } : t
-      );
+      const updatedSelected = state.selectedTruths.map((t) => (t.id === id ? { ...t, text } : t));
       updateState({ selectedTruths: updatedSelected });
     };
 
@@ -749,43 +927,65 @@ export default function Home() {
       bolder: state.truthOptions.filter((t) => t.level === 'bolder'),
     };
 
+    const levelLabels = {
+      safer: { label: 'Safer', desc: 'Broad appeal, easy to execute', color: 'var(--status-green)' },
+      sharper: { label: 'Sharper', desc: 'Clearer trade-offs, more distinctive', color: 'var(--status-amber)' },
+      bolder: { label: 'Bolder', desc: 'Provocative, high impact', color: 'var(--status-red)' },
+    };
+
     return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Select Human Truths</h2>
-          <p className="text-gray-600 text-sm">
-            Here are 12 human truths ranging from safer to bolder. Select any that resonate.
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Select Human Truths
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            12 truths ranging from safer to bolder. Select the ones that resonate with your
+            audience.
           </p>
         </div>
 
         {(['safer', 'sharper', 'bolder'] as const).map((level) => (
-          <div key={level}>
-            <h3 className="font-medium text-gray-500 uppercase text-xs tracking-wide mb-2">
-              {level === 'safer' ? 'Safer (1-4)' : level === 'sharper' ? 'Sharper (5-8)' : 'Bolder (9-12)'}
-            </h3>
-            <div className="space-y-2">
+          <div key={level} className="space-y-3">
+            <div className="flex items-center gap-3">
+              <span
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: levelLabels[level].color }}
+              />
+              <span className="font-semibold text-[var(--text-primary)]">
+                {levelLabels[level].label}
+              </span>
+              <span className="text-sm text-[var(--text-muted)]">— {levelLabels[level].desc}</span>
+            </div>
+            <div className="space-y-2 pl-6">
               {truthsByLevel[level].map((truth) => {
                 const isSelected = state.selectedTruths.some((t) => t.id === truth.id);
                 return (
                   <div
                     key={truth.id}
-                    className={`flex items-start gap-3 p-3 border rounded-lg transition-colors ${
-                      isSelected ? 'border-blue-500 bg-blue-50' : 'hover:border-gray-300'
+                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5'
+                        : 'border-[var(--border-color)] hover:border-[var(--border-hover)]'
                     }`}
+                    onClick={() => toggleTruth(truth)}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => toggleTruth(truth)}
-                      className="mt-1"
+                      className="mt-1 h-4 w-4 accent-[var(--expedia-navy)]"
                     />
                     <div className="flex-1">
-                      <span className="text-gray-400 text-sm mr-2">{truth.id}.</span>
                       <input
                         type="text"
                         value={truth.text}
-                        onChange={(e) => updateTruthText(truth.id, e.target.value)}
-                        className="w-full bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1"
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          updateTruthText(truth.id, e.target.value);
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-full bg-transparent text-sm text-[var(--text-primary)] focus:outline-none"
                       />
                     </div>
                   </div>
@@ -795,15 +995,15 @@ export default function Home() {
           </div>
         ))}
 
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-500">
-            Selected: {state.selectedTruths.length}
+        <div className="flex items-center justify-between pt-4 border-t border-[var(--border-color)]">
+          <span className="text-sm text-[var(--text-muted)]">
+            {state.selectedTruths.length} selected
           </span>
           <div className="flex gap-3">
             <button
               onClick={handleGenerateTruths}
               disabled={state.loading}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50 text-sm"
+              className="btn-outline text-sm px-4 py-2"
             >
               Regenerate
             </button>
@@ -835,9 +1035,10 @@ export default function Home() {
                 });
               }}
               disabled={state.selectedTruths.length === 0}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="btn-secondary flex items-center gap-2"
             >
-              Confirm & Continue →
+              Confirm & Continue
+              <span>→</span>
             </button>
           </div>
         </div>
@@ -845,51 +1046,64 @@ export default function Home() {
     );
   };
 
-  const renderOutputStep = () => (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Pitch Pack Complete</h2>
-        <p className="text-gray-600 text-sm">
-          All sections have been reviewed. Ready to compile the final output.
-        </p>
-      </div>
+  const renderOutputStep = () => {
+    if (state.loading) {
+      return (
+        <LoadingOverlay
+          message="Compiling your Pitch Pack..."
+          subMessage="Formatting all sections into the final document"
+        />
+      );
+    }
 
-      <div className="border rounded-lg divide-y">
-        {state.sections.map((section) => (
-          <div key={section.key} className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium">{section.name}</span>
-              <StatusBadge status={section.status} />
+    return (
+      <div className="space-y-6">
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Pitch Pack Complete
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            All sections reviewed. Ready to compile your final Pitch Pack.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
+          {state.sections.map((section, index) => (
+            <div
+              key={section.key}
+              className={`p-4 ${
+                index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
+                <StatusBadge status={section.status} />
+              </div>
+              <p className="text-sm text-[var(--text-muted)] line-clamp-2">
+                {section.content || '(not provided)'}
+              </p>
             </div>
-            <p className="text-sm text-gray-600 whitespace-pre-wrap line-clamp-3">
-              {section.content || '(not provided)'}
-            </p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="flex gap-3">
-        <button
-          onClick={handleCompileOutput}
-          disabled={state.loading}
-          className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-        >
-          {state.loading && <Spinner />}
-          Export Pitch Pack
-        </button>
-        <button
-          onClick={() => {
-            if (window.confirm('Are you sure? This will clear all your work.')) {
-              setState(createInitialState());
-            }
-          }}
-          className="px-6 py-3 border rounded-lg hover:bg-gray-50"
-        >
-          Start Over
-        </button>
+        <div className="flex gap-3">
+          <button onClick={handleCompileOutput} className="btn-secondary flex items-center gap-2">
+            Export Pitch Pack
+          </button>
+          <button
+            onClick={() => {
+              if (window.confirm('Are you sure? This will clear all your work.')) {
+                setState(createInitialState());
+              }
+            }}
+            className="btn-outline"
+          >
+            Start Over
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // ============================================
   // Main Render
@@ -915,15 +1129,29 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-3xl mx-auto px-6 py-4">
-          <h1 className="text-lg font-semibold">Pitch Pack Tool</h1>
-          <p className="text-sm text-gray-500">Brief improvement workflow for E Studio</p>
+    <div className="min-h-screen bg-[var(--bg-secondary)]">
+      {/* Header */}
+      <header className="bg-[var(--expedia-navy)] text-white">
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-[var(--expedia-yellow)] flex items-center justify-center">
+              <span className="text-[var(--expedia-navy)] font-bold text-sm">E</span>
+            </div>
+            <div>
+              <h1 className="font-semibold">Pitch Pack Tool</h1>
+              <p className="text-xs text-white/70">E Studio Brief Improvement</p>
+            </div>
+          </div>
+          <div className="text-sm text-white/70">
+            {state.step !== 'upload' && (
+              <span className="capitalize">{state.step.replace('_', ' ')}</span>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
         {state.error && (
           <ErrorBanner
             message={state.error}
@@ -935,8 +1163,13 @@ export default function Home() {
           />
         )}
 
-        <div className="bg-white rounded-lg border p-6">{renderStep()}</div>
+        <div className="card-elevated">{renderStep()}</div>
       </main>
+
+      {/* Footer */}
+      <footer className="text-center py-6 text-sm text-[var(--text-muted)]">
+        Pitch Pack Tool for E Studio
+      </footer>
     </div>
   );
 }
