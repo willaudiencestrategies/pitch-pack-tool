@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
     userMessage += `Please ${action} this section.`;
 
-    const response = await callClaudeJSON<SectionResponse>(systemPrompt, userMessage);
+    const response = await callClaudeJSON<SectionResponse>(systemPrompt, userMessage, { endpoint: `section:${sectionKey}:${action}` });
 
     return NextResponse.json(response);
   } catch (error) {

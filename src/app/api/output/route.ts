@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
 
     const response = await callClaudeJSON<{ markdown: string }>(
       systemPrompt,
-      userMessage
+      userMessage,
+      { endpoint: 'output' }
     );
 
     return NextResponse.json({ markdown: response.markdown } as OutputResponse);

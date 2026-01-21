@@ -28,7 +28,8 @@ Generate 12 human truths.`;
 
     const response = await callClaudeJSON<{ truths: Truth[] }>(
       systemPrompt,
-      userMessage
+      userMessage,
+      { endpoint: 'truths:generate' }
     );
 
     return NextResponse.json({ truths: response.truths } as TruthsResponse);

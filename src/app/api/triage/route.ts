@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         feedback: string;
       }>;
       summary: string;
-    }>(systemPrompt, userMessage);
+    }>(systemPrompt, userMessage, { endpoint: 'triage' });
 
     // Ensure all 7 sections are present
     const sections: Section[] = SECTION_KEYS.map((key) => {

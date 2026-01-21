@@ -46,7 +46,8 @@ ${additionalContext || 'None'}`;
 
       const response = await callClaudeJSON<{ personification: string }>(
         systemPrompt,
-        userMessage
+        userMessage,
+        { endpoint: 'audience:personify' }
       );
 
       return NextResponse.json({ personification: response.personification });
@@ -58,7 +59,8 @@ ${additionalContext || 'None'}`;
 
       const response = await callClaudeJSON<{ segments: Segment[] }>(
         systemPrompt,
-        userMessage
+        userMessage,
+        { endpoint: 'audience:generate' }
       );
 
       return NextResponse.json({ segments: response.segments });
