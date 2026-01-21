@@ -1,0 +1,60 @@
+{
+  "section": "research_stimuli",
+  "displayName": "Research Stimuli",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Research Stimuli.",
+    "task": "Evaluate whether useful research, competitor examples, or inspiration sources are provided.",
+    "logic": "GREEN: Has relevant research, competitor analysis, or inspiration with context. AMBER: Has some references but not annotated or explained. RED: Missing or only bare links.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted research/stimuli",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "If no research, suggest what would be helpful to include."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate research stimuli given new information.",
+    "logic": "Same criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "Note what research would strengthen the brief."
+  },
+
+  "generate": {
+    "role": "You are a Research Specialist.",
+    "task": "Suggest what research or stimuli would strengthen this brief.",
+    "logic": "Recommend specific types of research, competitor examples to analyze, or inspiration sources.",
+    "inputs": {
+      "brief": "The full brief",
+      "objective": "Campaign objective",
+      "audience": "Target audience",
+      "additionalContext": "User context"
+    },
+    "outputs": {
+      "suggestion": "Recommended research areas",
+      "reasoning": "Why these would help",
+      "questions": "What to ask the client"
+    },
+    "examples": [],
+    "escapeHatch": "Provide general categories if brief is too vague."
+  }
+}

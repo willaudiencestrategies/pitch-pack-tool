@@ -1,0 +1,59 @@
+{
+  "section": "media_strategy",
+  "displayName": "Media Strategy",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Media Strategy.",
+    "task": "Evaluate whether media strategy (channels, timing, markets) is clearly specified.",
+    "logic": "GREEN: Clear channels, markets, timing, budget allocation. AMBER: Has some info but gaps in specifics. RED: Missing or only vague mentions.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted media strategy",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "If budget doesn't match scope, flag as AMBER with note."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate media strategy given new information.",
+    "logic": "Same criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "Note budget/scope mismatches."
+  },
+
+  "generate": {
+    "role": "You are a Media Strategist.",
+    "task": "Suggest a top-line media strategy based on objectives and budget.",
+    "logic": "Recommend channels and timing that align with budget and campaign goals.",
+    "inputs": {
+      "brief": "The full brief",
+      "objective": "Campaign objective",
+      "additionalContext": "User context"
+    },
+    "outputs": {
+      "suggestion": "Recommended media approach",
+      "reasoning": "Why this mix works for budget/goals",
+      "questions": "Clarifying questions"
+    },
+    "examples": [],
+    "escapeHatch": "If budget unknown, provide tiered recommendations."
+  }
+}

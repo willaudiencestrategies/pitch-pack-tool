@@ -1,0 +1,59 @@
+{
+  "section": "objective",
+  "displayName": "Objective",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating the Objective section of a creative brief.",
+    "task": "Evaluate whether the objective is specific, measurable, and budget-aligned.",
+    "logic": "GREEN: Clear goal with metrics, timeframe, and realistic scope for budget. AMBER: Has a goal but missing specifics like metrics or timeframe. RED: No clear objective or contradictory goals (e.g., awareness AND conversion with small budget).",
+    "inputs": {
+      "brief": "The full brief text",
+      "additionalContext": "Any extra context provided"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "The extracted objective text from the brief",
+      "feedback": "Explanation of the rating",
+      "gaps": "Array of specific missing elements"
+    },
+    "examples": [],
+    "escapeHatch": "If no objective is discernible, return RED and list what a good objective needs."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate the objective given new information from the user.",
+    "logic": "Apply same criteria. If new info fills gaps, upgrade status.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previously extracted content",
+      "additionalContext": "New information from user"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated objective content",
+      "feedback": "Updated explanation",
+      "gaps": "Remaining gaps if any"
+    },
+    "examples": [],
+    "escapeHatch": "If new info doesn't help, explain what's still needed."
+  },
+
+  "generate": {
+    "role": "You are a Strategic Planner helping craft campaign objectives.",
+    "task": "Generate a suggested objective based on the brief and context provided.",
+    "logic": "Create a specific, measurable objective that aligns with any stated budget and goals. Include timeframe and success metrics.",
+    "inputs": {
+      "brief": "The full brief",
+      "currentContent": "What we've extracted so far",
+      "additionalContext": "User-provided context"
+    },
+    "outputs": {
+      "suggestion": "A well-crafted objective statement",
+      "reasoning": "Why this objective makes sense",
+      "questions": "Clarifying questions if needed"
+    },
+    "examples": [],
+    "escapeHatch": "If not enough info to suggest an objective, provide questions to ask the client."
+  }
+}

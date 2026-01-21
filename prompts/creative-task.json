@@ -1,0 +1,59 @@
+{
+  "section": "creative_task",
+  "displayName": "Creative Task",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating the Creative Task section.",
+    "task": "Evaluate whether the creative task clearly defines what the creative team is being asked to deliver.",
+    "logic": "GREEN: Clear deliverables with format expectations. AMBER: Has an ask but vague on specifics. RED: No clear task or buried/implicit asks.",
+    "inputs": {
+      "brief": "The full brief text",
+      "additionalContext": "Any extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted creative task description",
+      "feedback": "Explanation of rating",
+      "gaps": "Missing elements"
+    },
+    "examples": [],
+    "escapeHatch": "If no task found, return RED with guidance on what should be specified."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate the creative task given new information.",
+    "logic": "Same criteria, update if new info helps.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previously extracted content",
+      "additionalContext": "New information"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "Explain what's still missing."
+  },
+
+  "generate": {
+    "role": "You are a Strategic Planner helping define creative tasks.",
+    "task": "Generate a suggested creative task based on the brief.",
+    "logic": "Define clear deliverables that align with the objective and budget.",
+    "inputs": {
+      "brief": "The full brief",
+      "currentContent": "Extracted content",
+      "additionalContext": "User context"
+    },
+    "outputs": {
+      "suggestion": "Clear creative task statement",
+      "reasoning": "Why these deliverables make sense",
+      "questions": "Clarifying questions"
+    },
+    "examples": [],
+    "escapeHatch": "If unclear, ask what formats and channels are expected."
+  }
+}

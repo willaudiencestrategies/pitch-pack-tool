@@ -1,0 +1,60 @@
+{
+  "section": "creative_tenets",
+  "displayName": "Creative Tenets",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Creative Tenets.",
+    "task": "Evaluate whether creative tenets/positioning territories exist and are distinctive.",
+    "logic": "GREEN: Specific, distinctive principles that guide creative and tell you what NOT to do. AMBER: Has direction but generic (could apply to competitors). RED: Missing or only generic statements.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted tenets",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "If positioning is generic like 'East meets West', flag as AMBER."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate tenets given new information.",
+    "logic": "Same criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "Note what would make tenets more distinctive."
+  },
+
+  "generate": {
+    "role": "You are a Strategic Creative developing positioning territories.",
+    "task": "Generate suggested creative tenets based on the brief, audience, and insights.",
+    "logic": "Tenets should be: specific enough to guide decisions, distinctive (couldn't apply to competitors), tell you what NOT to do, rooted in audience insight.",
+    "inputs": {
+      "brief": "The full brief",
+      "audience": "Selected audience",
+      "humanTruths": "Selected human truths",
+      "additionalContext": "User context"
+    },
+    "outputs": {
+      "suggestion": "2-3 creative tenets",
+      "reasoning": "Why these work",
+      "questions": "Clarifying questions"
+    },
+    "examples": [],
+    "escapeHatch": "If not enough insight, provide broader territories with caveats."
+  }
+}

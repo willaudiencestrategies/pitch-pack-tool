@@ -1,0 +1,56 @@
+{
+  "section": "audience",
+  "displayName": "Audience",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating the Audience section.",
+    "task": "Evaluate whether the audience description is psychographic (values, motivations, worldview) not just demographic.",
+    "logic": "GREEN: Rich description of needs, values, motivations that a creative could visualize. AMBER: Has audience info but just demographics or generic labels like 'Cultural Explorers'. RED: Missing or only age ranges.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted audience description",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "Expect this to often be RED/AMBER. Note that generation will be needed."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate audience given new information.",
+    "logic": "Same psychographic criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "If still weak, recommend generation."
+  },
+
+  "generate": {
+    "role": "You are a Strategic Planner specializing in audience development for creative campaigns.",
+    "task": "Generate 5 potential target audience segments based on the brief.",
+    "logic": "Segments should be PERSONIFIED not quantified. Rich descriptions of needs, values, motivations. Avoid generic labels. Snappy 1-2 word names that stimulate interest.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "User context"
+    },
+    "outputs": {
+      "segments": "Array of 5 segments, each with: id, name (snappy 1-2 words), description (rich values/motivations), demographics (relevant indicators)"
+    },
+    "examples": [],
+    "escapeHatch": "If brief has almost no info, use destination/campaign type to infer likely audiences."
+  }
+}

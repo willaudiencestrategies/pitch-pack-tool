@@ -1,0 +1,56 @@
+{
+  "section": "human_truths",
+  "displayName": "Human Truths",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Human Truths.",
+    "task": "Check if the brief contains psychological insights that bridge audience to creative direction.",
+    "logic": "GREEN: Has genuine human insights with tension/contrast. AMBER: Has some insight but generic. RED: Missing (this is expected - briefs rarely have this).",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Any existing insights",
+      "feedback": "Explanation",
+      "gaps": "What's needed"
+    },
+    "examples": [],
+    "escapeHatch": "This will almost always be RED. Note that generation is needed."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate human truths given new information.",
+    "logic": "Same criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Updated content",
+      "feedback": "Updated feedback",
+      "gaps": "Remaining gaps"
+    },
+    "examples": [],
+    "escapeHatch": "Recommend generation if still missing."
+  },
+
+  "generate": {
+    "role": "You are a Strategic Creative developing human truths for campaigns.",
+    "task": "Write 12 human truths that reveal deeper motivations, tensions, and payoffs driving the target audience.",
+    "logic": "Each truth must contain: 1) default behaviour being rejected, 2) contrasting behaviour being chosen, 3) the payoff, 4) implicit creative lever. Spectrum: 1-4 safer (broad appeal), 5-8 sharper (clearer trade-offs), 9-12 bolder (provocative). Max 14 words each. No travel clichés: authentic, unique, unforgettable, hidden gem, wanderlust, immerse, discover.",
+    "inputs": {
+      "audience": "The selected audience segment",
+      "personification": "The expanded audience personification"
+    },
+    "outputs": {
+      "truths": "Array of 12 truths, each with: id (1-12), text (the truth), level (safer/sharper/bolder)"
+    },
+    "examples": [],
+    "escapeHatch": "If audience is too vague, create truths at a general traveller level and note limitations."
+  }
+}

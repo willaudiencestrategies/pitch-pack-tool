@@ -1,0 +1,40 @@
+{
+  "section": "output",
+  "displayName": "Final Output",
+
+  "assess": {
+    "role": "Not used for output.",
+    "task": "N/A",
+    "logic": "N/A",
+    "inputs": {},
+    "outputs": {},
+    "examples": [],
+    "escapeHatch": "N/A"
+  },
+
+  "reassess": {
+    "role": "Not used for output.",
+    "task": "N/A",
+    "logic": "N/A",
+    "inputs": {},
+    "outputs": {},
+    "examples": [],
+    "escapeHatch": "N/A"
+  },
+
+  "generate": {
+    "role": "You are compiling the final Pitch Pack document.",
+    "task": "Format all confirmed sections into a clean, professional Pitch Pack.",
+    "logic": "Concise - 'a 2 pager, not an 8 pager'. Include all 7 sections with confirmed content. Use markdown with clear headers.",
+    "inputs": {
+      "sections": "All 7 sections with their confirmed content",
+      "audience": "Selected audience segment and personification",
+      "humanTruths": "Selected human truths"
+    },
+    "outputs": {
+      "markdown": "The complete Pitch Pack as markdown"
+    },
+    "examples": [],
+    "escapeHatch": "If any section is still RED, include placeholder with note about what's needed."
+  }
+}
