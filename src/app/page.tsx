@@ -88,7 +88,6 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   );
 }
 
-// This is a placeholder - will be properly implemented in Task 7
 function SectionStepContent({
   section,
   sectionIndex,
@@ -112,9 +111,91 @@ function SectionStepContent({
   onAcceptSuggestion: () => void;
   onNext: () => void;
 }) {
+  const [additionalInfo, setAdditionalInfo] = useState('');
+
   return (
-    <div className="text-gray-500 text-center py-12">
-      Section step content - to be properly implemented in Task 7
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          Section {sectionIndex + 1}: {section.name}
+        </h2>
+        <StatusBadge status={section.status} />
+      </div>
+
+      {/* Current Content */}
+      <div className="border rounded-lg p-4">
+        <p className="text-sm text-gray-500 mb-2">Current content:</p>
+        <textarea
+          aria-label={`Current content for ${section.name}`}
+          className="w-full min-h-[100px] p-3 bg-gray-50 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={section.content || '(No content found)'}
+          onChange={(e) => onUpdateContent(e.target.value)}
+        />
+        <p className="mt-3 text-sm text-gray-600">{section.feedback}</p>
+      </div>
+
+      {/* Suggestion */}
+      {section.suggestion && (
+        <div className="border border-purple-200 rounded-lg p-4 bg-purple-50">
+          <p className="text-sm text-purple-600 mb-2 font-medium">Suggestion:</p>
+          <textarea
+            aria-label={`AI suggestion for ${section.name}`}
+            className="w-full min-h-[100px] p-3 bg-white rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            value={section.suggestion}
+            onChange={(e) => onUpdateSuggestion(e.target.value)}
+          />
+          <button
+            onClick={onAcceptSuggestion}
+            className="mt-2 px-4 py-2 bg-purple-600 text-white rounded text-sm hover:bg-purple-700"
+          >
+            Accept Suggestion
+          </button>
+        </div>
+      )}
+
+      {/* Add More Info */}
+      {section.status !== 'green' && (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <p className="font-medium mb-2">Do you have any additional info?</p>
+          <textarea
+            aria-label="Additional information for this section"
+            className="w-full h-24 p-3 border rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Add information here..."
+            value={additionalInfo}
+            onChange={(e) => setAdditionalInfo(e.target.value)}
+          />
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => onReassess(additionalInfo)}
+              disabled={loading || !additionalInfo.trim()}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading && <Spinner />}
+              Reassess
+            </button>
+            <button
+              onClick={onGenerate}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 border border-purple-300 text-purple-700 rounded text-sm hover:bg-purple-50"
+            >
+              {loading && <Spinner />}
+              Generate Suggestion
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button
+          onClick={onNext}
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        >
+          {sectionIndex < totalSections - 1 ? 'Confirm & Continue →' : 'Finish →'}
+        </button>
+      </div>
+
+      <ProgressBar current={sectionIndex} total={totalSections} />
     </div>
   );
 }
