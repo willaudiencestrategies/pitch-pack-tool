@@ -26,13 +26,13 @@ export async function POST(request: NextRequest) {
     const userMessage = `Please assess this brief:\n\n${brief}`;
 
     const response = await callClaudeJSON<{
-      synthesizedReplay: Record<string, {
+      synthesizedReplay?: Record<string, {
         content: string;
         contradictions: string[];
         vagueness: string[];
         quotes: string[];
       }>;
-      triageAssessment: Array<{
+      triageAssessment?: Array<{
         key: string;
         status: 'green' | 'amber' | 'red';
         synthesizedContent: string;
@@ -44,13 +44,17 @@ export async function POST(request: NextRequest) {
         realityCheck: string;
         questions: string[];
       }>;
-      overallBriefHealth: string;
+      overallBriefHealth?: string;
     }>(systemPrompt, userMessage, { endpoint: 'triage' });
+
+    // Defensive: ensure we have arrays even if Claude returns unexpected structure
+    const rawSynthesizedReplay = response.synthesizedReplay || {};
+    const rawTriageAssessment = Array.isArray(response.triageAssessment) ? response.triageAssessment : [];
 
     // Ensure all 8 sections are present in synthesizedReplay
     const synthesizedReplay: Record<SectionKey, SynthesizedSection> = {} as Record<SectionKey, SynthesizedSection>;
     for (const key of SECTION_KEYS) {
-      const found = response.synthesizedReplay[key];
+      const found = rawSynthesizedReplay[key];
       synthesizedReplay[key] = {
         content: found?.content || '',
         contradictions: found?.contradictions || [],
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Ensure all 8 sections are present in triageAssessment
     const triageAssessment: TriageSectionResult[] = SECTION_KEYS.map((key) => {
-      const found = response.triageAssessment.find((s) => s.key === key);
+      const found = rawTriageAssessment.find((s) => s.key === key);
       return {
         key,
         status: (found?.status || 'red') as Status,

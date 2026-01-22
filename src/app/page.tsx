@@ -471,16 +471,24 @@ export default function Home() {
 
       const data: EnhancedTriageResponse = await response.json();
 
+      // Defensive: ensure triageAssessment is an array
+      const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
+
       // Transform EnhancedTriageResponse into Section[] for UI
-      const sections: Section[] = data.triageAssessment.map((result) => ({
+      const sections: Section[] = triageAssessment.map((result) => ({
         key: result.key,
-        name: SECTION_CONFIG[result.key].name,
-        status: result.status,
-        content: result.synthesizedContent,
-        feedback: result.whyThisRating + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
-        questions: result.questions,
-        gaps: [...result.contradictions, ...result.vagueness],
+        name: SECTION_CONFIG[result.key]?.name || result.key,
+        status: result.status || 'red',
+        content: result.synthesizedContent || '',
+        feedback: (result.whyThisRating || '') + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
+        questions: result.questions || [],
+        gaps: [...(result.contradictions || []), ...(result.vagueness || [])],
       }));
+
+      // If no sections came back, something went wrong
+      if (sections.length === 0) {
+        throw new Error('No sections returned from triage');
+      }
 
       updateState({
         sections,
