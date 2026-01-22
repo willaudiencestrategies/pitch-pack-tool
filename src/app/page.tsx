@@ -310,9 +310,25 @@ function SectionStepContent({
           onChange={(e) => onUpdateContent(e.target.value)}
         />
         {section.feedback && (
-          <div className="text-sm bg-[var(--bg-secondary)] p-4 rounded-lg border-l-4 border-[var(--expedia-navy)]">
-            <p className="font-medium text-[var(--text-primary)] mb-1">Assessment</p>
-            <p className="text-[var(--text-secondary)]">{section.feedback}</p>
+          <div className={`p-4 rounded-xl border-l-4 ${
+            section.status === 'green'
+              ? 'bg-[var(--status-green)]/10 border-[var(--status-green)]'
+              : section.status === 'amber'
+              ? 'bg-[var(--status-amber)]/10 border-[var(--status-amber)]'
+              : 'bg-[var(--status-red)]/10 border-[var(--status-red)]'
+          }`}>
+            <p className="font-semibold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+              <span className="text-lg">
+                {section.status === 'green' ? '✓' : section.status === 'amber' ? '!' : '✗'}
+              </span>
+              AI Analysis
+            </p>
+            <p className="text-[var(--text-secondary)] leading-relaxed">{section.feedback}</p>
+            {section.status !== 'green' && (
+              <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-current/10">
+                💡 Use the tools below to add more information or generate AI suggestions
+              </p>
+            )}
           </div>
         )}
       </div>
@@ -388,8 +404,6 @@ function SectionStepContent({
           <span>→</span>
         </button>
       </div>
-
-      <ProgressBar current={sectionIndex} total={totalSections} />
     </div>
   );
 }
@@ -525,7 +539,8 @@ export default function Home() {
   };
 
   const handleGenerateAudience = async () => {
-    updateState({ loading: true, error: null });
+    // Update step immediately so progress bar shows Audience during loading
+    updateState({ loading: true, error: null, step: 'audience' });
     setLastAction(() => handleGenerateAudience);
 
     try {
@@ -543,7 +558,6 @@ export default function Home() {
       const data: AudienceResponse = await response.json();
       updateState({
         audienceOptions: data.segments || [],
-        step: 'audience',
         loading: false,
       });
     } catch (err) {
@@ -587,7 +601,8 @@ export default function Home() {
   const handleGenerateTruths = async () => {
     if (!state.selectedAudience) return;
 
-    updateState({ loading: true, error: null });
+    // Update step immediately so progress bar shows Truths during loading
+    updateState({ loading: true, error: null, step: 'truths' });
     setLastAction(() => handleGenerateTruths);
 
     try {
@@ -605,7 +620,6 @@ export default function Home() {
       const data: TruthsResponse = await response.json();
       updateState({
         truthOptions: data.truths,
-        step: 'truths',
         loading: false,
       });
     } catch (err) {
