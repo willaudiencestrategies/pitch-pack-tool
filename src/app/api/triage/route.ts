@@ -3,7 +3,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callClaudeJSON } from '@/lib/claude';
 import { loadPrompt, buildSystemPrompt } from '@/lib/prompts';
-import { TriageResponse, Section, SECTION_KEYS, SECTION_CONFIG } from '@/lib/types';
+import {
+  EnhancedTriageResponse,
+  TriageSectionResult,
+  SynthesizedSection,
+  SectionKey,
+  SECTION_KEYS,
+  Status,
+} from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,31 +26,61 @@ export async function POST(request: NextRequest) {
     const userMessage = `Please assess this brief:\n\n${brief}`;
 
     const response = await callClaudeJSON<{
-      sections: Array<{
+      synthesizedReplay: Record<string, {
+        content: string;
+        contradictions: string[];
+        vagueness: string[];
+        quotes: string[];
+      }>;
+      triageAssessment: Array<{
         key: string;
         status: 'green' | 'amber' | 'red';
-        content: string;
-        feedback: string;
+        synthesizedContent: string;
+        contradictions: string[];
+        vagueness: string[];
+        verbatimQuotes: string[];
+        whyThisRating: string;
+        whatNeeded?: string;
+        realityCheck: string;
+        questions: string[];
       }>;
-      summary: string;
+      overallBriefHealth: string;
     }>(systemPrompt, userMessage, { endpoint: 'triage' });
 
-    // Ensure all 7 sections are present
-    const sections: Section[] = SECTION_KEYS.map((key) => {
-      const found = response.sections.find((s) => s.key === key);
+    // Ensure all 8 sections are present in synthesizedReplay
+    const synthesizedReplay: Record<SectionKey, SynthesizedSection> = {} as Record<SectionKey, SynthesizedSection>;
+    for (const key of SECTION_KEYS) {
+      const found = response.synthesizedReplay[key];
+      synthesizedReplay[key] = {
+        content: found?.content || '',
+        contradictions: found?.contradictions || [],
+        vagueness: found?.vagueness || [],
+        quotes: found?.quotes || [],
+      };
+    }
+
+    // Ensure all 8 sections are present in triageAssessment
+    const triageAssessment: TriageSectionResult[] = SECTION_KEYS.map((key) => {
+      const found = response.triageAssessment.find((s) => s.key === key);
       return {
         key,
-        name: SECTION_CONFIG[key].name,
-        status: found?.status || 'red',
-        content: found?.content || '',
-        feedback: found?.feedback || 'Not assessed',
+        status: (found?.status || 'red') as Status,
+        synthesizedContent: found?.synthesizedContent || '',
+        contradictions: found?.contradictions || [],
+        vagueness: found?.vagueness || [],
+        verbatimQuotes: found?.verbatimQuotes || [],
+        whyThisRating: found?.whyThisRating || 'Not assessed',
+        whatNeeded: found?.whatNeeded,
+        realityCheck: found?.realityCheck || '',
+        questions: found?.questions || [],
       };
     });
 
     return NextResponse.json({
-      sections,
-      summary: response.summary,
-    } as TriageResponse);
+      synthesizedReplay,
+      triageAssessment,
+      overallBriefHealth: response.overallBriefHealth || '',
+    } as EnhancedTriageResponse);
   } catch (error) {
     console.error('Triage error:', error);
     return NextResponse.json(
