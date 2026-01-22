@@ -86,3 +86,25 @@ describe('Audience Prompt', () => {
     expect(system.toLowerCase()).toContain('avoid');
   });
 });
+
+describe('Human Truths Prompt', () => {
+  it('should specify 12 truths', () => {
+    const prompt = loadPrompt('human-truths');
+    const system = buildSystemPrompt(prompt.generate);
+    expect(system).toContain('12');
+  });
+
+  it('should define safer/sharper/bolder zones', () => {
+    const prompt = loadPrompt('human-truths');
+    const system = buildSystemPrompt(prompt.generate);
+    expect(system).toContain('1-4');
+    expect(system).toContain('5-8');
+    expect(system).toContain('9-12');
+  });
+
+  it('should require rhetorical questions', () => {
+    const prompt = loadPrompt('human-truths');
+    const system = buildSystemPrompt(prompt.generate);
+    expect(system.toLowerCase()).toContain('rhetorical');
+  });
+});

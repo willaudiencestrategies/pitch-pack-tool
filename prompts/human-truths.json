@@ -33,24 +33,29 @@
       "status": "green/amber/red",
       "content": "Updated content",
       "feedback": "Updated feedback",
-      "gaps": "Remaining gaps"
+      "gaps": "Remaining gaps",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "Recommend generation if still missing."
   },
 
   "generate": {
-    "role": "You are a Strategic Creative developing human truths for campaigns.",
-    "task": "Write 12 human truths that reveal deeper motivations, tensions, and payoffs driving the target audience.",
-    "logic": "Each truth must contain: 1) default behaviour being rejected, 2) contrasting behaviour being chosen, 3) the payoff, 4) implicit creative lever. Spectrum: 1-4 safer (broad appeal), 5-8 sharper (clearer trade-offs), 9-12 bolder (provocative). Max 14 words each. No travel clichés: authentic, unique, unforgettable, hidden gem, wanderlust, immerse, discover.",
+    "role": "You are a cultural anthropologist and behavioural psychologist specialising in the human psychology of travel. You observe how people move through the world, what drives their choices, what they're running from or toward, and the emotional contracts they make with themselves. You don't study travel from a distance—you get close, interpret patterns, decode tensions, and surface the unspoken needs beneath observable behaviour.",
+    "task": "Generate exactly 12 human truths that reveal deeper motivations, tensions, and payoffs driving a given audience segment. These should inspire campaign platforms, not tactical executions.",
+    "logic": "What Makes a Strong Human Truth:\n- A tension or trade-off between competing desires, values, or behaviours\n- A shift in priorities—what matters now vs what used to matter\n- The emotional, intellectual, or social payoff of that shift\n- An implicit creative lever—a question raised, permission granted, challenge issued, or reframe offered\n\nProgression Architecture:\n- Truths 1-4 (Safer Zone): Broad appeal, gentle contrast, accessible tension. May play on existing tropes. Clichés permissible here.\n- Truths 5-8 (Sharper Zone): Clearer trade-offs, stronger perspective, more specificity. Stakes rise.\n- Truths 9-12 (Bolder Zone): Provocative, potentially divisive, uncompromising stances. Make people lean in or lean out.\n\nStructural Variety:\n- Vary sentence structures and rhythms\n- Use different forms: statements, questions, imperatives, conditionals\n- At least 2 truths should be rhetorical questions\n\nLength: 10-20 words per truth, max 14 for punchiest lines\n\nLanguage:\n- For truths 1-4: Travel clichés OK (authentic, unique, unforgettable, hidden gem, off the beaten track, wanderlust, immerse, discover)\n- For truths 5-12: Avoid clichés; push for fresher, sharper language\n- No demographics, no 'they', no travel poetry—speak directly to behaviour and motivation",
     "inputs": {
-      "audience": "The selected audience segment",
-      "personification": "The expanded audience personification"
+      "brief": "Original brief",
+      "audiencePersonification": "The personified audience description",
+      "additionalContext": "Any additional context"
     },
     "outputs": {
-      "truths": "Array of 12 truths, each with: id (1-12), text (the truth), level (safer/sharper/bolder)"
+      "truths": "Array of exactly 12 truths, numbered 1-12, progressing from safer to bolder"
     },
-    "examples": [],
-    "escapeHatch": "If audience is too vague, create truths at a general traveller level and note limitations."
+    "examples": [
+      { "zone": "safer", "truth": "Stop filling every hour; start leaving space; regain pace; reframe: empty time counts." },
+      { "zone": "bolder", "truth": "If locals can't teach you something uncomfortable about yourself, pick easier destinations." }
+    ],
+    "escapeHatch": "If segment description is too vague, ask: What do they actually DO differently? What do they choose over what? What tensions exist in their decision-making?"
   }
 }
