@@ -154,3 +154,21 @@ export interface OutputRequest {
 export interface OutputResponse {
   markdown: string;
 }
+
+// Four-Option Response Types
+export type OptionLevel = 'lifted' | 'light' | 'inspired' | 'ruthless';
+
+export interface SectionOption {
+  level: OptionLevel;
+  content: string;
+  reasoning: string;
+  watchFor: string;
+  whenToChoose: string;
+}
+
+export interface SectionOptionsResponse {
+  currentState: string;
+  alignmentCheck?: string;
+  options: SectionOption[];
+  questions?: string[];
+}
