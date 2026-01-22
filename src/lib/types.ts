@@ -5,6 +5,7 @@ export type Status = 'green' | 'amber' | 'red';
 export type Step = 'upload' | 'triage' | 'context' | 'sections' | 'audience' | 'truths' | 'output';
 
 export type SectionKey =
+  | 'budget'
   | 'objective'
   | 'creative_task'
   | 'audience'
@@ -14,6 +15,7 @@ export type SectionKey =
   | 'research_stimuli';
 
 export const SECTION_CONFIG: Record<SectionKey, { name: string; order: number }> = {
+  budget: { name: 'Budget', order: 0 },
   objective: { name: 'Objective', order: 1 },
   creative_task: { name: 'Creative Task', order: 2 },
   audience: { name: 'Audience', order: 3 },
@@ -24,6 +26,7 @@ export const SECTION_CONFIG: Record<SectionKey, { name: string; order: number }>
 };
 
 export const SECTION_KEYS: SectionKey[] = [
+  'budget',
   'objective',
   'creative_task',
   'audience',
@@ -41,6 +44,7 @@ export interface Section {
   feedback: string;
   suggestion?: string;
   gaps?: string[];
+  questions?: string[];
 }
 
 export interface Segment {
