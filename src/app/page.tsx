@@ -9,7 +9,7 @@ import {
   Truth,
   Status,
   createInitialState,
-  TriageResponse,
+  EnhancedTriageResponse,
   SectionResponse,
   TruthsResponse,
   OutputResponse,
@@ -18,6 +18,7 @@ import {
   PersonificationResponse,
   OptionLevel,
   SectionOptionsResponse,
+  SECTION_CONFIG,
 } from '@/lib/types';
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
@@ -468,9 +469,22 @@ export default function Home() {
 
       if (!response.ok) throw new Error('Failed to assess brief');
 
-      const data: TriageResponse = await response.json();
+      const data: EnhancedTriageResponse = await response.json();
+
+      // Transform EnhancedTriageResponse into Section[] for UI
+      const sections: Section[] = data.triageAssessment.map((result) => ({
+        key: result.key,
+        name: SECTION_CONFIG[result.key].name,
+        status: result.status,
+        content: result.synthesizedContent,
+        feedback: result.whyThisRating + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
+        questions: result.questions,
+        gaps: [...result.contradictions, ...result.vagueness],
+      }));
+
       updateState({
-        sections: data.sections,
+        sections,
+        triageResult: data,
         step: 'triage',
         loading: false,
       });
