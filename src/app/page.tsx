@@ -179,6 +179,86 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   );
 }
 
+// Global progress indicator that shows at top of page
+function GlobalProgressBar({
+  step,
+  sectionIndex,
+  totalSections,
+  sections
+}: {
+  step: string;
+  sectionIndex: number;
+  totalSections: number;
+  sections: Section[];
+}) {
+  const steps = [
+    { key: 'upload', label: 'Upload' },
+    { key: 'triage', label: 'Triage' },
+    { key: 'sections', label: 'Sections' },
+    { key: 'audience', label: 'Audience' },
+    { key: 'truths', label: 'Truths' },
+    { key: 'output', label: 'Output' },
+  ];
+
+  const currentStepIndex = steps.findIndex(s => s.key === step);
+
+  return (
+    <div className="bg-white border-b border-[var(--border-color)] sticky top-0 z-50">
+      <div className="max-w-4xl mx-auto px-6 py-3">
+        <div className="flex items-center gap-2">
+          {steps.map((s, i) => {
+            const isCompleted = i < currentStepIndex;
+            const isCurrent = i === currentStepIndex;
+
+            return (
+              <div key={s.key} className="flex items-center">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  isCompleted
+                    ? 'bg-[var(--status-green)] text-white'
+                    : isCurrent
+                    ? 'bg-[var(--expedia-navy)] text-white'
+                    : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
+                }`}>
+                  {isCompleted && <span>✓</span>}
+                  {s.label}
+                  {s.key === 'sections' && isCurrent && (
+                    <span className="opacity-70">({sectionIndex + 1}/{totalSections})</span>
+                  )}
+                </div>
+                {i < steps.length - 1 && (
+                  <div className={`w-4 h-0.5 mx-1 ${
+                    i < currentStepIndex ? 'bg-[var(--status-green)]' : 'bg-[var(--border-color)]'
+                  }`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Section sub-progress when in sections step */}
+        {step === 'sections' && sections.length > 0 && (
+          <div className="flex gap-1 mt-2">
+            {sections.map((section, i) => (
+              <div
+                key={section.key}
+                className={`h-1 flex-1 rounded-full transition-colors ${
+                  i < sectionIndex
+                    ? section.status === 'green' ? 'bg-[var(--status-green)]' :
+                      section.status === 'amber' ? 'bg-[var(--status-amber)]' : 'bg-[var(--status-red)]'
+                    : i === sectionIndex
+                    ? 'bg-[var(--expedia-navy)]'
+                    : 'bg-[var(--border-color)]'
+                }`}
+                title={section.name}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SectionStepContent({
   section,
   sectionIndex,
@@ -225,70 +305,81 @@ function SectionStepContent({
         <textarea
           aria-label={`Current content for ${section.name}`}
           className="textarea-field"
-          style={{ minHeight: '140px' }}
+          style={{ minHeight: '180px' }}
           value={section.content || '(No content found in brief)'}
           onChange={(e) => onUpdateContent(e.target.value)}
         />
         {section.feedback && (
-          <p className="text-sm text-[var(--text-secondary)] bg-[var(--bg-secondary)] p-3 rounded-lg">
-            {section.feedback}
-          </p>
+          <div className="text-sm bg-[var(--bg-secondary)] p-4 rounded-lg border-l-4 border-[var(--expedia-navy)]">
+            <p className="font-medium text-[var(--text-primary)] mb-1">Assessment</p>
+            <p className="text-[var(--text-secondary)]">{section.feedback}</p>
+          </div>
         )}
       </div>
 
       {/* AI Suggestion */}
       {section.suggestion && (
-        <div className="space-y-3 p-4 rounded-xl bg-[var(--expedia-navy)]/5 border border-[var(--expedia-navy)]/20">
+        <div className="space-y-3 p-5 rounded-xl bg-[var(--expedia-navy)]/5 border border-[var(--expedia-navy)]/20">
           <label className="block text-sm font-medium text-[var(--expedia-navy)]">
             AI Suggestion
           </label>
           <textarea
             aria-label={`AI suggestion for ${section.name}`}
             className="textarea-field border-[var(--expedia-navy)]/30"
-            style={{ minHeight: '140px' }}
+            style={{ minHeight: '180px' }}
             value={section.suggestion}
             onChange={(e) => onUpdateSuggestion(e.target.value)}
           />
-          <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-4 py-2">
-            Accept Suggestion
-          </button>
-        </div>
-      )}
-
-      {/* Additional Info (for non-green sections) */}
-      {section.status !== 'green' && (
-        <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
-          <label className="block text-sm font-medium text-[var(--text-secondary)]">
-            Do you have any additional information?
-          </label>
-          <textarea
-            aria-label="Additional information for this section"
-            className="textarea-field"
-            style={{ minHeight: '100px' }}
-            placeholder="Add any extra context, notes, or information that might help..."
-            value={additionalInfo}
-            onChange={(e) => setAdditionalInfo(e.target.value)}
-          />
           <div className="flex gap-3">
-            <button
-              onClick={() => onReassess(additionalInfo)}
-              disabled={loading || !additionalInfo.trim()}
-              className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
-            >
-              {loading && <Spinner className="text-white" />}
-              Re-assess with Info
+            <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-4 py-2">
+              Accept Suggestion
             </button>
             <button
-              onClick={onGenerate}
-              disabled={loading}
-              className="btn-outline text-sm px-4 py-2 flex items-center gap-2"
+              onClick={() => onUpdateSuggestion('')}
+              className="btn-outline text-sm px-4 py-2"
             >
-              {loading && <Spinner />}
-              Generate Suggestion
+              Dismiss
             </button>
           </div>
         </div>
       )}
+
+      {/* AI Tools - available for ALL sections including green */}
+      <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
+        <label className="block text-sm font-medium text-[var(--text-secondary)]">
+          {section.status === 'green'
+            ? 'Want to improve this section further?'
+            : 'Do you have any additional information?'}
+        </label>
+        <textarea
+          aria-label="Additional information for this section"
+          className="textarea-field"
+          style={{ minHeight: '120px' }}
+          placeholder={section.status === 'green'
+            ? "Add context or notes if you'd like AI to suggest improvements..."
+            : "Add any extra context, notes, or information that might help..."}
+          value={additionalInfo}
+          onChange={(e) => setAdditionalInfo(e.target.value)}
+        />
+        <div className="flex gap-3 flex-wrap">
+          <button
+            onClick={() => onReassess(additionalInfo)}
+            disabled={loading || !additionalInfo.trim()}
+            className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
+          >
+            {loading && <Spinner className="text-white" />}
+            Re-assess with Info
+          </button>
+          <button
+            onClick={onGenerate}
+            disabled={loading}
+            className="btn-outline text-sm px-4 py-2 flex items-center gap-2"
+          >
+            {loading && <Spinner />}
+            {section.status === 'green' ? 'Get AI Suggestions' : 'Generate Suggestion'}
+          </button>
+        </div>
+      </div>
 
       {/* Continue Button */}
       <div className="pt-4">
@@ -669,7 +760,7 @@ export default function Home() {
           <textarea
             aria-label="Paste your brief content here"
             className="textarea-field font-mono text-sm"
-            style={{ minHeight: '280px' }}
+            style={{ minHeight: '350px' }}
             placeholder="Paste the full brief content here..."
             value={state.brief}
             onChange={(e) => updateState({ brief: e.target.value })}
@@ -687,62 +778,105 @@ export default function Home() {
     );
   };
 
-  const renderTriageStep = () => (
-    <div className="space-y-6">
-      <div className="text-center pb-6 border-b border-[var(--border-color)]">
-        <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-          Initial Assessment
-        </h2>
-        <p className="text-[var(--text-secondary)]">
-          Here's my review of your brief across the 7 Pitch Pack sections.
-        </p>
-      </div>
+  const renderTriageStep = () => {
+    // Calculate recommendation based on section statuses
+    const redSections = state.sections.filter(s => s.status === 'red');
+    const amberSections = state.sections.filter(s => s.status === 'amber');
+    const greenSections = state.sections.filter(s => s.status === 'green');
 
-      <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
-        {state.sections.map((section, index) => (
-          <div
-            key={section.key}
-            className={`flex items-center justify-between p-4 ${
-              index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-medium text-[var(--text-muted)]">
-                {index + 1}
-              </span>
-              <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
+    let recommendation = '';
+    let recommendationPriority: 'red' | 'amber' | 'green' = 'green';
+
+    if (redSections.length > 0) {
+      recommendationPriority = 'red';
+      if (redSections.length === 1) {
+        recommendation = `Critical gap: ${redSections[0].name} is missing. ${redSections[0].feedback || 'This section needs content before proceeding.'}`;
+      } else {
+        recommendation = `Critical gaps in ${redSections.length} sections: ${redSections.map(s => s.name).join(', ')}. Consider gathering more information on these before continuing.`;
+      }
+    } else if (amberSections.length > 0) {
+      recommendationPriority = 'amber';
+      recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map(s => s.name).join(', ')}. Adding more detail will strengthen your Pitch Pack.`;
+    } else {
+      recommendationPriority = 'green';
+      recommendation = `Your brief covers all sections well. You can still refine each section as you go through.`;
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Initial Assessment
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            Here's my review of your brief across the 7 Pitch Pack sections.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
+          {state.sections.map((section, index) => (
+            <div
+              key={section.key}
+              className={`flex items-center justify-between p-4 ${
+                index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-medium text-[var(--text-muted)]">
+                  {index + 1}
+                </span>
+                <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
+              </div>
+              <StatusBadge status={section.status} />
             </div>
-            <StatusBadge status={section.status} />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      <div className="p-4 rounded-xl bg-[var(--bg-secondary)]">
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-          Before we go section by section...
-        </label>
-        <p className="text-sm text-[var(--text-muted)] mb-3">
-          Do you have any additional context? (Other documents, website content, client notes)
-        </p>
-        <textarea
-          aria-label="Additional context for the brief"
-          className="textarea-field"
-          style={{ minHeight: '100px' }}
-          placeholder="Paste any additional context here (optional)..."
-          value={state.additionalContext}
-          onChange={(e) => updateState({ additionalContext: e.target.value })}
-        />
-      </div>
+        {/* Recommendation Summary */}
+        <div className={`p-4 rounded-xl border-l-4 ${
+          recommendationPriority === 'red'
+            ? 'bg-[var(--status-red-bg)] border-[var(--status-red)]'
+            : recommendationPriority === 'amber'
+            ? 'bg-[var(--status-amber)]/10 border-[var(--status-amber)]'
+            : 'bg-[var(--status-green)]/10 border-[var(--status-green)]'
+        }`}>
+          <p className="font-medium text-[var(--text-primary)] mb-1">
+            {recommendationPriority === 'red' ? '⚠️ Recommendation' :
+             recommendationPriority === 'amber' ? '💡 Recommendation' : '✓ Looking Good'}
+          </p>
+          <p className="text-sm text-[var(--text-secondary)]">{recommendation}</p>
+          <p className="text-xs text-[var(--text-muted)] mt-2">
+            {greenSections.length} good · {amberSections.length} needs work · {redSections.length} missing
+          </p>
+        </div>
 
-      <button
-        onClick={() => updateState({ step: 'sections', currentSectionIndex: 0 })}
-        className="btn-secondary flex items-center gap-2 w-full justify-center"
-      >
-        Continue to Sections
-        <span>→</span>
-      </button>
-    </div>
-  );
+        <div className="p-5 rounded-xl bg-[var(--bg-secondary)]">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+            Before we go section by section...
+          </label>
+          <p className="text-sm text-[var(--text-muted)] mb-3">
+            Do you have any additional context? (Other documents, website content, client notes)
+          </p>
+          <textarea
+            aria-label="Additional context for the brief"
+            className="textarea-field"
+            style={{ minHeight: '140px' }}
+            placeholder="Paste any additional context here (optional)..."
+            value={state.additionalContext}
+            onChange={(e) => updateState({ additionalContext: e.target.value })}
+          />
+        </div>
+
+        <button
+          onClick={() => updateState({ step: 'sections', currentSectionIndex: 0 })}
+          className="btn-secondary flex items-center gap-2 w-full justify-center"
+        >
+          Continue to Sections
+          <span>→</span>
+        </button>
+      </div>
+    );
+  };
 
   const renderSectionStep = () => {
     const section = state.sections[state.currentSectionIndex];
@@ -814,7 +948,7 @@ export default function Home() {
             <textarea
               aria-label="Audience personification"
               className="textarea-field"
-              style={{ minHeight: '240px' }}
+              style={{ minHeight: '300px' }}
               value={state.personification}
               onChange={(e) => updateState({ personification: e.target.value })}
             />
@@ -1142,13 +1276,18 @@ export default function Home() {
               <p className="text-xs text-white/70">E Studio Brief Improvement</p>
             </div>
           </div>
-          <div className="text-sm text-white/70">
-            {state.step !== 'upload' && (
-              <span className="capitalize">{state.step.replace('_', ' ')}</span>
-            )}
-          </div>
         </div>
       </header>
+
+      {/* Global Progress Bar - always visible after upload */}
+      {state.step !== 'upload' && (
+        <GlobalProgressBar
+          step={state.step}
+          sectionIndex={state.currentSectionIndex}
+          totalSections={state.sections.length}
+          sections={state.sections}
+        />
+      )}
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">
