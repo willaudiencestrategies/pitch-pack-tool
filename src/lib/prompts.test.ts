@@ -15,3 +15,26 @@ describe('Prompt Loading', () => {
     expect(system).toContain('pressure-tests');
   });
 });
+
+describe('Triage Prompt', () => {
+  it('should have multi-persona role', () => {
+    const prompt = loadPrompt('triage');
+    expect(prompt.assess.role).toContain('Strategic Planner');
+    expect(prompt.assess.role).toContain('Creative Strategist');
+    expect(prompt.assess.role).toContain('Brief Architect');
+    expect(prompt.assess.role).toContain('Behavioral Psychologist');
+    expect(prompt.assess.role).toContain('Budget Realist');
+  });
+
+  it('should include preserve chaos principle', () => {
+    const prompt = loadPrompt('triage');
+    const system = buildSystemPrompt(prompt.assess);
+    expect(system.toLowerCase()).toContain('preserve');
+    expect(system.toLowerCase()).toContain('chaos');
+  });
+
+  it('should assess 8 sections including budget', () => {
+    const prompt = loadPrompt('triage');
+    expect(prompt.assess.outputs.sections).toContain('budget');
+  });
+});
