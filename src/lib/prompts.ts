@@ -19,6 +19,7 @@ export interface SectionPrompts {
   assess: PromptConfig;
   reassess: PromptConfig;
   generate: PromptConfig;
+  personify?: PromptConfig;  // Only used by audience prompt (two-step flow)
 }
 
 export function loadPrompt(promptName: string): SectionPrompts {

@@ -3,72 +3,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callClaudeJSON } from '@/lib/claude';
 import { loadPrompt, buildSystemPrompt } from '@/lib/prompts';
-import { AudienceRequest, AudienceResponse, Segment } from '@/lib/types';
+import { AudienceSegmentMenu, PersonificationResponse, AudienceSegment } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: AudienceRequest = await request.json();
-    if (!body.brief) {
-      return NextResponse.json({ error: 'brief is required' }, { status: 400 });
+    const { brief, additionalContext, selectedSegment } = await request.json();
+
+    if (!brief) {
+      return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
     }
-    const { brief, additionalContext, selectedSegment } = body;
 
     const promptConfig = loadPrompt('audience');
 
     if (selectedSegment) {
-      // Personification step
-      const systemPrompt = `You are a Strategic Planner creating a detailed audience personification.
+      // Step 2: Personify the selected segment
+      if (!promptConfig.personify) {
+        return NextResponse.json(
+          { error: 'Personify prompt not configured' },
+          { status: 500 }
+        );
+      }
+      const systemPrompt = buildSystemPrompt(promptConfig.personify);
 
-Expand the selected audience segment into a vivid, human sketch. Include:
-- The type of traveller they are
-- What they're trying to feel and get out of the experience
-- Who they're travelling with
-- What they prioritise and trade off
-- What earns their trust
-- What triggers scepticism
-- The story they want to be able to tell afterwards
+      const userMessage = `Brief:\n${brief}\n\nSelected segment:\nName: ${selectedSegment.name}\nNeeds & Values: ${selectedSegment.needsValues}\nDemographics: ${selectedSegment.demographics}\n\nPlease personify this segment.`;
 
-NOT an individual persona with dry profile ('Julie, 37, accountant').
-A vivid TYPE of person - feel like you could meet them.
-
-Respond with JSON: { "personification": "the detailed personification text" }`;
-
-      const userMessage = `Segment to expand:
-Name: ${selectedSegment.name}
-Description: ${selectedSegment.description}
-Demographics: ${selectedSegment.demographics}
-
-Brief context:
-${brief}
-
-Additional context:
-${additionalContext || 'None'}`;
-
-      const response = await callClaudeJSON<{ personification: string }>(
+      const response = await callClaudeJSON<PersonificationResponse>(
         systemPrompt,
         userMessage,
         { endpoint: 'audience:personify' }
       );
 
-      return NextResponse.json({ personification: response.personification });
+      return NextResponse.json(response);
     } else {
-      // Generate 5 segments
+      // Step 1: Generate segment menu
       const systemPrompt = buildSystemPrompt(promptConfig.generate);
 
-      const userMessage = `Brief:\n${brief}\n\nAdditional context:\n${additionalContext || 'None'}\n\nGenerate 5 audience segments.`;
+      let userMessage = `Brief:\n${brief}\n\n`;
+      if (additionalContext) {
+        userMessage += `Additional context:\n${additionalContext}\n\n`;
+      }
+      userMessage += `Please generate 5 audience segments.`;
 
-      const response = await callClaudeJSON<{ segments: Segment[] }>(
+      const response = await callClaudeJSON<AudienceSegmentMenu>(
         systemPrompt,
         userMessage,
         { endpoint: 'audience:generate' }
       );
 
-      return NextResponse.json({ segments: response.segments });
+      return NextResponse.json(response);
     }
   } catch (error) {
     console.error('Audience generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate audience' },
+      { error: 'Failed to process audience' },
       { status: 500 }
     );
   }
