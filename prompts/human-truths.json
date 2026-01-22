@@ -50,7 +50,8 @@
       "additionalContext": "Any additional context"
     },
     "outputs": {
-      "truths": "Array of exactly 12 truths, numbered 1-12, progressing from safer to bolder"
+      "format": "JSON object with a 'truths' array containing exactly 12 string elements",
+      "truths": "Array of exactly 12 truth strings (NOT numbered - just the text), progressing from safer (index 0-3) to sharper (index 4-7) to bolder (index 8-11)"
     },
     "examples": [
       { "zone": "safer", "truth": "Stop filling every hour; start leaving space; regain pace; reframe: empty time counts." },

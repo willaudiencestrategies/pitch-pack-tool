@@ -26,13 +26,34 @@ ${personification}
 
 Generate 12 human truths.`;
 
-    const response = await callClaudeJSON<{ truths: Truth[] }>(
+    const response = await callClaudeJSON<{ truths: string[] }>(
       systemPrompt,
       userMessage,
       { endpoint: 'truths:generate' }
     );
 
-    return NextResponse.json({ truths: response.truths } as TruthsResponse);
+    // Transform string array into Truth objects with id and level
+    const rawTruths = Array.isArray(response.truths) ? response.truths : [];
+    const truths: Truth[] = rawTruths.map((text, index) => {
+      // Clean up any numbered prefixes Claude might add (e.g., "1. ", "1) ")
+      const cleanText = typeof text === 'string'
+        ? text.replace(/^\d+[\.\)]\s*/, '').trim()
+        : String(text);
+
+      // Determine level based on position: 0-3 safer, 4-7 sharper, 8-11 bolder
+      let level: 'safer' | 'sharper' | 'bolder';
+      if (index < 4) level = 'safer';
+      else if (index < 8) level = 'sharper';
+      else level = 'bolder';
+
+      return {
+        id: index + 1,
+        text: cleanText,
+        level,
+      };
+    });
+
+    return NextResponse.json({ truths } as TruthsResponse);
   } catch (error) {
     console.error('Truths generation error:', error);
     return NextResponse.json(
