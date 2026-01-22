@@ -6,16 +6,22 @@ import { useState } from 'react';
 import {
   SessionState,
   Section,
-  Segment,
   Truth,
   Status,
   createInitialState,
   TriageResponse,
   SectionResponse,
-  AudienceResponse,
   TruthsResponse,
   OutputResponse,
+  AudienceSegment,
+  AudienceSegmentMenu,
+  PersonificationResponse,
+  OptionLevel,
+  SectionOptionsResponse,
 } from '@/lib/types';
+import { SectionOptions } from '@/components/SectionOptions';
+import { AudienceMenu } from '@/components/AudienceMenu';
+import { PersonificationReview } from '@/components/PersonificationReview';
 
 // ============================================
 // Helper Components
@@ -194,6 +200,7 @@ function GlobalProgressBar({
   const steps = [
     { key: 'upload', label: 'Upload' },
     { key: 'triage', label: 'Triage' },
+    { key: 'budget', label: 'Budget' },
     { key: 'sections', label: 'Sections' },
     { key: 'audience', label: 'Audience' },
     { key: 'truths', label: 'Truths' },
@@ -324,9 +331,27 @@ function SectionStepContent({
               AI Analysis
             </p>
             <p className="text-[var(--text-secondary)] leading-relaxed">{section.feedback}</p>
+
+            {/* Questions to help improve the section */}
+            {section.questions && section.questions.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-current/10">
+                <p className="font-medium text-[var(--text-primary)] text-sm mb-2">
+                  Questions to help improve this section:
+                </p>
+                <ul className="space-y-1.5">
+                  {section.questions.map((question, idx) => (
+                    <li key={idx} className="text-sm text-[var(--text-secondary)] flex items-start gap-2">
+                      <span className="text-[var(--text-muted)]">•</span>
+                      <span>{question}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {section.status !== 'green' && (
               <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-current/10">
-                💡 Use the tools below to add more information or generate AI suggestions
+                💡 Answer the questions above in the text box below, then click "Re-assess with Info"
               </p>
             )}
           </div>
@@ -486,6 +511,7 @@ export default function Home() {
         content: data.content,
         feedback: data.feedback,
         suggestion: data.suggestion,
+        questions: data.questions,
       };
 
       updateState({
@@ -555,9 +581,9 @@ export default function Home() {
 
       if (!response.ok) throw new Error('Failed to generate audience options');
 
-      const data: AudienceResponse = await response.json();
+      const data: AudienceSegmentMenu = await response.json();
       updateState({
-        audienceOptions: data.segments || [],
+        audienceMenu: data,
         loading: false,
       });
     } catch (err) {
@@ -568,8 +594,8 @@ export default function Home() {
     }
   };
 
-  const handleSelectAudience = async (segment: Segment) => {
-    updateState({ loading: true, error: null, selectedAudience: segment });
+  const handleSelectAudience = async (segment: AudienceSegment) => {
+    updateState({ loading: true, error: null, selectedAudienceSegment: segment });
     setLastAction(() => () => handleSelectAudience(segment));
 
     try {
@@ -585,9 +611,9 @@ export default function Home() {
 
       if (!response.ok) throw new Error('Failed to personify audience');
 
-      const data: AudienceResponse = await response.json();
+      const data: PersonificationResponse = await response.json();
       updateState({
-        personification: data.personification || '',
+        personification: data,
         loading: false,
       });
     } catch (err) {
@@ -599,7 +625,7 @@ export default function Home() {
   };
 
   const handleGenerateTruths = async () => {
-    if (!state.selectedAudience) return;
+    if (!state.selectedAudienceSegment || !state.personification) return;
 
     // Update step immediately so progress bar shows Truths during loading
     updateState({ loading: true, error: null, step: 'truths' });
@@ -610,8 +636,8 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          audience: state.selectedAudience,
-          personification: state.personification,
+          audience: state.selectedAudienceSegment,
+          personification: state.personification.narrative,
         }),
       });
 
@@ -640,8 +666,8 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sections: state.sections,
-          audience: state.selectedAudience,
-          personification: state.personification,
+          audience: state.selectedAudienceSegment,
+          personification: state.personification?.narrative || '',
           selectedTruths: state.selectedTruths,
         }),
       });
@@ -691,7 +717,7 @@ export default function Home() {
 
     // Check if we need to go to audience generation
     const currentSection = state.sections[state.currentSectionIndex];
-    if (currentSection.key === 'audience' && state.audienceOptions.length === 0) {
+    if (currentSection.key === 'audience' && !state.audienceMenu) {
       handleGenerateAudience();
       return;
     }
@@ -823,7 +849,7 @@ export default function Home() {
             Initial Assessment
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Here's my review of your brief across the 7 Pitch Pack sections.
+            Here's my review of your brief across the 8 Pitch Pack sections.
           </p>
         </div>
 
@@ -913,8 +939,8 @@ export default function Home() {
   };
 
   const renderAudienceStep = () => {
-    // Loading state for audience generation or personification
-    if (state.loading && state.audienceOptions.length === 0) {
+    // Loading state for audience generation
+    if (state.loading && !state.audienceMenu) {
       return (
         <LoadingOverlay
           message="Generating audience segments..."
@@ -923,15 +949,17 @@ export default function Home() {
       );
     }
 
-    if (state.loading && state.selectedAudience && !state.personification) {
+    // Loading state for personification
+    if (state.loading && state.selectedAudienceSegment && !state.personification) {
       return (
         <LoadingOverlay
-          message={`Developing ${state.selectedAudience.name}...`}
+          message={`Developing ${state.selectedAudienceSegment.name}...`}
           subMessage="Creating a rich personification of this audience segment"
         />
       );
     }
 
+    // Loading state for truths generation
     if (state.loading && state.personification) {
       return (
         <LoadingOverlay
@@ -941,99 +969,51 @@ export default function Home() {
       );
     }
 
-    if (state.selectedAudience && state.personification) {
-      // Personification review
+    // Personification review using new component
+    if (state.selectedAudienceSegment && state.personification) {
+      return (
+        <PersonificationReview
+          segment={state.selectedAudienceSegment}
+          personification={state.personification}
+          onConfirm={(editedNarrative) => {
+            // Update personification with edited narrative
+            updateState({
+              personification: { ...state.personification!, narrative: editedNarrative },
+            });
+            handleGenerateTruths();
+          }}
+          onBack={() => updateState({ selectedAudienceSegment: null, personification: null })}
+          loading={state.loading}
+        />
+      );
+    }
+
+    // Segment selection using new component
+    if (state.audienceMenu) {
       return (
         <div className="space-y-6">
-          <div className="text-center pb-6 border-b border-[var(--border-color)]">
-            <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-              Review Audience Profile
-            </h2>
-            <p className="text-[var(--text-secondary)]">
-              Here's the expanded profile for{' '}
-              <strong className="text-[var(--expedia-navy)]">{state.selectedAudience.name}</strong>
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-[var(--text-secondary)]">
-              Audience Personification
-            </label>
-            <textarea
-              aria-label="Audience personification"
-              className="textarea-field"
-              style={{ minHeight: '300px' }}
-              value={state.personification}
-              onChange={(e) => updateState({ personification: e.target.value })}
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleGenerateTruths}
-              className="btn-secondary flex items-center gap-2"
-            >
-              Confirm & Generate Human Truths
-              <span>→</span>
-            </button>
-            <button
-              onClick={() => updateState({ selectedAudience: null, personification: '' })}
-              className="btn-outline"
-            >
-              ← Back
-            </button>
-          </div>
+          <AudienceMenu
+            menu={state.audienceMenu}
+            onSelect={handleSelectAudience}
+            loading={state.loading}
+          />
+          <button
+            onClick={handleGenerateAudience}
+            disabled={state.loading}
+            className="btn-outline text-sm"
+          >
+            Regenerate Options
+          </button>
         </div>
       );
     }
 
-    // Segment selection
+    // Fallback - shouldn't reach here
     return (
-      <div className="space-y-6">
-        <div className="text-center pb-6 border-b border-[var(--border-color)]">
-          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Choose Your Audience
-          </h2>
-          <p className="text-[var(--text-secondary)]">
-            Based on your brief, here are 5 potential audience segments. Click one to develop
-            further.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {state.audienceOptions.map((segment) => (
-            <div
-              key={segment.id}
-              className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--expedia-navy)] hover:shadow-md cursor-pointer transition-all group"
-              onClick={() => handleSelectAudience(segment)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleSelectAudience(segment);
-                }
-              }}
-              role="button"
-              tabIndex={0}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg text-[var(--expedia-navy)] group-hover:underline">
-                  {segment.name}
-                </h3>
-              </div>
-              <p className="text-[var(--text-primary)] mb-2">{segment.description}</p>
-              <p className="text-sm text-[var(--text-muted)]">{segment.demographics}</p>
-            </div>
-          ))}
-        </div>
-
-        <button
-          onClick={handleGenerateAudience}
-          disabled={state.loading}
-          className="btn-outline text-sm"
-        >
-          Regenerate Options
-        </button>
-      </div>
+      <LoadingOverlay
+        message="Preparing audience step..."
+        subMessage="Loading audience generation"
+      />
     );
   };
 
@@ -1169,11 +1149,11 @@ export default function Home() {
                 }
                 // Also update audience section
                 const audienceIndex = updatedSections.findIndex((s) => s.key === 'audience');
-                if (audienceIndex >= 0 && state.selectedAudience) {
+                if (audienceIndex >= 0 && state.selectedAudienceSegment) {
                   updatedSections[audienceIndex] = {
                     ...updatedSections[audienceIndex],
                     status: 'green',
-                    content: `**${state.selectedAudience.name}**\n\n${state.selectedAudience.description}\n\n${state.personification}`,
+                    content: `**${state.selectedAudienceSegment.name}**\n\n${state.selectedAudienceSegment.needsValues}\n\n${state.personification?.narrative || ''}`,
                   };
                 }
                 updateState({
