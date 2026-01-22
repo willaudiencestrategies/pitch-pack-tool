@@ -9,6 +9,10 @@ import {
   AudienceSegment,
   AudienceSegmentMenu,
   PersonificationResponse,
+  SynthesizedSection,
+  TriageSectionResult,
+  EnhancedTriageResponse,
+  Status,
 } from './types';
 
 describe('Section Configuration', () => {
@@ -83,5 +87,52 @@ describe('Two-Step Audience Types', () => {
       narrative: 'Rich 150-300 word description...',
     };
     expect(response.narrative).toBeDefined();
+  });
+});
+
+describe('Enhanced Triage Types', () => {
+  it('should have SynthesizedSection with required fields', () => {
+    const section: SynthesizedSection = {
+      content: 'What the brief says...',
+      contradictions: ['Contradiction 1'],
+      vagueness: ['Vague point 1'],
+      quotes: ['Quote 1'],
+    };
+    expect(section.contradictions.length).toBe(1);
+  });
+
+  it('should have TriageSectionResult with all required fields', () => {
+    const result: TriageSectionResult = {
+      key: 'objective',
+      status: 'amber',
+      synthesizedContent: 'What the brief says...',
+      contradictions: ['Contradiction 1'],
+      vagueness: ['Vague point 1'],
+      verbatimQuotes: ['Quote 1'],
+      whyThisRating: 'Specific rationale',
+      whatNeeded: 'What would improve',
+      realityCheck: 'Assessment of impact',
+      questions: ['Question 1'],
+    };
+    expect(result.whyThisRating).toBeDefined();
+  });
+
+  it('should have EnhancedTriageResponse with replay and assessment', () => {
+    const emptySection: SynthesizedSection = { content: '', contradictions: [], vagueness: [], quotes: [] };
+    const response: EnhancedTriageResponse = {
+      synthesizedReplay: {
+        budget: emptySection,
+        objective: emptySection,
+        creative_task: emptySection,
+        audience: emptySection,
+        human_truths: emptySection,
+        creative_tenets: emptySection,
+        media_strategy: emptySection,
+        research_stimuli: emptySection,
+      },
+      triageAssessment: [],
+      overallBriefHealth: 'Summary...',
+    };
+    expect(response.overallBriefHealth).toBeDefined();
   });
 });

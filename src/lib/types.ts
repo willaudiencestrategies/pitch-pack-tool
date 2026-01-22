@@ -190,3 +190,30 @@ export interface SectionOptionsResponse {
   options: SectionOption[];
   questions?: string[];
 }
+
+// Enhanced Triage Response Types
+export interface SynthesizedSection {
+  content: string;
+  contradictions: string[];
+  vagueness: string[];
+  quotes: string[];
+}
+
+export interface TriageSectionResult {
+  key: SectionKey;
+  status: Status;
+  synthesizedContent: string;
+  contradictions: string[];
+  vagueness: string[];
+  verbatimQuotes: string[];
+  whyThisRating: string;
+  whatNeeded?: string;
+  realityCheck: string;
+  questions: string[];
+}
+
+export interface EnhancedTriageResponse {
+  synthesizedReplay: Record<SectionKey, SynthesizedSection>;
+  triageAssessment: TriageSectionResult[];
+  overallBriefHealth: string;
+}
