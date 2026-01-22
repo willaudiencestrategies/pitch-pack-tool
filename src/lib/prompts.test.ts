@@ -108,3 +108,14 @@ describe('Human Truths Prompt', () => {
     expect(system.toLowerCase()).toContain('rhetorical');
   });
 });
+
+describe('Section Builder Prompts', () => {
+  const sectionBuilders = ['creative-tenets', 'media-strategy', 'research-stimuli'];
+
+  sectionBuilders.forEach((section) => {
+    it(`${section} should have four-option generate output`, () => {
+      const prompt = loadPrompt(section);
+      expect(prompt.generate.outputs.options).toBeDefined();
+    });
+  });
+});

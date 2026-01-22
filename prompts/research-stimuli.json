@@ -33,28 +33,29 @@
       "status": "green/amber/red",
       "content": "Updated content",
       "feedback": "Updated feedback",
-      "gaps": "Remaining gaps"
+      "gaps": "Remaining gaps",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "Note what research would strengthen the brief."
   },
 
   "generate": {
-    "role": "You are a Research Specialist.",
-    "task": "Suggest what research or stimuli would strengthen this brief.",
-    "logic": "Recommend specific types of research, competitor examples to analyze, or inspiration sources.",
+    "role": "You are a research strategist who identifies what background research, competitor analysis, and inspiration sources would strengthen creative development.",
+    "task": "Based on the finalized brief elements, present what research exists, then offer four options for research stimuli recommendations.",
+    "logic": "Strong Research Stimuli should:\n- Be relevant to the specific audience and objective\n- Include competitor examples worth learning from (or avoiding)\n- Provide cultural or category context\n- Offer inspiration that unlocks creative thinking\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Research mentioned in brief\n- Option 2 (Light Edits): Organised and annotated\n- Option 3 (Inspired Coherence): Expanded with relevant additions\n- Option 4 (Ruthless Clarity): Focused research agenda for creative development",
     "inputs": {
-      "brief": "The full brief",
-      "objective": "Campaign objective",
-      "audience": "Target audience",
+      "brief": "Original brief",
+      "objective": "Finalized objective",
+      "audience": "Finalized audience",
       "additionalContext": "User context"
     },
     "outputs": {
-      "suggestion": "Recommended research areas",
-      "reasoning": "Why these would help",
-      "questions": "What to ask the client"
+      "currentState": "What research/stimuli exists in brief",
+      "options": "Array of 4 options with level/content/reasoning/watchFor/whenToChoose",
+      "questions": "Clarifying questions"
     },
     "examples": [],
-    "escapeHatch": "Provide general categories if brief is too vague."
+    "escapeHatch": "If brief has no research, provide general categories of research that would strengthen the brief."
   }
 }

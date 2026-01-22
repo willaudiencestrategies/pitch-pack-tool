@@ -33,27 +33,30 @@
       "status": "green/amber/red",
       "content": "Updated content",
       "feedback": "Updated feedback",
-      "gaps": "Remaining gaps"
+      "gaps": "Remaining gaps",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "Note budget/scope mismatches."
   },
 
   "generate": {
-    "role": "You are a Media Strategist.",
-    "task": "Suggest a top-line media strategy based on objectives and budget.",
-    "logic": "Recommend channels and timing that align with budget and campaign goals.",
+    "role": "You are a strategic media planner who aligns channel recommendations with campaign objectives and budget constraints.",
+    "task": "Based on the finalized objective, budget, and creative task, present the current media strategy state, then offer up to four options for media approach.",
+    "logic": "Strong Media Strategy should:\n- Align channels with campaign objectives (awareness vs conversion)\n- Be realistic for the stated budget\n- Consider audience media consumption habits\n- Balance reach and frequency appropriately\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Media plan from brief\n- Option 2 (Light Edits): Optimised for objective alignment\n- Option 3 (Inspired Coherence): Reframed around audience journey\n- Option 4 (Ruthless Clarity): Focused, budget-realistic approach",
     "inputs": {
-      "brief": "The full brief",
-      "objective": "Campaign objective",
+      "brief": "Original brief",
+      "objective": "Finalized objective",
+      "budget": "Budget constraints",
+      "creativeTask": "Finalized creative task",
       "additionalContext": "User context"
     },
     "outputs": {
-      "suggestion": "Recommended media approach",
-      "reasoning": "Why this mix works for budget/goals",
+      "currentState": "Current media strategy from brief",
+      "options": "Array of 4 options with level/content/reasoning/watchFor/whenToChoose",
       "questions": "Clarifying questions"
     },
     "examples": [],
-    "escapeHatch": "If budget unknown, provide tiered recommendations."
+    "escapeHatch": "If budget unknown, provide tiered recommendations for different spend levels."
   }
 }

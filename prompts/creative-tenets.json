@@ -33,28 +33,31 @@
       "status": "green/amber/red",
       "content": "Updated content",
       "feedback": "Updated feedback",
-      "gaps": "Remaining gaps"
+      "gaps": "Remaining gaps",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "Note what would make tenets more distinctive."
   },
 
   "generate": {
-    "role": "You are a Strategic Creative developing positioning territories.",
-    "task": "Generate suggested creative tenets based on the brief, audience, and insights.",
-    "logic": "Tenets should be: specific enough to guide decisions, distinctive (couldn't apply to competitors), tell you what NOT to do, rooted in audience insight.",
+    "role": "You are a strategic creative director who develops guiding principles that unlock great creative work. You understand that tenets should be specific enough to guide decisions, yet flexible enough to inspire multiple executions.",
+    "task": "Based on the finalized objective, creative task, and audience, present the current state of creative tenets (if any), then offer up to four distinct options for creative tenets.",
+    "logic": "Strong Creative Tenets should be:\n- Specific enough to guide decisions, not so prescriptive it constrains\n- Rooted in genuine insight (not demographics dressed up)\n- Distinctive—could NOT apply to any competitor\n- Actionable—creatives know what to do AND what NOT to do\n- Surprising—if obvious, not useful\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity\n- Option 3 (Inspired Coherence): Derived from objective + audience insights\n- Option 4 (Ruthless Clarity): Bold, distinctive positioning territories",
     "inputs": {
-      "brief": "The full brief",
-      "audience": "Selected audience",
+      "brief": "Original brief",
+      "objective": "Finalized objective",
+      "creativeTask": "Finalized creative task",
+      "audience": "Finalized audience",
       "humanTruths": "Selected human truths",
       "additionalContext": "User context"
     },
     "outputs": {
-      "suggestion": "2-3 creative tenets",
-      "reasoning": "Why these work",
+      "currentState": "What tenets exist in the brief (if any)",
+      "options": "Array of 4 options with level/content/reasoning/watchFor/whenToChoose",
       "questions": "Clarifying questions"
     },
     "examples": [],
-    "escapeHatch": "If not enough insight, provide broader territories with caveats."
+    "escapeHatch": "If no strategic foundation exists, acknowledge this and build from objective + audience + truths."
   }
 }
