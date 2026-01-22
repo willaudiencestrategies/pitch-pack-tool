@@ -65,3 +65,24 @@ describe('Creative Task Prompt', () => {
     expect(prompt.generate.outputs.alignmentCheck).toBeDefined();
   });
 });
+
+describe('Audience Prompt', () => {
+  it('should have generate step for segment menu', () => {
+    const prompt = loadPrompt('audience');
+    expect(prompt.generate.outputs.intro).toBeDefined();
+    expect(prompt.generate.outputs.segments).toBeDefined();
+  });
+
+  it('should have personify step', () => {
+    const prompt = loadPrompt('audience');
+    expect(prompt.personify).toBeDefined();
+    expect(prompt.personify.outputs.narrative).toBeDefined();
+  });
+
+  it('should avoid overused segment names in logic', () => {
+    const prompt = loadPrompt('audience');
+    const system = buildSystemPrompt(prompt.generate);
+    expect(system).toContain('Cultural Explorers');
+    expect(system.toLowerCase()).toContain('avoid');
+  });
+});
