@@ -4,6 +4,10 @@
 [build]
 builder = "NIXPACKS"
 
+[build.nixpacks]
+# Next.js 16 requires Node.js 20+
+node_version = "20"
+
 [deploy]
 # Increase healthcheck timeout - Claude API calls can take 60+ seconds
 healthcheckPath = "/"
