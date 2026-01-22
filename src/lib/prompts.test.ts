@@ -38,3 +38,18 @@ describe('Triage Prompt', () => {
     expect(prompt.assess.outputs.sections).toContain('budget');
   });
 });
+
+describe('Objective Prompt', () => {
+  it('should have four-option generate output', () => {
+    const prompt = loadPrompt('objective');
+    expect(prompt.generate.outputs.options).toContain('lifted');
+    expect(prompt.generate.outputs.options).toContain('light');
+    expect(prompt.generate.outputs.options).toContain('inspired');
+    expect(prompt.generate.outputs.options).toContain('ruthless');
+  });
+
+  it('should include current state in generate output', () => {
+    const prompt = loadPrompt('objective');
+    expect(prompt.generate.outputs.currentState).toBeDefined();
+  });
+});

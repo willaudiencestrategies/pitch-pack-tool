@@ -33,27 +33,28 @@
       "status": "green/amber/red",
       "content": "Updated objective content",
       "feedback": "Updated explanation",
-      "gaps": "Remaining gaps if any"
+      "gaps": "Remaining gaps if any",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "If new info doesn't help, explain what's still needed."
   },
 
   "generate": {
-    "role": "You are a Strategic Planner helping craft campaign objectives.",
-    "task": "Generate a suggested objective based on the brief and context provided.",
-    "logic": "Create a specific, measurable objective that aligns with any stated budget and goals. Include timeframe and success metrics.",
+    "role": "You are a strategic clarity specialist working to help define the sharpest possible objective and focus for a campaign brief. You don't just rewrite what's given—you diagnose what's working, what's muddled, and what's missing, then offer a spectrum of options from conservative (staying close to the brief) to bold (bringing ruthless clarity where chaos exists).",
+    "task": "Based on the Objective and Focus section identified in the triage, present the current state clearly, then offer up to four distinct options for how to articulate the objective and focus. These options should range from preserving what's there to reimagining it for maximum coherence and strategic clarity.",
+    "logic": "A strong Objective and Focus should contain:\n1. A single, specific problem the campaign is solving (not multiple competing objectives)\n2. A clear strategic angle or focus (the lens through which the campaign will operate)\n3. Coherence with the customer journey stage (awareness / consideration / conversion)\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief, minimal cleanup\n- Option 2 (Light Edits): Brief's content with targeted edits for clarity\n- Option 3 (Inspired Coherence): Interpretation finding coherence across scattered elements\n- Option 4 (Ruthless Clarity): Bold reframe making hard choices for strategic clarity",
     "inputs": {
-      "brief": "The full brief",
-      "currentContent": "What we've extracted so far",
-      "additionalContext": "User-provided context"
+      "brief": "Original brief",
+      "triageResult": "The triage assessment for this section",
+      "additionalContext": "Any additional context from user"
     },
     "outputs": {
-      "suggestion": "A well-crafted objective statement",
-      "reasoning": "Why this objective makes sense",
-      "questions": "Clarifying questions if needed"
+      "currentState": "Present the synthesized content from triage, including contradictions, vagueness, traffic light rating, and customer journey position",
+      "options": "Array of 4 options: lifted, light, inspired, ruthless. Each with: level, content (the proposed objective text), reasoning (why this option), watchFor (potential issues), whenToChoose (when to pick this option)",
+      "questions": "Array of clarifying questions if needed"
     },
     "examples": [],
-    "escapeHatch": "If not enough info to suggest an objective, provide questions to ask the client."
+    "escapeHatch": "If objective is completely absent, state clearly and ask user to provide minimum: what problem the campaign solves, what success looks like, where in customer journey. If brief is too contradictory even for Option 4, list the specific contradictions that must be resolved."
   }
 }
