@@ -64,13 +64,25 @@ export interface SessionState {
   step: Step;
   brief: string;
   additionalContext: string;
+
+  // Enhanced triage
+  triageResult: EnhancedTriageResponse | null;
+
+  // Section building with options
   sections: Section[];
   currentSectionIndex: number;
-  audienceOptions: Segment[];
-  selectedAudience: Segment | null;
-  personification: string;
+  currentSectionOptions: SectionOptionsResponse | null;
+  selectedOptionLevel: OptionLevel | null;
+
+  // Two-step audience
+  audienceMenu: AudienceSegmentMenu | null;
+  selectedAudienceSegment: AudienceSegment | null;
+  personification: PersonificationResponse | null;
+
+  // Human truths
   truthOptions: Truth[];
   selectedTruths: Truth[];
+
   error: string | null;
   loading: boolean;
 }
@@ -80,6 +92,7 @@ export function createInitialState(): SessionState {
     step: 'upload',
     brief: '',
     additionalContext: '',
+    triageResult: null,
     sections: SECTION_KEYS.map((key) => ({
       key,
       name: SECTION_CONFIG[key].name,
@@ -88,9 +101,11 @@ export function createInitialState(): SessionState {
       feedback: '',
     })),
     currentSectionIndex: 0,
-    audienceOptions: [],
-    selectedAudience: null,
-    personification: '',
+    currentSectionOptions: null,
+    selectedOptionLevel: null,
+    audienceMenu: null,
+    selectedAudienceSegment: null,
+    personification: null,
     truthOptions: [],
     selectedTruths: [],
     error: null,
