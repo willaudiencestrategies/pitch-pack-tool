@@ -6,6 +6,9 @@ import {
   SectionOption,
   SectionOptionsResponse,
   OptionLevel,
+  AudienceSegment,
+  AudienceSegmentMenu,
+  PersonificationResponse,
 } from './types';
 
 describe('Section Configuration', () => {
@@ -46,5 +49,39 @@ describe('Four-Option Response Types', () => {
       ],
     };
     expect(response.options.length).toBe(4);
+  });
+});
+
+describe('Two-Step Audience Types', () => {
+  it('should have AudienceSegment with required fields', () => {
+    const segment: AudienceSegment = {
+      id: 1,
+      name: 'Reckonings',
+      needsValues: 'Rich description of needs/values/motivations',
+      demographics: 'Observable behaviours/demographics',
+    };
+    expect(segment.name).toBe('Reckonings');
+  });
+
+  it('should have AudienceSegmentMenu with 5 segments', () => {
+    const menu: AudienceSegmentMenu = {
+      intro: 'Based on everything...',
+      segments: [
+        { id: 1, name: 'Reckonings', needsValues: 'desc', demographics: 'demo' },
+        { id: 2, name: 'Inheritors', needsValues: 'desc', demographics: 'demo' },
+        { id: 3, name: 'Collectors', needsValues: 'desc', demographics: 'demo' },
+        { id: 4, name: 'Rewilders', needsValues: 'desc', demographics: 'demo' },
+        { id: 5, name: 'Contrarians', needsValues: 'desc', demographics: 'demo' },
+      ],
+    };
+    expect(menu.segments.length).toBe(5);
+  });
+
+  it('should have PersonificationResponse with narrative', () => {
+    const response: PersonificationResponse = {
+      intro: 'Thanks. Based on everything...',
+      narrative: 'Rich 150-300 word description...',
+    };
+    expect(response.narrative).toBeDefined();
   });
 });

@@ -155,6 +155,24 @@ export interface OutputResponse {
   markdown: string;
 }
 
+// Two-Step Audience Types
+export interface AudienceSegment {
+  id: number;
+  name: string;         // Snappy 1-2 word name
+  needsValues: string;  // Rich description of needs/values/motivations
+  demographics: string; // Observable behaviours/demographics
+}
+
+export interface AudienceSegmentMenu {
+  intro: string;
+  segments: AudienceSegment[];
+}
+
+export interface PersonificationResponse {
+  intro: string;
+  narrative: string;  // 150-300 word vivid human sketch
+}
+
 // Four-Option Response Types
 export type OptionLevel = 'lifted' | 'light' | 'inspired' | 'ruthless';
 
