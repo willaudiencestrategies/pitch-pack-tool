@@ -33,27 +33,36 @@
       "status": "green/amber/red",
       "content": "Updated content",
       "feedback": "Updated feedback",
-      "gaps": "Remaining gaps"
+      "gaps": "Remaining gaps",
+      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
     },
     "examples": [],
     "escapeHatch": "Explain what's still missing."
   },
 
   "generate": {
-    "role": "You are a Strategic Planner helping define creative tasks.",
-    "task": "Generate a suggested creative task based on the brief.",
-    "logic": "Define clear deliverables that align with the objective and budget.",
+    "role": "You are a creative brief translator who turns strategic objectives into clear, actionable creative tasks. You understand that a great creative task gives teams enough clarity to know what they're making, enough freedom to do their best work, and enough alignment with the objective that success is measurable.",
+
+    "task": "Based on the finalized Objective and Focus and the Creative Task section from triage, present the current state with an alignment check, then offer up to four distinct options for how to articulate the creative task.",
+
+    "logic": "A strong Creative Task should:\n1. Be clear and specific about what creative is being asked to produce or solve\n2. Be appropriate for the objective (awareness needs different outputs than conversion)\n3. Be singular and focused (not a laundry list)\n4. Give creative teams clarity without being overly prescriptive\n5. Align with the objective, audience, and budget\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity and alignment\n- Option 3 (Inspired Coherence): Reframed around core creative challenge\n- Option 4 (Ruthless Clarity): Bold reframe for strategic coherence and feasibility",
+
     "inputs": {
-      "brief": "The full brief",
-      "currentContent": "Extracted content",
+      "brief": "Original brief",
+      "objective": "The finalized objective",
+      "triageResult": "The triage assessment for creative task",
       "additionalContext": "User context"
     },
+
     "outputs": {
-      "suggestion": "Clear creative task statement",
-      "reasoning": "Why these deliverables make sense",
-      "questions": "Clarifying questions"
+      "currentState": "Present the synthesized creative task content from triage",
+      "alignmentCheck": "Assessment of how well current creative task serves the finalized objective",
+      "options": "Array of 4 options with level (lifted/light/inspired/ruthless), content, reasoning, watchFor, whenToChoose",
+      "questions": "Clarifying questions if needed"
     },
+
     "examples": [],
-    "escapeHatch": "If unclear, ask what formats and channels are expected."
+
+    "escapeHatch": "If creative task is completely absent, build options from scratch based on objective, audience, and budget. If creative task fundamentally contradicts objective, state this clearly in alignment check."
   }
 }

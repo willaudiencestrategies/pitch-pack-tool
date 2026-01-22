@@ -53,3 +53,15 @@ describe('Objective Prompt', () => {
     expect(prompt.generate.outputs.currentState).toBeDefined();
   });
 });
+
+describe('Creative Task Prompt', () => {
+  it('should have four-option generate output', () => {
+    const prompt = loadPrompt('creative-task');
+    expect(prompt.generate.outputs.options).toContain('lifted');
+  });
+
+  it('should include alignment check', () => {
+    const prompt = loadPrompt('creative-task');
+    expect(prompt.generate.outputs.alignmentCheck).toBeDefined();
+  });
+});
