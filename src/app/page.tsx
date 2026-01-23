@@ -200,7 +200,8 @@ function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: 
   );
 }
 
-// Global progress indicator that shows at top of page
+// Global progress indicator with sliding focus design
+// Current step is prominent, completed steps are compact checkmarks, future steps are dots
 function GlobalProgressBar({
   step,
   sectionIndex,
@@ -225,14 +226,23 @@ function GlobalProgressBar({
 
   const currentStepIndex = steps.findIndex(s => s.key === step);
 
+  // Determine which steps should show labels (current and adjacent)
+  const shouldShowLabel = (index: number) => {
+    return index === currentStepIndex ||
+           index === currentStepIndex - 1 ||
+           index === currentStepIndex + 1;
+  };
+
   return (
     <div className="bg-white border-b border-[var(--border-color)] sticky top-0 z-50">
       <div className="max-w-4xl mx-auto px-6 py-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-1">
           {steps.map((s, i) => {
             const isCompleted = i < currentStepIndex;
             const isCurrent = i === currentStepIndex;
+            const isFuture = i > currentStepIndex;
             const isClickable = isCompleted;
+            const showLabel = shouldShowLabel(i);
 
             return (
               <div key={s.key} className="flex items-center">
@@ -246,23 +256,43 @@ function GlobalProgressBar({
                       onNavigate(s.key as Step);
                     }
                   } : undefined}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    isCompleted
-                      ? 'bg-[var(--status-green)] text-white cursor-pointer hover:bg-[var(--status-green)]/80'
-                      : isCurrent
-                      ? 'bg-[var(--expedia-navy)] text-white'
-                      : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
+                  title={s.label}
+                  className={`flex items-center justify-center transition-all ${
+                    isCurrent
+                      ? 'px-4 py-2 rounded-full bg-[var(--expedia-navy)] text-white text-sm font-medium'
+                      : isCompleted
+                      ? showLabel
+                        ? 'px-3 py-1.5 rounded-full bg-[var(--status-green)] text-white text-xs font-medium cursor-pointer hover:bg-[var(--status-green)]/80'
+                        : 'w-6 h-6 rounded-full bg-[var(--status-green)] text-white text-xs cursor-pointer hover:bg-[var(--status-green)]/80'
+                      : showLabel
+                      ? 'px-3 py-1.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-muted)] text-xs'
+                      : 'w-2 h-2 rounded-full bg-[var(--border-color)]'
                   }`}
                 >
-                  {isCompleted && <span>✓</span>}
-                  {s.label}
-                  {s.key === 'sections' && isCurrent && (
-                    <span className="opacity-70">({sectionIndex + 1}/{totalSections})</span>
+                  {isCompleted && !showLabel && <span className="text-[10px]">✓</span>}
+                  {isCompleted && showLabel && (
+                    <>
+                      <span className="mr-1">✓</span>
+                      {s.label}
+                    </>
                   )}
+                  {isCurrent && (
+                    <>
+                      {s.label}
+                      {s.key === 'sections' && (
+                        <span className="ml-1 opacity-70">({sectionIndex + 1}/{totalSections})</span>
+                      )}
+                    </>
+                  )}
+                  {isFuture && showLabel && s.label}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`w-4 h-0.5 mx-1 ${
-                    i < currentStepIndex ? 'bg-[var(--status-green)]' : 'bg-[var(--border-color)]'
+                  <div className={`h-0.5 mx-1 transition-all ${
+                    i < currentStepIndex
+                      ? 'w-4 bg-[var(--status-green)]'
+                      : shouldShowLabel(i) || shouldShowLabel(i + 1)
+                      ? 'w-4 bg-[var(--border-color)]'
+                      : 'w-2 bg-[var(--border-color)]'
                   }`} />
                 )}
               </div>
