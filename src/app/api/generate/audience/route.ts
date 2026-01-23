@@ -7,7 +7,7 @@ import { AudienceSegmentMenu, PersonificationResponse, AudienceSegment } from '@
 
 export async function POST(request: NextRequest) {
   try {
-    const { brief, additionalContext, selectedSegment } = await request.json();
+    const { brief, additionalContext, selectedSegment, feedback } = await request.json();
 
     if (!brief) {
       return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
@@ -42,7 +42,11 @@ export async function POST(request: NextRequest) {
       if (additionalContext) {
         userMessage += `Additional context:\n${additionalContext}\n\n`;
       }
-      userMessage += `Please generate 5 audience segments.`;
+      if (feedback) {
+        userMessage += `User feedback on previous options:\n${feedback}\n\nPlease generate 5 NEW audience segments that address this feedback.\n\n`;
+      } else {
+        userMessage += `Please generate 5 audience segments.`;
+      }
 
       const response = await callClaudeJSON<AudienceSegmentMenu>(
         systemPrompt,

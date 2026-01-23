@@ -83,6 +83,9 @@ export interface SessionState {
   truthOptions: Truth[];
   selectedTruths: Truth[];
 
+  // Output
+  outputMarkdown: string | null;
+
   error: string | null;
   loading: boolean;
 }
@@ -108,6 +111,7 @@ export function createInitialState(): SessionState {
     personification: null,
     truthOptions: [],
     selectedTruths: [],
+    outputMarkdown: null,
     error: null,
     loading: false,
   };
