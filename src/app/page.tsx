@@ -25,6 +25,7 @@ import {
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
+import { FileUpload } from '@/components/FileUpload';
 
 // ============================================
 // Helper Components
@@ -752,33 +753,12 @@ export default function Home() {
 
       const data: OutputResponse = await response.json();
 
-      // Store markdown in a section for display
-      updateState({ step: 'output', loading: false });
-
-      // Open in new window
-      const w = window.open('', '_blank');
-      if (w) {
-        w.document.write(`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Pitch Pack</title>
-              <style>
-                body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
-                h1, h2, h3 { margin-top: 2rem; }
-                pre { white-space: pre-wrap; background: #f5f5f5; padding: 1rem; border-radius: 4px; }
-              </style>
-            </head>
-            <body>
-              <pre>${data.markdown}</pre>
-            </body>
-          </html>
-        `);
-      } else {
-        // Popup was blocked, show in alert or copy to clipboard
-        alert('Popup blocked. Your Pitch Pack has been copied to clipboard.');
-        navigator.clipboard.writeText(data.markdown);
-      }
+      // Store markdown for inline display
+      updateState({
+        step: 'output',
+        loading: false,
+        outputMarkdown: data.markdown,
+      });
     } catch (err) {
       updateState({
         error: err instanceof Error ? err.message : 'Something went wrong',
@@ -872,11 +852,24 @@ export default function Home() {
             Upload Your Brief
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Paste your brief below and I'll assess each section, highlighting what's strong and what
-            needs work.
+            Upload a document or paste your brief below. I'll assess each section, highlighting what's strong and what needs work.
           </p>
         </div>
 
+        {/* File Upload */}
+        <FileUpload
+          onFileContent={(content) => updateState({ brief: content, error: null })}
+          disabled={state.loading}
+        />
+
+        {/* Divider */}
+        <div className="flex items-center gap-4">
+          <div className="flex-1 h-px bg-[var(--border-color)]" />
+          <span className="text-sm text-[var(--text-muted)]">or paste directly</span>
+          <div className="flex-1 h-px bg-[var(--border-color)]" />
+        </div>
+
+        {/* Text Input */}
         <div className="space-y-3">
           <label className="block text-sm font-medium text-[var(--text-secondary)]">
             Brief Content
@@ -884,7 +877,7 @@ export default function Home() {
           <textarea
             aria-label="Paste your brief content here"
             className="textarea-field font-mono text-sm"
-            style={{ minHeight: '350px' }}
+            style={{ minHeight: '250px' }}
             placeholder="Paste the full brief content here..."
             value={state.brief}
             onChange={(e) => updateState({ brief: e.target.value })}
@@ -1268,6 +1261,82 @@ export default function Home() {
       );
     }
 
+    const handleCopy = async () => {
+      if (!state.outputMarkdown) return;
+      try {
+        await navigator.clipboard.writeText(state.outputMarkdown);
+        // Simple feedback - could be improved with toast
+        alert('Copied to clipboard!');
+      } catch {
+        // Clipboard API failed, fall back to download
+        handleDownload();
+      }
+    };
+
+    const handleDownload = () => {
+      if (!state.outputMarkdown) return;
+      const blob = new Blob([state.outputMarkdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'pitch-pack.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // Show inline output if we have it
+    if (state.outputMarkdown) {
+      return (
+        <div className="space-y-6">
+          {/* Back Button */}
+          <BackButton onClick={() => updateState({ step: 'truths', outputMarkdown: null })} label="Back to Truths" />
+
+          <div className="text-center pb-6 border-b border-[var(--border-color)]">
+            <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+              Your Pitch Pack
+            </h2>
+            <p className="text-[var(--text-secondary)]">
+              Review your completed Pitch Pack below. Copy or download when ready.
+            </p>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3">
+            <button onClick={handleCopy} className="btn-secondary flex items-center gap-2">
+              <span>📋</span> Copy to Clipboard
+            </button>
+            <button onClick={handleDownload} className="btn-outline flex items-center gap-2">
+              <span>⬇️</span> Download as Markdown
+            </button>
+          </div>
+
+          {/* Output display */}
+          <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-tertiary)] p-6 overflow-auto max-h-[500px]">
+            <pre className="whitespace-pre-wrap text-sm text-[var(--text-primary)] font-mono leading-relaxed">
+              {state.outputMarkdown}
+            </pre>
+          </div>
+
+          {/* Start over */}
+          <div className="pt-4 border-t border-[var(--border-color)]">
+            <button
+              onClick={() => {
+                if (window.confirm('Are you sure? This will clear all your work.')) {
+                  setState(createInitialState());
+                }
+              }}
+              className="btn-outline"
+            >
+              Start Over
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Pre-export summary
     return (
       <div className="space-y-6">
         {/* Back Button */}
