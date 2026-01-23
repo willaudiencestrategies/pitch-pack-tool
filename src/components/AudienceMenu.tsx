@@ -180,8 +180,8 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
                   Needs & Values
                 </label>
                 <textarea
-                  className="w-full p-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--expedia-navy)] focus:outline-none text-sm resize-none"
-                  rows={4}
+                  className="w-full p-3 rounded-lg border border-[var(--border-color)] focus:border-[var(--expedia-navy)] focus:outline-none text-sm resize-y"
+                  style={{ minHeight: '120px' }}
                   value={editingSegment.needsValues}
                   onChange={(e) =>
                     setEditingSegment({ ...editingSegment, needsValues: e.target.value })
@@ -194,8 +194,8 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
                   Demographics
                 </label>
                 <textarea
-                  className="w-full p-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--expedia-navy)] focus:outline-none text-sm resize-none"
-                  rows={2}
+                  className="w-full p-3 rounded-lg border border-[var(--border-color)] focus:border-[var(--expedia-navy)] focus:outline-none text-sm resize-y"
+                  style={{ minHeight: '80px' }}
                   value={editingSegment.demographics}
                   onChange={(e) =>
                     setEditingSegment({ ...editingSegment, demographics: e.target.value })
