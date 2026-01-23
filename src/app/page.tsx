@@ -8,6 +8,7 @@ import {
   Section,
   Truth,
   Status,
+  Step,
   createInitialState,
   EnhancedTriageResponse,
   SectionResponse,
@@ -19,6 +20,7 @@ import {
   OptionLevel,
   SectionOptionsResponse,
   SECTION_CONFIG,
+  SECTION_KEYS,
 } from '@/lib/types';
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
@@ -186,22 +188,34 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
   );
 }
 
+function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1 mb-4"
+    >
+      ← {label}
+    </button>
+  );
+}
+
 // Global progress indicator that shows at top of page
 function GlobalProgressBar({
   step,
   sectionIndex,
   totalSections,
-  sections
+  sections,
+  onNavigate,
 }: {
   step: string;
   sectionIndex: number;
   totalSections: number;
   sections: Section[];
+  onNavigate: (step: Step) => void;
 }) {
   const steps = [
     { key: 'upload', label: 'Upload' },
     { key: 'triage', label: 'Triage' },
-    { key: 'budget', label: 'Budget' },
     { key: 'sections', label: 'Sections' },
     { key: 'audience', label: 'Audience' },
     { key: 'truths', label: 'Truths' },
@@ -217,16 +231,28 @@ function GlobalProgressBar({
           {steps.map((s, i) => {
             const isCompleted = i < currentStepIndex;
             const isCurrent = i === currentStepIndex;
+            const isClickable = isCompleted;
 
             return (
               <div key={s.key} className="flex items-center">
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  isCompleted
-                    ? 'bg-[var(--status-green)] text-white'
-                    : isCurrent
-                    ? 'bg-[var(--expedia-navy)] text-white'
-                    : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
-                }`}>
+                <div
+                  role={isClickable ? 'button' : undefined}
+                  tabIndex={isClickable ? 0 : undefined}
+                  onClick={isClickable ? () => onNavigate(s.key as Step) : undefined}
+                  onKeyDown={isClickable ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onNavigate(s.key as Step);
+                    }
+                  } : undefined}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    isCompleted
+                      ? 'bg-[var(--status-green)] text-white cursor-pointer hover:bg-[var(--status-green)]/80'
+                      : isCurrent
+                      ? 'bg-[var(--expedia-navy)] text-white'
+                      : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
+                  }`}
+                >
                   {isCompleted && <span>✓</span>}
                   {s.label}
                   {s.key === 'sections' && isCurrent && (
@@ -278,6 +304,7 @@ function SectionStepContent({
   onUpdateSuggestion,
   onAcceptSuggestion,
   onNext,
+  onBack,
 }: {
   section: Section;
   sectionIndex: number;
@@ -289,11 +316,22 @@ function SectionStepContent({
   onUpdateSuggestion: (suggestion: string) => void;
   onAcceptSuggestion: () => void;
   onNext: () => void;
+  onBack: () => void;
 }) {
   const [additionalInfo, setAdditionalInfo] = useState('');
 
+  // Get the previous section name for back button label
+  const getPreviousSectionName = () => {
+    if (sectionIndex === 0) return 'Triage';
+    const prevSectionKey = SECTION_KEYS[sectionIndex - 1];
+    return prevSectionKey ? SECTION_CONFIG[prevSectionKey]?.name : 'Previous';
+  };
+
   return (
     <div className="space-y-6">
+      {/* Back Button */}
+      <BackButton onClick={onBack} label={`Back to ${getPreviousSectionName()}`} />
+
       {/* Section Header */}
       <div className="flex items-center justify-between pb-4 border-b border-[var(--border-color)]">
         <div>
@@ -447,6 +485,18 @@ export default function Home() {
     setState((prev) => ({ ...prev, ...updates }));
   };
 
+  // Navigation handler for progress bar
+  const handleNavigateToStep = (step: Step) => {
+    if (step === 'upload') {
+      setState(createInitialState());
+      return;
+    }
+    updateState({ step });
+    if (step === 'sections') {
+      updateState({ currentSectionIndex: 0 });
+    }
+  };
+
   // ============================================
   // API Handlers
   // ============================================
@@ -479,7 +529,10 @@ export default function Home() {
         key: result.key,
         name: SECTION_CONFIG[result.key]?.name || result.key,
         status: result.status || 'red',
-        content: result.synthesizedContent || '',
+        // Prefer verbatimQuotes (actual brief content) over synthesizedContent (AI interpretation)
+        content: result.verbatimQuotes?.length
+          ? result.verbatimQuotes.join('\n\n')
+          : result.synthesizedContent || '',
         feedback: (result.whyThisRating || '') + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
         questions: result.questions || [],
         gaps: [...(result.contradictions || []), ...(result.vagueness || [])],
@@ -586,10 +639,10 @@ export default function Home() {
     }
   };
 
-  const handleGenerateAudience = async () => {
+  const handleGenerateAudience = async (feedback?: string) => {
     // Update step immediately so progress bar shows Audience during loading
     updateState({ loading: true, error: null, step: 'audience' });
-    setLastAction(() => handleGenerateAudience);
+    setLastAction(() => () => handleGenerateAudience(feedback));
 
     try {
       const response = await fetch('/api/generate/audience', {
@@ -598,6 +651,7 @@ export default function Home() {
         body: JSON.stringify({
           brief: state.brief,
           additionalContext: state.additionalContext,
+          feedback,
         }),
       });
 
@@ -757,6 +811,14 @@ export default function Home() {
     }
   };
 
+  const goToPreviousSection = () => {
+    if (state.currentSectionIndex > 0) {
+      updateState({ currentSectionIndex: state.currentSectionIndex - 1 });
+    } else {
+      updateState({ step: 'triage' });
+    }
+  };
+
   const updateSectionContent = (content: string) => {
     const updatedSections = [...state.sections];
     updatedSections[state.currentSectionIndex] = {
@@ -866,6 +928,9 @@ export default function Home() {
 
     return (
       <div className="space-y-6">
+        {/* Back Button */}
+        <BackButton onClick={() => handleNavigateToStep('upload')} label="Back to Upload" />
+
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
             Initial Assessment
@@ -956,6 +1021,7 @@ export default function Home() {
         onUpdateSuggestion={updateSectionSuggestion}
         onAcceptSuggestion={acceptSuggestion}
         onNext={goToNextSection}
+        onBack={goToPreviousSection}
       />
     );
   };
@@ -1013,20 +1079,13 @@ export default function Home() {
     // Segment selection using new component
     if (state.audienceMenu) {
       return (
-        <div className="space-y-6">
-          <AudienceMenu
-            menu={state.audienceMenu}
-            onSelect={handleSelectAudience}
-            loading={state.loading}
-          />
-          <button
-            onClick={handleGenerateAudience}
-            disabled={state.loading}
-            className="btn-outline text-sm"
-          >
-            Regenerate Options
-          </button>
-        </div>
+        <AudienceMenu
+          menu={state.audienceMenu}
+          onSelect={handleSelectAudience}
+          onRegenerate={handleGenerateAudience}
+          onBack={() => updateState({ step: 'sections', currentSectionIndex: state.sections.length - 1 })}
+          loading={state.loading}
+        />
       );
     }
 
@@ -1085,6 +1144,9 @@ export default function Home() {
 
     return (
       <div className="space-y-6">
+        {/* Back Button */}
+        <BackButton onClick={() => updateState({ step: 'audience' })} label="Back to Audience" />
+
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
             Select Human Truths
@@ -1208,6 +1270,9 @@ export default function Home() {
 
     return (
       <div className="space-y-6">
+        {/* Back Button */}
+        <BackButton onClick={() => updateState({ step: 'truths' })} label="Back to Truths" />
+
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
             Pitch Pack Complete
@@ -1302,6 +1367,7 @@ export default function Home() {
           sectionIndex={state.currentSectionIndex}
           totalSections={state.sections.length}
           sections={state.sections}
+          onNavigate={handleNavigateToStep}
         />
       )}
 
