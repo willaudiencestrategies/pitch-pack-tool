@@ -1285,6 +1285,17 @@ export default function Home() {
       );
     }
 
+    const navigateToSection = (sectionKey: string) => {
+      const sectionIndex = state.sections.findIndex(s => s.key === sectionKey);
+      if (sectionIndex >= 0) {
+        updateState({
+          step: 'sections',
+          currentSectionIndex: sectionIndex,
+          outputMarkdown: null, // Clear output so they can re-export after changes
+        });
+      }
+    };
+
     const handleCopy = async () => {
       if (!state.outputMarkdown) return;
       try {
@@ -1379,12 +1390,13 @@ export default function Home() {
           {state.sections.map((section, index) => (
             <div
               key={section.key}
-              className={`p-4 ${
+              onClick={() => navigateToSection(section.key)}
+              className={`p-4 cursor-pointer hover:bg-[var(--bg-secondary)] transition-colors ${
                 index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
+                <span className="font-medium text-[var(--text-primary)] hover:underline">{section.name}</span>
                 <StatusBadge status={section.status} />
               </div>
               <p className="text-sm text-[var(--text-muted)] line-clamp-2">
@@ -1393,6 +1405,9 @@ export default function Home() {
             </div>
           ))}
         </div>
+        <p className="text-xs text-[var(--text-muted)] text-center mt-2">
+          Click any section to go back and edit it
+        </p>
 
         <div className="flex gap-3">
           <button onClick={handleCompileOutput} className="btn-secondary flex items-center gap-2">
