@@ -685,9 +685,19 @@ export default function Home() {
     }
   };
 
-  const handleSelectAudience = async (segment: AudienceSegment) => {
-    updateState({ loading: true, error: null, selectedAudienceSegment: segment });
-    setLastAction(() => () => handleSelectAudience(segment));
+  const handleSelectAudience = async (segments: AudienceSegment[]) => {
+    // If multiple segments selected, merge them into a unified profile
+    const segmentToPersonify = segments.length === 1
+      ? segments[0]
+      : {
+          id: 0,
+          name: segments.map(s => s.name).join(' + '),
+          needsValues: segments.map(s => s.needsValues).join('\n\n'),
+          demographics: segments.map(s => s.demographics).join('\n\n'),
+        };
+
+    updateState({ loading: true, error: null, selectedAudienceSegment: segmentToPersonify });
+    setLastAction(() => () => handleSelectAudience(segments));
 
     try {
       const response = await fetch('/api/generate/audience', {
@@ -696,7 +706,8 @@ export default function Home() {
         body: JSON.stringify({
           brief: state.brief,
           additionalContext: state.additionalContext,
-          selectedSegment: segment,
+          selectedSegment: segmentToPersonify,
+          isMerged: segments.length > 1,
         }),
       });
 

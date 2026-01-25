@@ -7,7 +7,7 @@ import { AudienceSegmentMenu, PersonificationResponse, AudienceSegment } from '@
 
 export async function POST(request: NextRequest) {
   try {
-    const { brief, additionalContext, selectedSegment, feedback } = await request.json();
+    const { brief, additionalContext, selectedSegment, feedback, isMerged } = await request.json();
 
     if (!brief) {
       return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
@@ -25,7 +25,14 @@ export async function POST(request: NextRequest) {
       }
       const systemPrompt = buildSystemPrompt(promptConfig.personify);
 
-      const userMessage = `Brief:\n${brief}\n\nSelected segment:\nName: ${selectedSegment.name}\nNeeds & Values: ${selectedSegment.needsValues}\nDemographics: ${selectedSegment.demographics}\n\nPlease personify this segment.`;
+      // Build user message - adjust for merged segments
+      let userMessage = `Brief:\n${brief}\n\nSelected segment:\nName: ${selectedSegment.name}\nNeeds & Values: ${selectedSegment.needsValues}\nDemographics: ${selectedSegment.demographics}\n\n`;
+
+      if (isMerged) {
+        userMessage += `IMPORTANT: This is a UNIFIED profile created by merging multiple audience segments. The user has selected these segments because they see overlap or complementary aspects. Your task is to:\n1. Find the common threads that unite these segments\n2. Identify any interesting tensions between them that could fuel creative work\n3. Create a single, coherent personification that captures the essence of this combined audience\n4. Don't treat this as multiple people - synthesize into one rich, nuanced persona\n\n`;
+      }
+
+      userMessage += `Please personify this segment.`;
 
       const response = await callClaudeJSON<PersonificationResponse>(
         systemPrompt,

@@ -5,7 +5,7 @@ import { AudienceSegment, AudienceSegmentMenu } from '@/lib/types';
 
 interface AudienceMenuProps {
   menu: AudienceSegmentMenu;
-  onSelect: (segment: AudienceSegment) => void;
+  onSelect: (segments: AudienceSegment[]) => void;
   onRegenerate: (feedback: string) => void;
   onBack: () => void;
   loading: boolean;
@@ -20,6 +20,7 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
   const [feedback, setFeedback] = useState('');
   const [editingSegment, setEditingSegment] = useState<EditedSegment | null>(null);
   const [editedSegments, setEditedSegments] = useState<Record<number, EditedSegment>>({});
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   const handleRegenerateClick = () => {
     if (feedback.trim()) {
@@ -43,10 +44,24 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
     return editedSegments[original.id] || original;
   };
 
-  const handleSelectSegment = (original: AudienceSegment) => {
+  const toggleSelection = (id: number) => {
     if (loading) return;
-    const segmentToSelect = editedSegments[original.id] || original;
-    onSelect(segmentToSelect);
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleConfirmSelection = () => {
+    if (loading || selectedIds.size === 0) return;
+    // Get the segments (with edits applied) in order of their IDs
+    const selectedSegments = menu.segments
+      .filter(s => selectedIds.has(s.id))
+      .map(s => editedSegments[s.id] || s);
+    onSelect(selectedSegments);
   };
 
   return (
@@ -66,32 +81,55 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
         <p className="text-[var(--text-secondary)]">{menu.intro}</p>
       </div>
 
+      <p className="text-sm text-[var(--text-muted)] mb-4">
+        Select one or more segments. Multiple selections will be merged into a unified profile.
+      </p>
+
       <div className="space-y-3">
         {menu.segments.map((original) => {
           const segment = getSegmentToDisplay(original);
           const isEdited = editedSegments[original.id]?.isEdited;
+          const isSelected = selectedIds.has(original.id);
 
           return (
             <div
               key={original.id}
-              className="p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--expedia-navy)] hover:shadow-md transition-all group relative"
+              className={`p-4 rounded-xl border-2 transition-all group relative cursor-pointer ${
+                isSelected
+                  ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5 shadow-md'
+                  : 'border-[var(--border-color)] hover:border-[var(--expedia-navy)]/50 hover:shadow-sm'
+              }`}
+              onClick={() => toggleSelection(original.id)}
             >
-              <div
-                className="cursor-pointer"
-                onClick={() => handleSelectSegment(original)}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-lg text-[var(--expedia-navy)] group-hover:underline">
-                    {segment.name}
-                  </h3>
-                  {isEdited && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--expedia-navy)]/10 text-[var(--expedia-navy)]">
-                      (edited)
-                    </span>
-                  )}
+              <div className="flex items-start gap-3">
+                {/* Checkbox */}
+                <div className="pt-1">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelection(original.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="h-5 w-5 rounded border-[var(--border-color)] accent-[var(--expedia-navy)] cursor-pointer"
+                  />
                 </div>
-                <p className="text-[var(--text-primary)] mb-2">{segment.needsValues}</p>
-                <p className="text-sm text-[var(--text-muted)]">{segment.demographics}</p>
+
+                {/* Content */}
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className={`font-semibold text-lg ${
+                      isSelected ? 'text-[var(--expedia-navy)]' : 'text-[var(--expedia-navy)] group-hover:underline'
+                    }`}>
+                      {segment.name}
+                    </h3>
+                    {isEdited && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--expedia-navy)]/10 text-[var(--expedia-navy)]">
+                        (edited)
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[var(--text-primary)] mb-2">{segment.needsValues}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{segment.demographics}</p>
+                </div>
               </div>
 
               <button
@@ -99,7 +137,7 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
                   e.stopPropagation();
                   setEditingSegment({ ...segment });
                 }}
-                className="absolute top-4 right-4 text-xs px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-navy)] hover:text-[var(--expedia-navy)] transition-colors"
+                className="absolute top-4 right-4 text-xs px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-navy)] hover:text-[var(--expedia-navy)] transition-colors bg-white"
               >
                 Edit
               </button>
@@ -107,6 +145,31 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
           );
         })}
       </div>
+
+      {/* Selection Summary and Confirm Button */}
+      {selectedIds.size > 0 && (
+        <div className="pt-4 border-t border-[var(--border-color)] mt-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="font-medium text-[var(--text-primary)]">
+                {selectedIds.size} segment{selectedIds.size > 1 ? 's' : ''} selected
+              </span>
+              {selectedIds.size > 1 && (
+                <span className="text-sm text-[var(--text-muted)] ml-2">
+                  — will be merged into a unified profile
+                </span>
+              )}
+            </div>
+            <button
+              onClick={handleConfirmSelection}
+              disabled={loading}
+              className="px-5 py-2.5 text-sm font-medium bg-[var(--expedia-navy)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {loading ? 'Processing...' : 'Confirm & Continue →'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Feedback and Regenerate Section */}
       <div className="pt-4 border-t border-[var(--border-color)]">
