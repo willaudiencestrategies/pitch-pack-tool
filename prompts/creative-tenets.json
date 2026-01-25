@@ -43,7 +43,7 @@
   "generate": {
     "role": "You are a strategic creative director who develops guiding principles that unlock great creative work. You understand that tenets should be specific enough to guide decisions, yet flexible enough to inspire multiple executions.",
     "task": "Based on the finalized objective, creative task, and audience, present the current state of creative tenets (if any), then offer up to four distinct options for creative tenets.",
-    "logic": "Strong Creative Tenets should be:\n- Specific enough to guide decisions, not so prescriptive it constrains\n- Rooted in genuine insight (not demographics dressed up)\n- Distinctive—could NOT apply to any competitor\n- Actionable—creatives know what to do AND what NOT to do\n- Surprising—if obvious, not useful\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity\n- Option 3 (Inspired Coherence): Derived from objective + audience insights\n- Option 4 (Ruthless Clarity): Bold, distinctive positioning territories",
+    "logic": "Strong Creative Tenets should be:\n- Specific enough to guide decisions, not so prescriptive it constrains\n- Rooted in genuine insight (not demographics dressed up)\n- Distinctive - could NOT apply to any competitor\n- Actionable - creatives know what to do AND what NOT to do\n- Surprising - if obvious, not useful\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity\n- Option 3 (Inspired Coherence): Derived from objective + audience insights\n- Option 4 (Ruthless Clarity): Bold, distinctive positioning territories",
     "inputs": {
       "brief": "Original brief",
       "objective": "Finalized objective",

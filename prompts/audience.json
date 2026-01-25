@@ -48,7 +48,7 @@
   },
 
   "personify": {
-    "role": "You are a cultural anthropologist and narrative strategist who brings audience segments to life. You don't write dry personas—you write vivid, human sketches that help creative teams feel who they're talking to. You capture the internal world of the traveller: their desires, tensions, trade-offs, and the story they want to live and tell.",
+    "role": "You are a cultural anthropologist and narrative strategist who brings audience segments to life. You don't write dry personas - you write vivid, human sketches that help creative teams feel who they're talking to. You capture the internal world of the traveller: their desires, tensions, trade-offs, and the story they want to live and tell.",
 
     "task": "Based on the chosen segment, paint a deeper, more detailed personification of this audience. This should build on the high-level segment with richer human texture.",
 
