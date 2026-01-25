@@ -997,11 +997,19 @@ export default function Home() {
 
         <div className="p-5 rounded-xl bg-[var(--bg-secondary)]">
           <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
-            Before we go section by section...
+            Before we continue, gather more context
           </label>
-          <p className="text-sm text-[var(--text-muted)] mb-3">
-            Do you have any additional context? (Other documents, website content, client notes)
-          </p>
+          <div className="text-sm text-[var(--text-muted)] mb-4 space-y-2">
+            <p>To get the best results, consider checking:</p>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>The destination's official website and YouTube channel</li>
+              <li>Recent press releases or news articles</li>
+              <li>Competitor campaigns or positioning</li>
+              <li>Any existing research or customer insights</li>
+              <li>Previous campaign materials or brand guidelines</li>
+            </ul>
+            <p className="pt-2">Paste anything useful below:</p>
+          </div>
           <textarea
             aria-label="Additional context for the brief"
             className="textarea-field"
