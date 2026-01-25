@@ -1372,6 +1372,13 @@ export default function Home() {
     }
 
     // Pre-export summary
+    const getStatusSummary = () => {
+      const red = state.sections.filter(s => s.status === 'red');
+      const amber = state.sections.filter(s => s.status === 'amber');
+      const green = state.sections.filter(s => s.status === 'green');
+      return { red, amber, green };
+    };
+
     return (
       <div className="space-y-6">
         {/* Back Button */}
@@ -1385,6 +1392,62 @@ export default function Home() {
             All sections reviewed. Ready to compile your final Pitch Pack.
           </p>
         </div>
+
+        {/* Status Summary */}
+        {(() => {
+          const { red, amber, green } = getStatusSummary();
+          const hasIssues = red.length > 0 || amber.length > 0;
+
+          return (
+            <div className={`p-4 rounded-xl border-l-4 mb-6 ${
+              red.length > 0
+                ? 'bg-[var(--status-red-bg)] border-[var(--status-red)]'
+                : amber.length > 0
+                ? 'bg-[var(--status-amber)]/10 border-[var(--status-amber)]'
+                : 'bg-[var(--status-green)]/10 border-[var(--status-green)]'
+            }`}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">
+                  {red.length > 0 ? '⚠️' : amber.length > 0 ? '💡' : '✓'}
+                </span>
+                <span className="font-semibold text-[var(--text-primary)]">
+                  {red.length > 0
+                    ? 'Some sections need attention'
+                    : amber.length > 0
+                    ? 'Almost there'
+                    : 'Looking good!'}
+                </span>
+              </div>
+
+              <div className="text-sm text-[var(--text-secondary)] space-y-1">
+                {red.length > 0 && (
+                  <p>
+                    <span className="font-medium text-[var(--status-red)]">Missing ({red.length}):</span>{' '}
+                    {red.map(s => s.name).join(', ')}
+                  </p>
+                )}
+                {amber.length > 0 && (
+                  <p>
+                    <span className="font-medium text-[var(--status-amber)]">Needs work ({amber.length}):</span>{' '}
+                    {amber.map(s => s.name).join(', ')}
+                  </p>
+                )}
+                {green.length > 0 && (
+                  <p>
+                    <span className="font-medium text-[var(--status-green)]">Good ({green.length}):</span>{' '}
+                    {green.map(s => s.name).join(', ')}
+                  </p>
+                )}
+              </div>
+
+              {hasIssues && (
+                <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-current/10">
+                  Click any section below to go back and improve it
+                </p>
+              )}
+            </div>
+          );
+        })()}
 
         <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
           {state.sections.map((section, index) => (
