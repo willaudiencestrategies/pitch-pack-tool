@@ -330,7 +330,6 @@ function SectionStepContent({
   totalSections,
   loading,
   onReassess,
-  onGenerate,
   onUpdateContent,
   onUpdateSuggestion,
   onAcceptSuggestion,
@@ -342,7 +341,6 @@ function SectionStepContent({
   totalSections: number;
   loading: boolean;
   onReassess: (info: string) => void;
-  onGenerate: () => void;
   onUpdateContent: (content: string) => void;
   onUpdateSuggestion: (suggestion: string) => void;
   onAcceptSuggestion: () => void;
@@ -458,38 +456,24 @@ function SectionStepContent({
       {/* AI Tools - available for ALL sections including green */}
       <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
         <label className="block text-sm font-medium text-[var(--text-secondary)]">
-          {section.status === 'green'
-            ? 'Want to improve this section further?'
-            : 'Do you have any additional information?'}
+          Add extra context to improve this section
         </label>
         <textarea
           aria-label="Additional information for this section"
           className="textarea-field"
           style={{ minHeight: '120px' }}
-          placeholder={section.status === 'green'
-            ? "Add context or notes if you'd like AI to suggest improvements..."
-            : "Add any extra context, notes, or information that might help..."}
+          placeholder="Paste additional context, client notes, website content, or other information that could help improve this section..."
           value={additionalInfo}
           onChange={(e) => setAdditionalInfo(e.target.value)}
         />
-        <div className="flex gap-3 flex-wrap">
-          <button
-            onClick={() => onReassess(additionalInfo)}
-            disabled={loading || !additionalInfo.trim()}
-            className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
-          >
-            {loading && <Spinner className="text-white" />}
-            Re-assess with Info
-          </button>
-          <button
-            onClick={onGenerate}
-            disabled={loading}
-            className="btn-outline text-sm px-4 py-2 flex items-center gap-2"
-          >
-            {loading && <Spinner />}
-            {section.status === 'green' ? 'Get AI Suggestions' : 'Generate Suggestion'}
-          </button>
-        </div>
+        <button
+          onClick={() => onReassess(additionalInfo)}
+          disabled={loading || !additionalInfo.trim()}
+          className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
+        >
+          {loading && <Spinner className="text-white" />}
+          Re-assess with Info
+        </button>
       </div>
 
       {/* Continue Button */}
@@ -1039,7 +1023,6 @@ export default function Home() {
         totalSections={state.sections.length}
         loading={state.loading}
         onReassess={handleSectionReassess}
-        onGenerate={handleSectionGenerate}
         onUpdateContent={updateSectionContent}
         onUpdateSuggestion={updateSectionSuggestion}
         onAcceptSuggestion={acceptSuggestion}
