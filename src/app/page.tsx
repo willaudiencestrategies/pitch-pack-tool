@@ -385,6 +385,20 @@ function SectionStepContent({
         </div>
       )}
 
+      {/* Creative Tenets special note */}
+      {section.key === 'creative_tenets' && (
+        <div className="p-4 rounded-lg bg-[var(--expedia-navy)]/5 border border-[var(--expedia-navy)]/20 text-sm">
+          <p className="font-medium text-[var(--expedia-navy)] mb-1">
+            Note: Creative Tenets are generated, not extracted
+          </p>
+          <p className="text-[var(--text-secondary)]">
+            Unlike other sections, Creative Tenets are typically not in the original brief.
+            They're strategic principles we'll help you develop based on everything we've
+            learned so far. The content below is a starting point for you to refine.
+          </p>
+        </div>
+      )}
+
       {/* Current Content */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-[var(--text-secondary)]">
