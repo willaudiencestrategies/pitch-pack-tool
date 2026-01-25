@@ -372,6 +372,19 @@ function SectionStepContent({
         <StatusBadge status={section.status} />
       </div>
 
+      {/* Section-specific guidance */}
+      {section.status !== 'green' && (
+        <div className="p-4 rounded-lg bg-[var(--bg-tertiary)] text-sm">
+          <p className="font-medium text-[var(--text-primary)] mb-2">How to improve this section:</p>
+          <ol className="list-decimal list-inside space-y-1 text-[var(--text-secondary)]">
+            <li>Review the AI Analysis below to understand what's missing</li>
+            <li>Add any extra information you have in the text box at the bottom</li>
+            <li>Click "Re-assess with Info" to get an updated assessment</li>
+            <li>Repeat until you're happy, then click "Confirm & Continue"</li>
+          </ol>
+        </div>
+      )}
+
       {/* Current Content */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-[var(--text-secondary)]">
