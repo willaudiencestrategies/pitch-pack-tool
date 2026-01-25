@@ -399,6 +399,20 @@ function SectionStepContent({
         </div>
       )}
 
+      {/* Research Stimuli note */}
+      {section.key === 'research_stimuli' && (
+        <div className="p-4 rounded-lg bg-[var(--status-amber)]/10 border border-[var(--status-amber)]/30 text-sm">
+          <p className="font-medium text-[var(--status-amber)] mb-1">
+            Note: URLs are extracted, not verified
+          </p>
+          <p className="text-[var(--text-secondary)]">
+            Any URLs shown below were extracted from the brief. We haven't checked if they
+            still work or verified their content. Please check any links before including
+            them in your final Pitch Pack.
+          </p>
+        </div>
+      )}
+
       {/* Current Content */}
       <div className="space-y-3">
         <label className="block text-sm font-medium text-[var(--text-secondary)]">
