@@ -31,10 +31,9 @@
     },
     "outputs": {
       "status": "green/amber/red",
-      "content": "Updated objective content",
-      "feedback": "Updated explanation",
-      "gaps": "Remaining gaps if any",
-      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
+      "suggestion": "Your improved version of the objective based on the additional context. This will be presented to the user for review - they can accept or reject it.",
+      "feedback": "Updated explanation of what has improved and what still needs work",
+      "questions": "Array of 2-4 remaining questions if any gaps remain"
     },
     "examples": [],
     "escapeHatch": "If new info doesn't help, explain what's still needed."
