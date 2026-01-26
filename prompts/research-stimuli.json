@@ -31,10 +31,9 @@
     },
     "outputs": {
       "status": "green/amber/red",
-      "content": "Updated content",
-      "feedback": "Updated feedback",
-      "gaps": "Remaining gaps",
-      "questions": "Array of 2-4 specific questions the user could answer to further improve this section"
+      "suggestion": "Your improved version of the research stimuli based on the additional context. This will be presented to the user for review - they can accept or reject it.",
+      "feedback": "Updated explanation of what has improved and what still needs work",
+      "questions": "Array of 2-4 remaining questions if any gaps remain"
     },
     "examples": [],
     "escapeHatch": "Note what research would strengthen the brief."
