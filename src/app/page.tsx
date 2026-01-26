@@ -340,7 +340,7 @@ function SectionStepContent({
   sectionIndex: number;
   totalSections: number;
   loading: boolean;
-  onReassess: (info: string) => void;
+  onReassess: (info: string) => Promise<void>;
   onUpdateContent: (content: string) => void;
   onUpdateSuggestion: (suggestion: string) => void;
   onAcceptSuggestion: () => void;
@@ -348,6 +348,7 @@ function SectionStepContent({
   onBack: () => void;
 }) {
   const [additionalInfo, setAdditionalInfo] = useState('');
+  const [reassessSuccess, setReassessSuccess] = useState(false);
 
   // Get the previous section name for back button label
   const getPreviousSectionName = () => {
@@ -508,13 +509,23 @@ function SectionStepContent({
           onChange={(e) => setAdditionalInfo(e.target.value)}
         />
         <button
-          onClick={() => onReassess(additionalInfo)}
+          onClick={async () => {
+            await onReassess(additionalInfo);
+            setAdditionalInfo('');  // Clear input
+            setReassessSuccess(true);
+            setTimeout(() => setReassessSuccess(false), 3000);  // Hide after 3s
+          }}
           disabled={loading || !additionalInfo.trim()}
           className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
         >
           {loading && <Spinner className="text-white" />}
           Re-assess with Info
         </button>
+        {reassessSuccess && (
+          <p className="text-sm text-[var(--status-green)] mt-2 flex items-center gap-1">
+            <span>✓</span> Re-assessment complete - check the suggestion above
+          </p>
+        )}
       </div>
 
       {/* Continue Button */}
@@ -639,9 +650,9 @@ export default function Home() {
       updatedSections[state.currentSectionIndex] = {
         ...section,
         status: data.status,
-        content: data.content,
+        // content stays as-is until user accepts suggestion
         feedback: data.feedback,
-        suggestion: data.suggestion,
+        suggestion: data.suggestion,  // This shows in the suggestion box
         questions: data.questions,
       };
 
