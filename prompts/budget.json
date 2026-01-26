@@ -41,9 +41,9 @@
     },
     "outputs": {
       "status": "green/amber/red",
-      "content": "Updated budget content",
-      "feedback": "Updated explanation",
-      "questions": "Array of remaining questions"
+      "suggestion": "Your improved version of the budget section based on the additional context. This will be presented to the user for review - they can accept or reject it.",
+      "feedback": "Updated explanation of what has improved and what still needs work",
+      "questions": "Array of 2-4 remaining questions if any gaps remain"
     },
     "examples": [],
     "escapeHatch": "If new info doesn't help, explain what's still needed."
