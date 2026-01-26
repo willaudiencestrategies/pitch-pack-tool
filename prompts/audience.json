@@ -17,7 +17,12 @@
     "task": "Re-evaluate audience given new information.",
     "logic": "Same psychographic criteria.",
     "inputs": { "brief": "Original brief", "currentContent": "Previous content", "additionalContext": "New info" },
-    "outputs": { "status": "green/amber/red", "content": "Updated content", "feedback": "Updated feedback", "gaps": "Remaining gaps", "questions": "Array of questions" },
+    "outputs": {
+      "status": "green/amber/red",
+      "suggestion": "Your improved version of the audience definition based on the additional context. This will be presented to the user for review - they can accept or reject it.",
+      "feedback": "Updated explanation of what has improved and what still needs work",
+      "questions": "Array of 2-4 remaining questions if any gaps remain"
+    },
     "examples": [],
     "escapeHatch": "If still weak, recommend generation."
   },
