@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     }
     const { audience, personification } = body;
 
-    const promptConfig = loadPrompt('human-truths');
+    const promptConfig = loadPrompt('audience-insights');
     const systemPrompt = buildSystemPrompt(promptConfig.generate);
 
     const userMessage = `Audience segment:
@@ -24,27 +24,27 @@ Demographics: ${audience.demographics}
 Personification:
 ${personification}
 
-Generate 12 human truths.`;
+Generate 12 audience insights.`;
 
-    const response = await callClaudeJSON<{ truths: string[] }>(
+    const response = await callClaudeJSON<{ insights: string[] }>(
       systemPrompt,
       userMessage,
       { endpoint: 'truths:generate' }
     );
 
     // Transform string array into Truth objects with id and level
-    const rawTruths = Array.isArray(response.truths) ? response.truths : [];
+    const rawTruths = Array.isArray(response.insights) ? response.insights : [];
     const truths: Truth[] = rawTruths.map((text, index) => {
       // Clean up any numbered prefixes Claude might add (e.g., "1. ", "1) ")
       const cleanText = typeof text === 'string'
         ? text.replace(/^\d+[\.\)]\s*/, '').trim()
         : String(text);
 
-      // Determine level based on position: 0-3 safer, 4-7 sharper, 8-11 bolder
+      // Determine level based on position: 0-3 bolder, 4-7 sharper, 8-11 safer (BOLD FIRST)
       let level: 'safer' | 'sharper' | 'bolder';
-      if (index < 4) level = 'safer';
+      if (index < 4) level = 'bolder';
       else if (index < 8) level = 'sharper';
-      else level = 'bolder';
+      else level = 'safer';
 
       return {
         id: index + 1,
