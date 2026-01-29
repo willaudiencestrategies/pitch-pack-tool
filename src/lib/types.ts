@@ -2,39 +2,55 @@
 
 export type Status = 'green' | 'amber' | 'red';
 
-export type Step = 'upload' | 'triage' | 'context' | 'sections' | 'audience' | 'truths' | 'output';
+// Gate-based step flow
+export type Step = 'upload' | 'triage' | 'context' | 'gate1_sections' | 'gate_transition' | 'gate2_brand' | 'gate2_audience' | 'gate2_insights' | 'gate2_tenets' | 'gate2_media' | 'output';
 
-export type SectionKey =
-  | 'budget'
-  | 'objective'
-  | 'creative_task'
-  | 'audience'
-  | 'human_truths'
-  | 'creative_tenets'
-  | 'media_strategy'
-  | 'research_stimuli';
+// Section keys by gate
+export type Gate1SectionKey = 'objective' | 'budget' | 'audience' | 'creative_task';
+export type Gate2SectionKey = 'brand_alignment' | 'audience_insights' | 'creative_tenets' | 'media_context';
+export type AppendixKey = 'research_stimuli';
+export type SectionKey = Gate1SectionKey | Gate2SectionKey | AppendixKey;
 
-export const SECTION_CONFIG: Record<SectionKey, { name: string; order: number }> = {
-  budget: { name: 'Budget', order: 0 },
-  objective: { name: 'Objective', order: 1 },
-  creative_task: { name: 'Creative Task', order: 2 },
-  audience: { name: 'Audience', order: 3 },
-  human_truths: { name: 'Human Truths', order: 4 },
-  creative_tenets: { name: 'Creative Tenets', order: 5 },
-  media_strategy: { name: 'Media Strategy', order: 6 },
-  research_stimuli: { name: 'Research Stimuli', order: 7 },
-};
+// Section key arrays for iteration
+export const GATE1_SECTION_KEYS: Gate1SectionKey[] = [
+  'objective',
+  'budget',
+  'audience',
+  'creative_task',
+];
+
+export const GATE2_SECTION_KEYS: Gate2SectionKey[] = [
+  'brand_alignment',
+  'audience_insights',
+  'creative_tenets',
+  'media_context',
+];
+
+export const APPENDIX_KEYS: AppendixKey[] = ['research_stimuli'];
 
 export const SECTION_KEYS: SectionKey[] = [
-  'budget',
-  'objective',
-  'creative_task',
-  'audience',
-  'human_truths',
-  'creative_tenets',
-  'media_strategy',
-  'research_stimuli',
+  ...GATE1_SECTION_KEYS,
+  ...GATE2_SECTION_KEYS,
+  ...APPENDIX_KEYS,
 ];
+
+export const SECTION_CONFIG: Record<SectionKey, { name: string; order: number; gate: 'gate1' | 'gate2' | 'appendix' }> = {
+  objective: { name: 'Objective', order: 0, gate: 'gate1' },
+  budget: { name: 'Budget', order: 1, gate: 'gate1' },
+  audience: { name: 'Audience', order: 2, gate: 'gate1' },
+  creative_task: { name: 'Creative Task', order: 3, gate: 'gate1' },
+  brand_alignment: { name: 'Brand Alignment', order: 4, gate: 'gate2' },
+  audience_insights: { name: 'Audience Insights', order: 5, gate: 'gate2' },
+  creative_tenets: { name: 'Creative Tenets', order: 6, gate: 'gate2' },
+  media_context: { name: 'Media Context', order: 7, gate: 'gate2' },
+  research_stimuli: { name: 'Research Stimuli', order: 8, gate: 'appendix' },
+};
+
+// Legacy mapping for backwards compatibility during migration
+export const LEGACY_SECTION_MAP: Record<string, SectionKey> = {
+  human_truths: 'audience_insights',
+  media_strategy: 'media_context',
+};
 
 export interface Section {
   key: SectionKey;
@@ -45,6 +61,35 @@ export interface Section {
   suggestion?: string;
   gaps?: string[];
   questions?: string[];
+}
+
+// Brand Alignment (Gate 2 - NEW)
+export type ExpediaBrand = 'expedia' | 'hotels_com' | 'vrbo';
+
+export interface BrandAlignment {
+  brand: ExpediaBrand | null;
+  hasDGMatch: boolean;
+  brandAudience?: string; // Placeholder for brand audience definition
+}
+
+// Budget Details (enhanced)
+export interface BudgetDetails {
+  totalBudget: string;
+  productionBudget: string;
+  currency: string;
+}
+
+// Audience Prioritisation (Gate 2)
+export interface AudiencePrioritisation {
+  primary: AudienceSegment;
+  secondary: AudienceSegment[]; // Max 2
+}
+
+// Brief Score (stub for analytics)
+export interface BriefScore {
+  sellerName?: string;
+  timestamp: string;
+  gate1Scores: Partial<Record<Gate1SectionKey, Status>>;
 }
 
 export interface Segment {
@@ -62,6 +107,7 @@ export interface Truth {
 
 export interface SessionState {
   step: Step;
+  currentGate: 'gate1' | 'gate2' | 'output';
   brief: string;
   additionalContext: string;
 
@@ -74,17 +120,28 @@ export interface SessionState {
   currentSectionOptions: SectionOptionsResponse | null;
   selectedOptionLevel: OptionLevel | null;
 
-  // Two-step audience
+  // Gate 2: Brand Alignment
+  brandAlignment: BrandAlignment | null;
+
+  // Gate 2: Budget Details
+  budgetDetails: BudgetDetails | null;
+
+  // Gate 2: Audience
   audienceMenu: AudienceSegmentMenu | null;
   selectedAudienceSegment: AudienceSegment | null;
   personification: PersonificationResponse | null;
+  audiencePrioritisation: AudiencePrioritisation | null;
 
-  // Human truths
-  truthOptions: Truth[];
-  selectedTruths: Truth[];
+  // Gate 2: Audience Insights (renamed from Human Truths)
+  insightOptions: Truth[]; // Renamed from truthOptions
+  selectedInsights: Truth[]; // Renamed from selectedTruths, max 3
 
   // Output
   outputMarkdown: string | null;
+  includeResearchStimuli: boolean; // Toggle for appendix
+
+  // Analytics stub
+  briefScore: BriefScore | null;
 
   error: string | null;
   loading: boolean;
@@ -93,6 +150,7 @@ export interface SessionState {
 export function createInitialState(): SessionState {
   return {
     step: 'upload',
+    currentGate: 'gate1',
     brief: '',
     additionalContext: '',
     triageResult: null,
@@ -106,12 +164,17 @@ export function createInitialState(): SessionState {
     currentSectionIndex: 0,
     currentSectionOptions: null,
     selectedOptionLevel: null,
+    brandAlignment: null,
+    budgetDetails: null,
     audienceMenu: null,
     selectedAudienceSegment: null,
     personification: null,
-    truthOptions: [],
-    selectedTruths: [],
+    audiencePrioritisation: null,
+    insightOptions: [],
+    selectedInsights: [],
     outputMarkdown: null,
+    includeResearchStimuli: false,
+    briefScore: null,
     error: null,
     loading: false,
   };
@@ -168,6 +231,7 @@ export interface OutputRequest {
   audience?: Segment;
   personification?: string;
   selectedTruths?: Truth[];
+  includeResearchStimuli?: boolean;
 }
 
 export interface OutputResponse {
@@ -177,9 +241,9 @@ export interface OutputResponse {
 // Two-Step Audience Types
 export interface AudienceSegment {
   id: number;
-  name: string;         // Snappy 1-2 word name
-  needsValues: string;  // Rich description of needs/values/motivations
-  demographics: string; // Observable behaviours/demographics
+  name: string;
+  needsValues: string;
+  demographics: string;
 }
 
 export interface AudienceSegmentMenu {
@@ -189,7 +253,7 @@ export interface AudienceSegmentMenu {
 
 export interface PersonificationResponse {
   intro: string;
-  narrative: string;  // 150-300 word vivid human sketch
+  narrative: string;
 }
 
 // Four-Option Response Types
@@ -235,4 +299,18 @@ export interface EnhancedTriageResponse {
   synthesizedReplay: Record<SectionKey, SynthesizedSection>;
   triageAssessment: TriageSectionResult[];
   overallBriefHealth: string;
+}
+
+// Creative Tenets Generation (NEW - v1.2)
+export interface CreativeTenetsRequest {
+  brief: string;
+  objective: string;
+  audience: AudienceSegment;
+  insights: Truth[];
+  additionalContext?: string;
+}
+
+export interface CreativeTenetsResponse {
+  tenets: string[];
+  intro: string;
 }
