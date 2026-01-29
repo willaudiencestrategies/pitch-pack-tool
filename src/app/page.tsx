@@ -21,11 +21,19 @@ import {
   SectionOptionsResponse,
   SECTION_CONFIG,
   SECTION_KEYS,
+  GATE1_SECTION_KEYS,
+  GATE2_SECTION_KEYS,
+  BrandAlignment as BrandAlignmentType,
+  CreativeTenetsResponse,
 } from '@/lib/types';
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
 import { FileUpload } from '@/components/FileUpload';
+import { BrandAlignment } from '@/components/BrandAlignment';
+import { GateTransition } from '@/components/GateTransition';
+import { CreativeTenets } from '@/components/CreativeTenets';
+import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 
 // ============================================
 // Helper Components
@@ -207,20 +215,27 @@ function GlobalProgressBar({
   sectionIndex,
   totalSections,
   sections,
+  currentGate,
   onNavigate,
 }: {
   step: string;
   sectionIndex: number;
   totalSections: number;
   sections: Section[];
+  currentGate: 'gate1' | 'gate2' | 'output';
   onNavigate: (step: Step) => void;
 }) {
+  // Two-gate flow progress steps
   const steps = [
     { key: 'upload', label: 'Upload' },
     { key: 'triage', label: 'Triage' },
-    { key: 'sections', label: 'Sections' },
-    { key: 'audience', label: 'Audience' },
-    { key: 'truths', label: 'Truths' },
+    { key: 'gate1_sections', label: 'Gate 1' },
+    { key: 'gate_transition', label: 'Transition' },
+    { key: 'gate2_brand', label: 'Brand' },
+    { key: 'gate2_audience', label: 'Audience' },
+    { key: 'gate2_insights', label: 'Insights' },
+    { key: 'gate2_tenets', label: 'Tenets' },
+    { key: 'gate2_media', label: 'Media' },
     { key: 'output', label: 'Output' },
   ];
 
@@ -300,23 +315,26 @@ function GlobalProgressBar({
           })}
         </div>
 
-        {/* Section sub-progress when in sections step */}
-        {step === 'sections' && sections.length > 0 && (
+        {/* Section sub-progress when in Gate 1 sections step */}
+        {step === 'gate1_sections' && sections.length > 0 && (
           <div className="flex gap-1 mt-2">
-            {sections.map((section, i) => (
-              <div
-                key={section.key}
-                className={`h-1 flex-1 rounded-full transition-colors ${
-                  i < sectionIndex
-                    ? section.status === 'green' ? 'bg-[var(--status-green)]' :
-                      section.status === 'amber' ? 'bg-[var(--status-amber)]' : 'bg-[var(--status-red)]'
-                    : i === sectionIndex
-                    ? 'bg-[var(--expedia-navy)]'
-                    : 'bg-[var(--border-color)]'
-                }`}
-                title={section.name}
-              />
-            ))}
+            {/* Only show Gate 1 sections in sub-progress */}
+            {sections
+              .filter((s) => GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number]))
+              .map((section, i) => (
+                <div
+                  key={section.key}
+                  className={`h-1 flex-1 rounded-full transition-colors ${
+                    i < sectionIndex
+                      ? section.status === 'green' ? 'bg-[var(--status-green)]' :
+                        section.status === 'amber' ? 'bg-[var(--status-amber)]' : 'bg-[var(--status-red)]'
+                      : i === sectionIndex
+                      ? 'bg-[var(--expedia-navy)]'
+                      : 'bg-[var(--border-color)]'
+                  }`}
+                  title={section.name}
+                />
+              ))}
           </div>
         )}
       </div>
@@ -372,6 +390,9 @@ function SectionStepContent({
         </div>
         <StatusBadge status={section.status} />
       </div>
+
+      {/* Good Example Prompt - expandable guidance */}
+      <GoodExamplePrompt sectionKey={section.key} />
 
       {/* Section-specific guidance */}
       {section.status !== 'green' && (
@@ -482,14 +503,14 @@ function SectionStepContent({
             onChange={(e) => onUpdateSuggestion(e.target.value)}
           />
           <div className="flex gap-3">
-            <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-4 py-2">
-              Accept Suggestion
+            <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-5 py-2.5">
+              Use this suggestion
             </button>
             <button
               onClick={() => onUpdateSuggestion('')}
-              className="btn-outline text-sm px-4 py-2"
+              className="btn-outline text-sm px-5 py-2.5"
             >
-              Dismiss
+              Keep current
             </button>
           </div>
         </div>
@@ -498,13 +519,13 @@ function SectionStepContent({
       {/* AI Tools - available for ALL sections including green */}
       <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
         <label className="block text-sm font-medium text-[var(--text-secondary)]">
-          Add extra context to improve this section
+          Tell me more
         </label>
         <textarea
           aria-label="Additional information for this section"
           className="textarea-field"
           style={{ minHeight: '120px' }}
-          placeholder="Paste additional context, client notes, website content, or other information that could help improve this section..."
+          placeholder="Add any extra context, client notes, or information that could help improve this section..."
           value={additionalInfo}
           onChange={(e) => setAdditionalInfo(e.target.value)}
         />
@@ -559,7 +580,16 @@ export default function Home() {
       return;
     }
     updateState({ step });
-    if (step === 'sections') {
+    // Update gate based on step
+    if (step === 'triage' || step === 'gate1_sections') {
+      updateState({ currentGate: 'gate1' });
+    } else if (step.startsWith('gate2_') || step === 'gate_transition') {
+      updateState({ currentGate: 'gate2' });
+    } else if (step === 'output') {
+      updateState({ currentGate: 'output' });
+    }
+    // Reset section index for gate1 sections
+    if (step === 'gate1_sections') {
       updateState({ currentSectionIndex: 0 });
     }
   };
@@ -708,7 +738,7 @@ export default function Home() {
 
   const handleGenerateAudience = async (feedback?: string) => {
     // Update step immediately so progress bar shows Audience during loading
-    updateState({ loading: true, error: null, step: 'audience' });
+    updateState({ loading: true, error: null, step: 'gate2_audience' });
     setLastAction(() => () => handleGenerateAudience(feedback));
 
     try {
@@ -778,12 +808,12 @@ export default function Home() {
     }
   };
 
-  const handleGenerateTruths = async () => {
+  const handleGenerateInsights = async () => {
     if (!state.selectedAudienceSegment || !state.personification) return;
 
-    // Update step immediately so progress bar shows Truths during loading
-    updateState({ loading: true, error: null, step: 'truths' });
-    setLastAction(() => handleGenerateTruths);
+    // Update step immediately so progress bar shows Insights during loading
+    updateState({ loading: true, error: null, step: 'gate2_insights' });
+    setLastAction(() => handleGenerateInsights);
 
     try {
       const response = await fetch('/api/generate/truths', {
@@ -795,11 +825,11 @@ export default function Home() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate truths');
+      if (!response.ok) throw new Error('Failed to generate insights');
 
       const data: TruthsResponse = await response.json();
       updateState({
-        truthOptions: data.truths,
+        insightOptions: data.truths,
         loading: false,
       });
     } catch (err) {
@@ -808,6 +838,73 @@ export default function Home() {
         loading: false,
       });
     }
+  };
+
+  // Brand Alignment handler (Gate 2)
+  const handleBrandAlignment = (alignment: BrandAlignmentType) => {
+    updateState({
+      brandAlignment: alignment,
+      step: 'gate2_audience',
+    });
+  };
+
+  // Generate Creative Tenets (Gate 2)
+  const handleGenerateTenets = async (): Promise<CreativeTenetsResponse> => {
+    if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
+      throw new Error('Audience and insights required');
+    }
+
+    updateState({ loading: true, error: null });
+    setLastAction(() => () => handleGenerateTenets());
+
+    try {
+      // Get objective from sections
+      const objectiveSection = state.sections.find((s) => s.key === 'objective');
+      const objective = objectiveSection?.content || '';
+
+      const response = await fetch('/api/generate/tenets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brief: state.brief,
+          objective,
+          audience: state.selectedAudienceSegment,
+          insights: state.selectedInsights,
+          additionalContext: state.additionalContext,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to generate tenets');
+
+      const data: CreativeTenetsResponse = await response.json();
+      updateState({ loading: false });
+      return data;
+    } catch (err) {
+      updateState({
+        error: err instanceof Error ? err.message : 'Something went wrong',
+        loading: false,
+      });
+      throw err;
+    }
+  };
+
+  // Confirm tenets and continue to media step
+  const handleConfirmTenets = (tenets: string[]) => {
+    // Update the creative_tenets section with the confirmed tenets
+    const updatedSections = [...state.sections];
+    const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
+    if (tenetsIndex >= 0) {
+      updatedSections[tenetsIndex] = {
+        ...updatedSections[tenetsIndex],
+        status: 'green',
+        content: tenets.map((t, i) => `${i + 1}. ${t}`).join('\n'),
+      };
+    }
+
+    updateState({
+      sections: updatedSections,
+      step: 'gate2_media',
+    });
   };
 
   const handleCompileOutput = async () => {
@@ -822,7 +919,8 @@ export default function Home() {
           sections: state.sections,
           audience: state.selectedAudienceSegment,
           personification: state.personification?.narrative || '',
-          selectedTruths: state.selectedTruths,
+          selectedTruths: state.selectedInsights, // API still uses selectedTruths name
+          includeResearchStimuli: state.includeResearchStimuli,
         }),
       });
 
@@ -844,31 +942,23 @@ export default function Home() {
     }
   };
 
-  // Navigation helpers
-  const goToNextSection = () => {
+  // Navigation helpers for two-gate flow
+  const goToNextGate1Section = () => {
+    // Get only Gate 1 sections
+    const gate1Sections = state.sections.filter((s) =>
+      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+    );
     const nextIndex = state.currentSectionIndex + 1;
 
-    // Check if we need to go to audience generation
-    const currentSection = state.sections[state.currentSectionIndex];
-    if (currentSection.key === 'audience' && !state.audienceMenu) {
-      handleGenerateAudience();
-      return;
-    }
-
-    // Check if we need to go to truths generation
-    if (currentSection.key === 'human_truths' && state.truthOptions.length === 0) {
-      handleGenerateTruths();
-      return;
-    }
-
-    if (nextIndex < state.sections.length) {
+    if (nextIndex < gate1Sections.length) {
       updateState({ currentSectionIndex: nextIndex });
     } else {
-      updateState({ step: 'output' });
+      // Finished Gate 1, go to transition
+      updateState({ step: 'gate_transition' });
     }
   };
 
-  const goToPreviousSection = () => {
+  const goToPreviousGate1Section = () => {
     if (state.currentSectionIndex > 0) {
       updateState({ currentSectionIndex: state.currentSectionIndex - 1 });
     } else {
@@ -973,10 +1063,15 @@ export default function Home() {
   };
 
   const renderTriageStep = () => {
-    // Calculate recommendation based on section statuses
-    const redSections = state.sections.filter(s => s.status === 'red');
-    const amberSections = state.sections.filter(s => s.status === 'amber');
-    const greenSections = state.sections.filter(s => s.status === 'green');
+    // Filter to only Gate 1 sections for triage display
+    const gate1Sections = state.sections.filter((s) =>
+      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+    );
+
+    // Calculate recommendation based on Gate 1 section statuses only
+    const redSections = gate1Sections.filter(s => s.status === 'red');
+    const amberSections = gate1Sections.filter(s => s.status === 'amber');
+    const greenSections = gate1Sections.filter(s => s.status === 'green');
 
     let recommendation = '';
     let recommendationPriority: 'red' | 'amber' | 'green' = 'green';
@@ -993,7 +1088,7 @@ export default function Home() {
       recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map(s => s.name).join(', ')}. Adding more detail will strengthen your Pitch Pack.`;
     } else {
       recommendationPriority = 'green';
-      recommendation = `Your brief covers all sections well. You can still refine each section as you go through.`;
+      recommendation = `Your brief covers the core Gate 1 sections well. You can still refine each section as you go through.`;
     }
 
     return (
@@ -1003,19 +1098,19 @@ export default function Home() {
 
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Initial Assessment
+            Gate 1: Brief Assessment
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Here's my review of your brief across the 8 Pitch Pack sections.
+            Here's my review of the core brief elements. We'll build the creative brief in Gate 2.
           </p>
         </div>
 
         <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
-          {state.sections.map((section, index) => (
+          {gate1Sections.map((section, index) => (
             <div
               key={section.key}
               className={`flex items-center justify-between p-4 ${
-                index !== state.sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+                index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
               }`}
             >
               <div className="flex items-center gap-4">
@@ -1073,37 +1168,206 @@ export default function Home() {
         </div>
 
         <button
-          onClick={() => updateState({ step: 'sections', currentSectionIndex: 0 })}
+          onClick={() => updateState({ step: 'gate1_sections', currentSectionIndex: 0, currentGate: 'gate1' })}
           className="btn-secondary flex items-center gap-2 w-full justify-center"
         >
-          Continue to Sections
+          Review Gate 1 Sections
           <span>→</span>
         </button>
       </div>
     );
   };
 
-  const renderSectionStep = () => {
-    const section = state.sections[state.currentSectionIndex];
+  const renderGate1SectionStep = () => {
+    // Get only Gate 1 sections
+    const gate1Sections = state.sections.filter((s) =>
+      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+    );
+    const section = gate1Sections[state.currentSectionIndex];
+
+    if (!section) {
+      // Safety check - should not happen
+      return null;
+    }
 
     return (
       <SectionStepContent
         key={section.key}
         section={section}
         sectionIndex={state.currentSectionIndex}
-        totalSections={state.sections.length}
+        totalSections={gate1Sections.length}
         loading={state.loading}
         onReassess={handleSectionReassess}
         onUpdateContent={updateSectionContent}
         onUpdateSuggestion={updateSectionSuggestion}
         onAcceptSuggestion={acceptSuggestion}
-        onNext={goToNextSection}
-        onBack={goToPreviousSection}
+        onNext={goToNextGate1Section}
+        onBack={goToPreviousGate1Section}
       />
     );
   };
 
-  const renderAudienceStep = () => {
+  // Gate Transition step renderer
+  const renderGateTransitionStep = () => {
+    return (
+      <GateTransition
+        sections={state.sections}
+        onContinue={() => updateState({ step: 'gate2_brand', currentGate: 'gate2' })}
+        onBack={() => {
+          // Go back to last Gate 1 section
+          const gate1Sections = state.sections.filter((s) =>
+            GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+          );
+          updateState({
+            step: 'gate1_sections',
+            currentSectionIndex: gate1Sections.length - 1,
+          });
+        }}
+      />
+    );
+  };
+
+  // Brand Alignment step renderer (Gate 2)
+  const renderBrandAlignmentStep = () => {
+    return (
+      <BrandAlignment
+        onConfirm={handleBrandAlignment}
+        onBack={() => updateState({ step: 'gate_transition' })}
+        initialValue={state.brandAlignment}
+      />
+    );
+  };
+
+  // Creative Tenets step renderer (Gate 2)
+  const renderCreativeTenetsStep = () => {
+    if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
+      // Redirect back to insights if missing required data
+      updateState({ step: 'gate2_insights' });
+      return null;
+    }
+
+    return (
+      <CreativeTenets
+        audience={state.selectedAudienceSegment}
+        insights={state.selectedInsights}
+        onConfirm={handleConfirmTenets}
+        onBack={() => updateState({ step: 'gate2_insights' })}
+        onGenerate={handleGenerateTenets}
+        loading={state.loading}
+      />
+    );
+  };
+
+  // Media Context step renderer (Gate 2)
+  const renderMediaContextStep = () => {
+    // Get the media_context section
+    const mediaSection = state.sections.find((s) => s.key === 'media_context');
+
+    return (
+      <div className="space-y-6">
+        {/* Back Button */}
+        <button
+          onClick={() => updateState({ step: 'gate2_tenets' })}
+          className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1"
+        >
+          ← Back to Tenets
+        </button>
+
+        {/* Header */}
+        <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-4"
+            style={{
+              backgroundColor: 'var(--expedia-navy)',
+              color: 'white',
+              opacity: 0.85,
+            }}
+          >
+            Gate 2: Step 5
+          </div>
+          <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
+            Media Context
+          </h2>
+          <p className="text-[var(--text-secondary)]">
+            Add any media context the CP has provided. This is not AI-generated.
+          </p>
+        </div>
+
+        {/* Good Example */}
+        <GoodExamplePrompt sectionKey="media_context" />
+
+        {/* Media Context Input */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-[var(--text-secondary)]">
+            Media Context
+          </label>
+          <textarea
+            aria-label="Media context"
+            className="textarea-field"
+            style={{ minHeight: '180px' }}
+            placeholder="Enter any media context provided by the CP (channels, timing, markets, DG match details)..."
+            value={mediaSection?.content || ''}
+            onChange={(e) => {
+              const updatedSections = [...state.sections];
+              const mediaIndex = updatedSections.findIndex((s) => s.key === 'media_context');
+              if (mediaIndex >= 0) {
+                updatedSections[mediaIndex] = {
+                  ...updatedSections[mediaIndex],
+                  content: e.target.value,
+                  status: e.target.value.trim() ? 'green' : 'amber',
+                };
+                updateState({ sections: updatedSections });
+              }
+            }}
+          />
+          <p className="text-xs text-[var(--text-muted)]">
+            This section captures what the CP knows about media direction. It's not a detailed media plan.
+          </p>
+        </div>
+
+        {/* Research Stimuli Toggle */}
+        <div className="p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]">
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div className="pt-0.5">
+              <input
+                type="checkbox"
+                checked={state.includeResearchStimuli}
+                onChange={(e) => updateState({ includeResearchStimuli: e.target.checked })}
+                className="h-5 w-5 rounded border-[var(--border-color)] accent-[var(--expedia-navy)] cursor-pointer"
+              />
+            </div>
+            <div>
+              <span className="font-medium text-[var(--text-primary)] group-hover:text-[var(--expedia-navy)] transition-colors">
+                Include Research Stimuli
+              </span>
+              <p className="text-sm text-[var(--text-muted)] mt-1">
+                Include any URLs and research materials extracted from the brief as an appendix.
+              </p>
+            </div>
+          </label>
+        </div>
+
+        {/* Actions */}
+        <div className="pt-4 border-t border-[var(--border-color)] flex gap-3">
+          <button
+            onClick={() => updateState({ step: 'output', currentGate: 'output' })}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <span>Finish & Generate Output</span>
+            <span>→</span>
+          </button>
+          <button
+            onClick={() => updateState({ step: 'gate2_tenets' })}
+            className="btn-outline"
+          >
+            ← Back
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGate2AudienceStep = () => {
     // Loading state for audience generation
     if (state.loading && !state.audienceMenu) {
       return (
@@ -1124,11 +1388,11 @@ export default function Home() {
       );
     }
 
-    // Loading state for truths generation
+    // Loading state for insights generation
     if (state.loading && state.personification) {
       return (
         <LoadingOverlay
-          message="Generating human truths..."
+          message="Generating audience insights..."
           subMessage="Creating 12 psychological insights for your audience"
         />
       );
@@ -1145,7 +1409,7 @@ export default function Home() {
             updateState({
               personification: { ...state.personification!, narrative: editedNarrative },
             });
-            handleGenerateTruths();
+            handleGenerateInsights();
           }}
           onBack={() => updateState({ selectedAudienceSegment: null, personification: null })}
           loading={state.loading}
@@ -1160,10 +1424,15 @@ export default function Home() {
           menu={state.audienceMenu}
           onSelect={handleSelectAudience}
           onRegenerate={handleGenerateAudience}
-          onBack={() => updateState({ step: 'sections', currentSectionIndex: state.sections.length - 1 })}
+          onBack={() => updateState({ step: 'gate2_brand' })}
           loading={state.loading}
         />
       );
+    }
+
+    // Auto-trigger audience generation if no menu yet
+    if (!state.loading && !state.audienceMenu) {
+      handleGenerateAudience();
     }
 
     // Fallback - shouldn't reach here
@@ -1175,66 +1444,98 @@ export default function Home() {
     );
   };
 
-  const renderTruthsStep = () => {
-    if (state.loading && state.truthOptions.length === 0) {
+  const renderInsightsStep = () => {
+    if (state.loading && state.insightOptions.length === 0) {
       return (
         <LoadingOverlay
-          message="Generating human truths..."
+          message="Generating audience insights..."
           subMessage="Creating 12 psychological insights across safer, sharper, and bolder levels"
         />
       );
     }
 
-    const toggleTruth = (truth: Truth) => {
-      const isSelected = state.selectedTruths.some((t) => t.id === truth.id);
+    const toggleInsight = (insight: Truth) => {
+      const isSelected = state.selectedInsights.some((t) => t.id === insight.id);
       if (isSelected) {
         updateState({
-          selectedTruths: state.selectedTruths.filter((t) => t.id !== truth.id),
+          selectedInsights: state.selectedInsights.filter((t) => t.id !== insight.id),
         });
       } else {
+        // Limit to max 3 insights
+        if (state.selectedInsights.length >= 3) {
+          return; // Don't add more than 3
+        }
         updateState({
-          selectedTruths: [...state.selectedTruths, truth],
+          selectedInsights: [...state.selectedInsights, insight],
         });
       }
     };
 
-    const updateTruthText = (id: number, text: string) => {
-      const updatedTruths = state.truthOptions.map((t) => (t.id === id ? { ...t, text } : t));
-      updateState({ truthOptions: updatedTruths });
+    const updateInsightText = (id: number, text: string) => {
+      const updatedInsights = state.insightOptions.map((t) => (t.id === id ? { ...t, text } : t));
+      updateState({ insightOptions: updatedInsights });
 
       // Also update in selected if present
-      const updatedSelected = state.selectedTruths.map((t) => (t.id === id ? { ...t, text } : t));
-      updateState({ selectedTruths: updatedSelected });
+      const updatedSelected = state.selectedInsights.map((t) => (t.id === id ? { ...t, text } : t));
+      updateState({ selectedInsights: updatedSelected });
     };
 
-    const truthsByLevel = {
-      safer: state.truthOptions.filter((t) => t.level === 'safer'),
-      sharper: state.truthOptions.filter((t) => t.level === 'sharper'),
-      bolder: state.truthOptions.filter((t) => t.level === 'bolder'),
+    // Display order: Bolder first, then Sharper, then Safer
+    const insightsByLevel = {
+      bolder: state.insightOptions.filter((t) => t.level === 'bolder'),
+      sharper: state.insightOptions.filter((t) => t.level === 'sharper'),
+      safer: state.insightOptions.filter((t) => t.level === 'safer'),
     };
 
     const levelLabels = {
-      safer: { label: 'Safer', desc: 'Broad appeal, easy to execute', color: 'var(--status-green)' },
-      sharper: { label: 'Sharper', desc: 'Clearer trade-offs, more distinctive', color: 'var(--status-amber)' },
       bolder: { label: 'Bolder', desc: 'Provocative, high impact', color: 'var(--status-red)' },
+      sharper: { label: 'Sharper', desc: 'Clearer trade-offs, more distinctive', color: 'var(--status-amber)' },
+      safer: { label: 'Safer', desc: 'Broad appeal, easy to execute', color: 'var(--status-green)' },
     };
 
     return (
       <div className="space-y-6">
         {/* Back Button */}
-        <BackButton onClick={() => updateState({ step: 'audience' })} label="Back to Audience" />
+        <BackButton onClick={() => updateState({ step: 'gate2_audience' })} label="Back to Audience" />
 
+        {/* Header */}
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-4"
+            style={{
+              backgroundColor: 'var(--expedia-navy)',
+              color: 'white',
+              opacity: 0.85,
+            }}
+          >
+            Gate 2: Step 3
+          </div>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Select Human Truths
+            Select Audience Insights
           </h2>
           <p className="text-[var(--text-secondary)]">
-            12 truths ranging from safer to bolder. Select the ones that resonate with your
-            audience.
+            12 insights ranging from bolder to safer. Select up to 3 that resonate with your audience.
           </p>
         </div>
 
-        {(['safer', 'sharper', 'bolder'] as const).map((level) => (
+        {/* Selection count indicator */}
+        <div className={`p-3 rounded-lg text-center ${
+          state.selectedInsights.length === 3
+            ? 'bg-[var(--status-green)]/10 border border-[var(--status-green)]'
+            : 'bg-[var(--bg-secondary)]'
+        }`}>
+          <span className="text-sm font-medium">
+            {state.selectedInsights.length}/3 insights selected
+          </span>
+          {state.selectedInsights.length === 3 && (
+            <span className="text-sm text-[var(--status-green)] ml-2">Maximum reached</span>
+          )}
+        </div>
+
+        {/* Good Example */}
+        <GoodExamplePrompt sectionKey="audience_insights" />
+
+        {(['bolder', 'sharper', 'safer'] as const).map((level) => (
           <div key={level} className="space-y-3">
             <div className="flex items-center gap-3">
               <span
@@ -1247,31 +1548,37 @@ export default function Home() {
               <span className="text-sm text-[var(--text-muted)]">— {levelLabels[level].desc}</span>
             </div>
             <div className="space-y-2 pl-6">
-              {truthsByLevel[level].map((truth) => {
-                const isSelected = state.selectedTruths.some((t) => t.id === truth.id);
+              {insightsByLevel[level].map((insight) => {
+                const isSelected = state.selectedInsights.some((t) => t.id === insight.id);
+                const isDisabled = !isSelected && state.selectedInsights.length >= 3;
                 return (
                   <div
-                    key={truth.id}
-                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                    key={insight.id}
+                    className={`flex items-start gap-3 p-3 rounded-lg border transition-all ${
+                      isDisabled
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'cursor-pointer'
+                    } ${
                       isSelected
                         ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5'
                         : 'border-[var(--border-color)] hover:border-[var(--border-hover)]'
                     }`}
-                    onClick={() => toggleTruth(truth)}
+                    onClick={() => !isDisabled && toggleInsight(insight)}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      onChange={() => toggleTruth(truth)}
+                      disabled={isDisabled}
+                      onChange={() => toggleInsight(insight)}
                       className="mt-1 h-4 w-4 accent-[var(--expedia-navy)]"
                     />
                     <div className="flex-1">
                       <input
                         type="text"
-                        value={truth.text}
+                        value={insight.text}
                         onChange={(e) => {
                           e.stopPropagation();
-                          updateTruthText(truth.id, e.target.value);
+                          updateInsightText(insight.id, e.target.value);
                         }}
                         onClick={(e) => e.stopPropagation()}
                         className="w-full bg-transparent text-sm text-[var(--text-primary)] focus:outline-none"
@@ -1286,26 +1593,26 @@ export default function Home() {
 
         <div className="flex items-center justify-between pt-4 border-t border-[var(--border-color)]">
           <span className="text-sm text-[var(--text-muted)]">
-            {state.selectedTruths.length} selected
+            {state.selectedInsights.length} selected (max 3)
           </span>
           <div className="flex gap-3">
             <button
-              onClick={handleGenerateTruths}
+              onClick={handleGenerateInsights}
               disabled={state.loading}
-              className="btn-outline text-sm px-4 py-2"
+              className="btn-outline text-sm px-5 py-2.5"
             >
               Regenerate
             </button>
             <button
               onClick={() => {
-                // Update the human truths section and continue
+                // Update the audience_insights section and continue to tenets
                 const updatedSections = [...state.sections];
-                const truthsIndex = updatedSections.findIndex((s) => s.key === 'human_truths');
-                if (truthsIndex >= 0) {
-                  updatedSections[truthsIndex] = {
-                    ...updatedSections[truthsIndex],
+                const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
+                if (insightsIndex >= 0) {
+                  updatedSections[insightsIndex] = {
+                    ...updatedSections[insightsIndex],
                     status: 'green',
-                    content: state.selectedTruths.map((t) => `- ${t.text}`).join('\n'),
+                    content: state.selectedInsights.map((t) => `- ${t.text}`).join('\n'),
                   };
                 }
                 // Also update audience section
@@ -1319,11 +1626,10 @@ export default function Home() {
                 }
                 updateState({
                   sections: updatedSections,
-                  step: 'sections',
-                  currentSectionIndex: updatedSections.findIndex((s) => s.key === 'creative_tenets'),
+                  step: 'gate2_tenets',
                 });
               }}
-              disabled={state.selectedTruths.length === 0}
+              disabled={state.selectedInsights.length === 0}
               className="btn-secondary flex items-center gap-2"
             >
               Confirm & Continue
@@ -1346,13 +1652,39 @@ export default function Home() {
     }
 
     const navigateToSection = (sectionKey: string) => {
-      const sectionIndex = state.sections.findIndex(s => s.key === sectionKey);
-      if (sectionIndex >= 0) {
-        updateState({
-          step: 'sections',
-          currentSectionIndex: sectionIndex,
-          outputMarkdown: null, // Clear output so they can re-export after changes
-        });
+      // Determine which gate the section belongs to
+      const isGate1 = GATE1_SECTION_KEYS.includes(sectionKey as typeof GATE1_SECTION_KEYS[number]);
+      const isGate2 = GATE2_SECTION_KEYS.includes(sectionKey as typeof GATE2_SECTION_KEYS[number]);
+
+      if (isGate1) {
+        const gate1Sections = state.sections.filter((s) =>
+          GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+        );
+        const sectionIndex = gate1Sections.findIndex(s => s.key === sectionKey);
+        if (sectionIndex >= 0) {
+          updateState({
+            step: 'gate1_sections',
+            currentSectionIndex: sectionIndex,
+            currentGate: 'gate1',
+            outputMarkdown: null,
+          });
+        }
+      } else if (isGate2) {
+        // For Gate 2 sections, navigate to the appropriate step
+        switch (sectionKey) {
+          case 'brand_alignment':
+            updateState({ step: 'gate2_brand', currentGate: 'gate2', outputMarkdown: null });
+            break;
+          case 'audience_insights':
+            updateState({ step: 'gate2_insights', currentGate: 'gate2', outputMarkdown: null });
+            break;
+          case 'creative_tenets':
+            updateState({ step: 'gate2_tenets', currentGate: 'gate2', outputMarkdown: null });
+            break;
+          case 'media_context':
+            updateState({ step: 'gate2_media', currentGate: 'gate2', outputMarkdown: null });
+            break;
+        }
       }
     };
 
@@ -1386,7 +1718,7 @@ export default function Home() {
       return (
         <div className="space-y-6">
           {/* Back Button */}
-          <BackButton onClick={() => updateState({ step: 'truths', outputMarkdown: null })} label="Back to Truths" />
+          <BackButton onClick={() => updateState({ step: 'gate2_media', outputMarkdown: null })} label="Back to Media" />
 
           <div className="text-center pb-6 border-b border-[var(--border-color)]">
             <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
@@ -1442,7 +1774,7 @@ export default function Home() {
     return (
       <div className="space-y-6">
         {/* Back Button */}
-        <BackButton onClick={() => updateState({ step: 'truths' })} label="Back to Truths" />
+        <BackButton onClick={() => updateState({ step: 'gate2_media' })} label="Back to Media" />
 
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
@@ -1561,12 +1893,20 @@ export default function Home() {
         return renderUploadStep();
       case 'triage':
         return renderTriageStep();
-      case 'sections':
-        return renderSectionStep();
-      case 'audience':
-        return renderAudienceStep();
-      case 'truths':
-        return renderTruthsStep();
+      case 'gate1_sections':
+        return renderGate1SectionStep();
+      case 'gate_transition':
+        return renderGateTransitionStep();
+      case 'gate2_brand':
+        return renderBrandAlignmentStep();
+      case 'gate2_audience':
+        return renderGate2AudienceStep();
+      case 'gate2_insights':
+        return renderInsightsStep();
+      case 'gate2_tenets':
+        return renderCreativeTenetsStep();
+      case 'gate2_media':
+        return renderMediaContextStep();
       case 'output':
         return renderOutputStep();
       default:
@@ -1596,8 +1936,11 @@ export default function Home() {
         <GlobalProgressBar
           step={state.step}
           sectionIndex={state.currentSectionIndex}
-          totalSections={state.sections.length}
+          totalSections={state.sections.filter((s) =>
+            GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+          ).length}
           sections={state.sections}
+          currentGate={state.currentGate}
           onNavigate={handleNavigateToStep}
         />
       )}
@@ -1610,7 +1953,7 @@ export default function Home() {
             onRetry={() => lastAction?.()}
             onSkip={() => {
               updateState({ error: null });
-              if (state.step === 'sections') goToNextSection();
+              if (state.step === 'gate1_sections') goToNextGate1Section();
             }}
           />
         )}
