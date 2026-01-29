@@ -1,0 +1,72 @@
+{
+  "section": "brand_alignment",
+  "displayName": "Brand Alignment",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Brand Alignment for Expedia Group campaigns.",
+    "task": "Check if the brief specifies which Expedia Group brand the campaign is for and whether there's DG match/co-investment.",
+    "logic": "GREEN: Brand clearly specified with DG match status. AMBER: Brand mentioned but DG status unclear. RED: No brand specified.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted brand information",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "If brand unclear, default to Expedia."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate brand alignment given new information.",
+    "logic": "Same criteria.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "suggestion": "Updated brand alignment summary",
+      "feedback": "Explanation",
+      "questions": "Remaining questions"
+    },
+    "examples": [],
+    "escapeHatch": "If still unclear, prompt user to select brand."
+  },
+
+  "generate": {
+    "role": "NOT USED - Brand Alignment is user selection.",
+    "task": "This section is not AI-generated. User selects brand from dropdown.",
+    "logic": "N/A",
+    "inputs": {},
+    "outputs": {},
+    "examples": [],
+    "escapeHatch": "Prompt user to select brand if not specified."
+  },
+
+  "brandInfo": {
+    "expedia": {
+      "name": "Expedia",
+      "coreAudience": "Quality seekers, premium travellers",
+      "description": "For travellers who value quality and comprehensive trip planning.",
+      "pointsOfSale": "[Placeholder - awaiting E Studio materials]"
+    },
+    "hotels_com": {
+      "name": "Hotels.com",
+      "coreAudience": "Savvy travellers, deal hunters",
+      "description": "For travellers who love rewards and finding the best deals.",
+      "pointsOfSale": "[Placeholder - awaiting E Studio materials]"
+    },
+    "vrbo": {
+      "name": "Vrbo",
+      "coreAudience": "Family planners, group travellers",
+      "description": "For families and groups who want whole-home rentals.",
+      "pointsOfSale": "[Placeholder - awaiting E Studio materials]"
+    }
+  }
+}
