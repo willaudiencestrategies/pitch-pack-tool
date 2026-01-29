@@ -479,7 +479,12 @@ function SectionStepContent({
   };
 
   return (
-    <div className="space-y-6">
+    <div
+      className="space-y-6"
+      style={{
+        animation: 'fadeSlideIn 0.4s ease-out',
+      }}
+    >
       {/* Back Button */}
       <BackButton onClick={onBack} label={`Back to ${getPreviousSectionName()}`} />
 
@@ -585,33 +590,49 @@ function SectionStepContent({
 
             {section.status !== 'green' && (
               <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-current/10">
-                💡 Answer the questions above in the text box below, then click "Re-assess with Info"
+                Answer the questions above in the text box below, then click "Re-assess with Info"
               </p>
             )}
           </div>
         )}
       </div>
 
-      {/* AI Suggestion */}
+      {/* AI Suggestion - yellow accent border like GoodExamplePrompt */}
       {section.suggestion && (
-        <div className="space-y-3 p-5 rounded-xl bg-[var(--expedia-navy)]/5 border border-[var(--expedia-navy)]/20">
-          <label className="block text-sm font-medium text-[var(--expedia-navy)]">
+        <div
+          className="relative space-y-4 p-5 rounded-xl"
+          style={{
+            borderLeft: '3px solid var(--expedia-yellow)',
+            backgroundColor: 'rgba(255, 199, 44, 0.06)',
+          }}
+        >
+          {/* Subtle corner accent */}
+          <div
+            className="absolute top-0 right-0 w-16 h-16 opacity-5 pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle at top right, var(--expedia-yellow), transparent 70%)',
+            }}
+          />
+          <label className="block text-sm font-semibold text-[var(--text-primary)]">
             AI Suggestion
           </label>
           <textarea
             aria-label={`AI suggestion for ${section.name}`}
-            className="textarea-field border-[var(--expedia-navy)]/30"
-            style={{ minHeight: '180px' }}
+            className="textarea-field"
+            style={{ minHeight: '180px', backgroundColor: 'var(--bg-primary)' }}
             value={section.suggestion}
             onChange={(e) => onUpdateSuggestion(e.target.value)}
           />
           <div className="flex gap-3">
-            <button onClick={onAcceptSuggestion} className="btn-secondary text-sm px-5 py-2.5">
+            <button
+              onClick={onAcceptSuggestion}
+              className="btn-secondary text-sm px-5 py-2.5 hover:shadow-sm transition-shadow"
+            >
               Use this suggestion
             </button>
             <button
               onClick={() => onUpdateSuggestion('')}
-              className="btn-outline text-sm px-5 py-2.5"
+              className="btn-outline text-sm px-5 py-2.5 hover:shadow-sm transition-shadow"
             >
               Keep current
             </button>
@@ -620,8 +641,8 @@ function SectionStepContent({
       )}
 
       {/* AI Tools - available for ALL sections including green */}
-      <div className="space-y-3 p-4 rounded-xl bg-[var(--bg-secondary)]">
-        <label className="block text-sm font-medium text-[var(--text-secondary)]">
+      <div className="space-y-4 p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+        <label className="block text-sm font-semibold text-[var(--text-primary)]">
           Tell me more
         </label>
         <textarea
@@ -640,25 +661,42 @@ function SectionStepContent({
             setTimeout(() => setReassessSuccess(false), 3000);  // Hide after 3s
           }}
           disabled={loading || !additionalInfo.trim()}
-          className="btn-primary text-sm px-4 py-2 flex items-center gap-2"
+          className="btn-primary text-sm px-5 py-2.5 flex items-center gap-2 hover:shadow-sm transition-shadow"
         >
           {loading && <Spinner className="text-white" />}
           Re-assess with Info
         </button>
         {reassessSuccess && (
-          <p className="text-sm text-[var(--status-green)] mt-2 flex items-center gap-1">
+          <p className="text-sm text-[var(--status-green)] flex items-center gap-1">
             <span>✓</span> Re-assessment complete - check the suggestion above
           </p>
         )}
       </div>
 
       {/* Continue Button */}
-      <div className="pt-4">
-        <button onClick={onNext} className="btn-secondary flex items-center gap-2">
+      <div className="pt-4 border-t border-[var(--border-color)]">
+        <button
+          onClick={onNext}
+          className="btn-secondary flex items-center gap-2 hover:shadow-sm transition-shadow"
+        >
           {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
           <span>→</span>
         </button>
       </div>
+
+      {/* Animation keyframes */}
+      <style jsx>{`
+        @keyframes fadeSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -1196,13 +1234,20 @@ export default function Home() {
     }
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" style={{ animation: 'fadeSlideIn 0.4s ease-out' }}>
         {/* Back Button */}
         <BackButton onClick={() => handleNavigateToStep('upload')} label="Back to Upload" />
 
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
+          {/* Gate 1 Badge */}
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium uppercase tracking-wider mb-4"
+            style={{ backgroundColor: 'var(--expedia-navy)', color: 'white', opacity: 0.85 }}
+          >
+            Gate 1
+          </div>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Gate 1: Brief Assessment
+            Brief Assessment
           </h2>
           <p className="text-[var(--text-secondary)]">
             Here's my review of the core brief elements. We'll build the creative brief in Gate 2.
@@ -1213,12 +1258,20 @@ export default function Home() {
           {gate1Sections.map((section, index) => (
             <div
               key={section.key}
-              className={`flex items-center justify-between p-4 ${
+              className={`flex items-center justify-between p-4 transition-all hover:bg-[var(--bg-secondary)] ${
                 index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
               }`}
+              style={{
+                animation: 'fadeSlideIn 0.3s ease-out forwards',
+                animationDelay: `${index * 80}ms`,
+                opacity: 0,
+              }}
             >
               <div className="flex items-center gap-4">
-                <span className="w-6 h-6 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center text-sm font-medium text-[var(--text-muted)]">
+                <span
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold"
+                  style={{ backgroundColor: 'var(--expedia-navy)', color: 'white' }}
+                >
                   {index + 1}
                 </span>
                 <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
@@ -1227,6 +1280,14 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* Animation keyframes */}
+        <style jsx>{`
+          @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
 
         {/* Recommendation Summary */}
         <div className={`p-4 rounded-xl border-l-4 ${
