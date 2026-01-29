@@ -25,11 +25,12 @@
   "generate": {
     "role": "You are compiling the final Pitch Pack document.",
     "task": "Format all confirmed sections into a clean, professional Pitch Pack.",
-    "logic": "Concise - 'a 2 pager, not an 8 pager'. Include all 7 sections with confirmed content. Use markdown with clear headers.",
+    "logic": "Concise - 'a 2 pager, not an 8 pager'. Structure: Gate 1 sections (Objective, Budget, Audience, Creative Task), then Gate 2 sections (Brand Alignment, Audience Insights, Creative Tenets, Media Context), then optional Research Stimuli appendix if included. Use markdown with clear headers.",
     "inputs": {
-      "sections": "All 7 sections with their confirmed content",
+      "sections": "All sections with their confirmed content (Gate 1 + Gate 2 + optional appendix)",
       "audience": "Selected audience segment and personification",
-      "humanTruths": "Selected human truths"
+      "audienceInsights": "Selected audience insights (max 3)",
+      "brandAlignment": "Brand selection, DG match status, and brand audience"
     },
     "outputs": {
       "markdown": "The complete Pitch Pack as markdown"

@@ -232,6 +232,7 @@ export interface OutputRequest {
   personification?: string;
   selectedInsights?: Truth[];
   includeResearchStimuli?: boolean;
+  brandAlignment?: BrandAlignment;
 }
 
 export interface OutputResponse {

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!body.sections || !Array.isArray(body.sections)) {
       return NextResponse.json({ error: 'sections array is required' }, { status: 400 });
     }
-    const { sections, audience, personification, selectedInsights, includeResearchStimuli } = body;
+    const { sections, audience, personification, selectedInsights, includeResearchStimuli, brandAlignment } = body;
 
     // Filter out research_stimuli if not included
     const filteredSections = includeResearchStimuli
@@ -40,6 +40,17 @@ export async function POST(request: NextRequest) {
       for (const insight of selectedInsights) {
         userMessage += `- ${insight.text}\n`;
       }
+      userMessage += '\n';
+    }
+
+    if (brandAlignment) {
+      userMessage += `## Brand Alignment\n`;
+      userMessage += `Brand: ${brandAlignment.brand || 'Not specified'}\n`;
+      userMessage += `DG Match: ${brandAlignment.hasDGMatch ? 'Yes' : 'No'}\n`;
+      if (brandAlignment.brandAudience) {
+        userMessage += `Brand Audience: ${brandAlignment.brandAudience}\n`;
+      }
+      userMessage += '\n';
     }
 
     const response = await callClaudeJSON<{ markdown: string }>(
