@@ -50,8 +50,28 @@ function StatusBadge({ status }: { status: Status }) {
 
   return (
     <span className={`status-badge ${className}`}>
-      <span className="text-xs">{icon}</span>
+      <span
+        className="text-xs"
+        style={{
+          display: 'inline-block',
+          animation: 'scaleIn 0.2s ease-out'
+        }}
+      >
+        {icon}
+      </span>
       {label}
+      <style jsx>{`
+        @keyframes scaleIn {
+          from {
+            transform: scale(0);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </span>
   );
 }
@@ -59,23 +79,21 @@ function StatusBadge({ status }: { status: Status }) {
 function Spinner({ className = '' }: { className?: string }) {
   return (
     <svg
-      className={`animate-spin h-5 w-5 ${className}`}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
+      className={`animate-spin h-4 w-4 ${className}`}
       viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
     >
       <circle
-        className="opacity-25"
         cx="12"
         cy="12"
         r="10"
-        stroke="currentColor"
-        strokeWidth="4"
+        strokeOpacity="0.25"
       />
       <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        d="M12 2a10 10 0 0 1 10 10"
+        strokeLinecap="round"
       />
     </svg>
   );
@@ -83,20 +101,23 @@ function Spinner({ className = '' }: { className?: string }) {
 
 function LoadingOverlay({ message, subMessage }: { message: string; subMessage?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-8">
+    <div
+      className="flex flex-col items-center justify-center py-16 px-8"
+      style={{ animation: 'fadeIn 0.3s ease-out' }}
+    >
       {/* Animated dots */}
       <div className="flex gap-2 mb-6">
         <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
-          style={{ animationDelay: '0ms' }}
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
+          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '0ms' }}
         />
         <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
-          style={{ animationDelay: '150ms' }}
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
+          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '160ms' }}
         />
         <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)] animate-bounce"
-          style={{ animationDelay: '300ms' }}
+          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
+          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '320ms' }}
         />
       </div>
 
@@ -108,30 +129,48 @@ function LoadingOverlay({ message, subMessage }: { message: string; subMessage?:
         <p className="text-sm text-[var(--text-muted)] mt-2 text-center">{subMessage}</p>
       )}
 
-      {/* Progress bar animation */}
-      <div className="w-48 h-1 bg-[var(--bg-tertiary)] rounded-full mt-6 overflow-hidden">
+      {/* Gradient progress bar */}
+      <div className="w-48 h-1.5 bg-[var(--bg-tertiary)] rounded-full mt-6 overflow-hidden">
         <div
-          className="h-full bg-[var(--expedia-navy)] rounded-full animate-pulse"
+          className="h-full rounded-full"
           style={{
-            width: '60%',
-            animation: 'loading-progress 2s ease-in-out infinite',
+            background: 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))',
+            backgroundSize: '200% 100%',
+            animation: 'gradientSlide 2s ease-in-out infinite',
           }}
         />
       </div>
 
       <style jsx>{`
-        @keyframes loading-progress {
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes dotBounce {
+          0%, 80%, 100% {
+            transform: scale(1);
+            opacity: 0.6;
+          }
+          40% {
+            transform: scale(1.2);
+            opacity: 1;
+          }
+        }
+        @keyframes gradientSlide {
           0% {
-            width: 10%;
-            margin-left: 0%;
+            background-position: 100% 0;
           }
           50% {
-            width: 60%;
-            margin-left: 20%;
+            background-position: 0% 0;
           }
           100% {
-            width: 10%;
-            margin-left: 90%;
+            background-position: 100% 0;
           }
         }
       `}</style>
