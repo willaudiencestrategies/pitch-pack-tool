@@ -11,14 +11,19 @@ export async function POST(request: NextRequest) {
     if (!body.sections || !Array.isArray(body.sections)) {
       return NextResponse.json({ error: 'sections array is required' }, { status: 400 });
     }
-    const { sections, audience, personification, selectedInsights } = body;
+    const { sections, audience, personification, selectedInsights, includeResearchStimuli } = body;
+
+    // Filter out research_stimuli if not included
+    const filteredSections = includeResearchStimuli
+      ? sections
+      : sections.filter(s => s.key !== 'research_stimuli');
 
     const promptConfig = loadPrompt('output');
     const systemPrompt = buildSystemPrompt(promptConfig.generate);
 
     let userMessage = 'Compile the final Pitch Pack from these sections:\n\n';
 
-    for (const section of sections) {
+    for (const section of filteredSections) {
       userMessage += `## ${section.name}\nStatus: ${section.status}\nContent: ${section.content || '(not provided)'}\n\n`;
     }
 
