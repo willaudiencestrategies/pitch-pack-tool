@@ -188,7 +188,10 @@ function ErrorBanner({
   onSkip?: () => void;
 }) {
   return (
-    <div className="mb-6 p-4 rounded-xl bg-[var(--status-red-bg)] border border-[var(--status-red)]">
+    <div
+      className="mb-6 p-4 rounded-xl bg-[var(--status-red-bg)] border border-[var(--status-red)]"
+      style={{ animation: 'shake 0.5s ease-out' }}
+    >
       <p className="text-[var(--status-red)] text-sm mb-3 font-medium">{message}</p>
       <div className="flex gap-3">
         <button
@@ -206,6 +209,13 @@ function ErrorBanner({
           </button>
         )}
       </div>
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20%, 60% { transform: translateX(-4px); }
+          40%, 80% { transform: translateX(4px); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -223,14 +233,20 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
         {Array.from({ length: total }, (_, i) => (
           <div
             key={i}
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
-              i < current
-                ? 'bg-[var(--status-green)]'
-                : i === current
-                ? 'bg-[var(--expedia-navy)]'
-                : 'bg-[var(--border-color)]'
-            }`}
-          />
+            className="h-1.5 flex-1 rounded-full overflow-hidden bg-[var(--border-color)]"
+          >
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: i < current ? '100%' : i === current ? '100%' : '0%',
+                background: i <= current
+                  ? 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))'
+                  : 'transparent',
+                opacity: i < current ? 0.6 : i === current ? 1 : 0,
+                transition: 'width 0.5s ease-out, opacity 0.3s ease-out',
+              }}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -241,7 +257,7 @@ function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: 
   return (
     <button
       onClick={onClick}
-      className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1 mb-4"
+      className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
     >
       ← {label}
     </button>
