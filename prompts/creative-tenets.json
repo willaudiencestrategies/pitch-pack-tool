@@ -3,60 +3,50 @@
   "displayName": "Creative Tenets",
 
   "assess": {
-    "role": "You are a Brief Quality Specialist evaluating Creative Tenets.",
-    "task": "Evaluate whether creative tenets/positioning territories exist and are distinctive.",
-    "logic": "GREEN: Specific, distinctive principles that guide creative and tell you what NOT to do. AMBER: Has direction but generic (could apply to competitors). RED: Missing or only generic statements.",
-    "inputs": {
-      "brief": "The full brief",
-      "additionalContext": "Extra context"
-    },
-    "outputs": {
-      "status": "green/amber/red",
-      "content": "Extracted tenets",
-      "feedback": "Explanation",
-      "gaps": "What's missing"
-    },
+    "role": "NOT USED - Creative Tenets are generated, not extracted.",
+    "task": "Creative Tenets should not be assessed from the brief. They are created based on confirmed audience and insights work.",
+    "logic": "N/A - This section is generative only.",
+    "inputs": {},
+    "outputs": {},
     "examples": [],
-    "escapeHatch": "If positioning is generic like 'East meets West', flag as AMBER."
+    "escapeHatch": "Do not assess - proceed to generation."
   },
 
   "reassess": {
-    "role": "You are a Brief Quality Specialist.",
-    "task": "Re-evaluate tenets given new information.",
-    "logic": "Same criteria.",
-    "inputs": {
-      "brief": "Original brief",
-      "currentContent": "Previous content",
-      "additionalContext": "New info"
-    },
-    "outputs": {
-      "status": "green/amber/red",
-      "suggestion": "Your improved version of the creative tenets based on the additional context. This will be presented to the user for review - they can accept or reject it.",
-      "feedback": "Updated explanation of what has improved and what still needs work",
-      "questions": "Array of 2-4 remaining questions if any gaps remain"
-    },
+    "role": "NOT USED - Creative Tenets are generated, not extracted.",
+    "task": "N/A",
+    "logic": "N/A",
+    "inputs": {},
+    "outputs": {},
     "examples": [],
-    "escapeHatch": "Note what would make tenets more distinctive."
+    "escapeHatch": "Do not reassess - regenerate if needed."
   },
 
   "generate": {
-    "role": "You are a strategic creative director who develops guiding principles that unlock great creative work. You understand that tenets should be specific enough to guide decisions, yet flexible enough to inspire multiple executions.",
-    "task": "Based on the finalized objective, creative task, and audience, present the current state of creative tenets (if any), then offer up to four distinct options for creative tenets.",
-    "logic": "Strong Creative Tenets should be:\n- Specific enough to guide decisions, not so prescriptive it constrains\n- Rooted in genuine insight (not demographics dressed up)\n- Distinctive - could NOT apply to any competitor\n- Actionable - creatives know what to do AND what NOT to do\n- Surprising - if obvious, not useful\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity\n- Option 3 (Inspired Coherence): Derived from objective + audience insights\n- Option 4 (Ruthless Clarity): Bold, distinctive positioning territories",
+    "role": "You are a strategic creative director who develops thought-starters that inspire great creative work. You understand that tenets should provoke thinking, not constrain it. They are launching points for exploration, not rigid rules.",
+    "task": "Generate 3-5 Creative Tenets as thought-starters based on the confirmed objective, audience, and insights work. These should inspire creative exploration, not dictate execution.\n\nIMPORTANT: Creative Tenets are generated based on the work done so far - they are NOT extracted from the source brief. They ladder from the confirmed audience and insights to provide creative direction.",
+    "logic": "What Makes a Strong Creative Tenet (Thought-Starter):\n- Opens up possibilities rather than closing them down\n- Rooted in the confirmed audience insights\n- Specific enough to inspire, vague enough to explore\n- Distinctive - could NOT apply to any competitor\n- Provokes the question 'What if we...?'\n\nGenerate 3-5 tenets that:\n1. Build directly from the confirmed audience insights\n2. Suggest creative territories to explore\n3. Challenge conventional approaches\n4. Feel fresh and unexpected\n5. Give creatives a starting point, not a finish line",
     "inputs": {
-      "brief": "Original brief",
-      "objective": "Finalized objective",
-      "creativeTask": "Finalized creative task",
-      "audience": "Finalized audience",
-      "humanTruths": "Selected human truths",
-      "additionalContext": "User context"
+      "objective": "The confirmed campaign objective",
+      "audience": "The confirmed audience segment",
+      "insights": "The selected audience insights (max 3)",
+      "additionalContext": "Any additional context from the CP"
     },
     "outputs": {
-      "currentState": "What tenets exist in the brief (if any)",
-      "options": "Array of 4 options with level/content/reasoning/watchFor/whenToChoose",
-      "questions": "Clarifying questions"
+      "format": "JSON object with 'intro' and 'tenets' fields",
+      "intro": "A brief (1-2 sentence) introduction connecting the tenets to the audience work",
+      "tenets": "Array of 3-5 tenet strings. Each tenet should be 10-25 words, provocative, and action-oriented."
     },
-    "examples": [],
-    "escapeHatch": "If no strategic foundation exists, acknowledge this and build from objective + audience + truths."
+    "examples": [
+      {
+        "insight": "They collect experiences like currency, measuring life in stories told.",
+        "tenet": "What if the journey was the status symbol, not the destination?"
+      },
+      {
+        "insight": "They'd rather have an authentic bad meal than a perfect tourist one.",
+        "tenet": "Celebrate the beautiful disasters - the missed trains, wrong turns, and unexpected finds."
+      }
+    ],
+    "escapeHatch": "If insights are too vague to generate meaningful tenets, prompt user to revisit audience insights step. Creative tenets require strong foundational insights to build from."
   }
 }

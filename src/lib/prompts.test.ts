@@ -111,13 +111,34 @@ describe('Audience Insights Prompt', () => {
 });
 
 describe('Section Builder Prompts', () => {
-  const sectionBuilders = ['creative-tenets', 'research-stimuli'];
+  const sectionBuilders = ['research-stimuli'];
 
   sectionBuilders.forEach((section) => {
     it(`${section} should have four-option generate output`, () => {
       const prompt = loadPrompt(section);
       expect(prompt.generate.outputs.options).toBeDefined();
     });
+  });
+});
+
+describe('Creative Tenets Prompt', () => {
+  it('should be generative only (not extracted from brief)', () => {
+    const prompt = loadPrompt('creative-tenets');
+    expect(prompt.assess.role).toContain('NOT USED');
+    expect(prompt.reassess.role).toContain('NOT USED');
+  });
+
+  it('should generate tenets based on audience and insights', () => {
+    const prompt = loadPrompt('creative-tenets');
+    expect(prompt.generate.inputs.objective).toBeDefined();
+    expect(prompt.generate.inputs.audience).toBeDefined();
+    expect(prompt.generate.inputs.insights).toBeDefined();
+  });
+
+  it('should output intro and tenets array', () => {
+    const prompt = loadPrompt('creative-tenets');
+    expect(prompt.generate.outputs.intro).toBeDefined();
+    expect(prompt.generate.outputs.tenets).toBeDefined();
   });
 });
 
