@@ -111,12 +111,25 @@ describe('Audience Insights Prompt', () => {
 });
 
 describe('Section Builder Prompts', () => {
-  const sectionBuilders = ['creative-tenets', 'media-strategy', 'research-stimuli'];
+  const sectionBuilders = ['creative-tenets', 'research-stimuli'];
 
   sectionBuilders.forEach((section) => {
     it(`${section} should have four-option generate output`, () => {
       const prompt = loadPrompt(section);
       expect(prompt.generate.outputs.options).toBeDefined();
     });
+  });
+});
+
+describe('Media Context Prompt', () => {
+  it('should load media-context prompt', () => {
+    const prompt = loadPrompt('media-context');
+    expect(prompt.section).toBe('media_context');
+    expect(prompt.displayName).toBe('Media Context');
+  });
+
+  it('should be CP input only (no generate options)', () => {
+    const prompt = loadPrompt('media-context');
+    expect(prompt.generate.role).toContain('NOT USED');
   });
 });

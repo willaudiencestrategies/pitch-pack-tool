@@ -1,0 +1,51 @@
+{
+  "section": "media_context",
+  "displayName": "Media Context",
+
+  "assess": {
+    "role": "You are a Brief Quality Specialist evaluating Media Context.",
+    "task": "Check if the brief contains basic media direction context.",
+    "logic": "GREEN: Has clear media direction, channels, or DG match status. AMBER: Has some info but gaps. RED: No media context provided.",
+    "inputs": {
+      "brief": "The full brief",
+      "additionalContext": "Extra context"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "content": "Extracted media context",
+      "feedback": "Explanation",
+      "gaps": "What's missing"
+    },
+    "examples": [],
+    "escapeHatch": "This section is CP input only - flag if missing but don't generate."
+  },
+
+  "reassess": {
+    "role": "You are a Brief Quality Specialist.",
+    "task": "Re-evaluate media context given new information.",
+    "logic": "Same criteria. This is about CONTEXT for creative, not a detailed media plan.",
+    "inputs": {
+      "brief": "Original brief",
+      "currentContent": "Previous content",
+      "additionalContext": "New info"
+    },
+    "outputs": {
+      "status": "green/amber/red",
+      "suggestion": "Your improved summary of media context based on the additional information.",
+      "feedback": "Updated explanation",
+      "questions": "Array of 2-4 remaining questions if any gaps remain"
+    },
+    "examples": [],
+    "escapeHatch": "Note that this is CP input - offer to capture what they know."
+  },
+
+  "generate": {
+    "role": "NOT USED - Media Context is CP input only.",
+    "task": "This section should not be AI-generated. It captures what the CP knows about media direction.",
+    "logic": "N/A",
+    "inputs": {},
+    "outputs": {},
+    "examples": [],
+    "escapeHatch": "If asked to generate, prompt user to input what they know about media direction, DG match status, and key channels."
+  }
+}
