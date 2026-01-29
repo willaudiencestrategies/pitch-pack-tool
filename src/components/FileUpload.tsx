@@ -106,12 +106,20 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
         onDragLeave={handleDragLeave}
         onClick={handleClick}
         className={`
-          relative p-6 rounded-xl border-2 border-dashed transition-all cursor-pointer
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-          ${isDragging ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5' : 'border-[var(--border-color)] hover:border-[var(--border-hover)]'}
+          relative p-6 rounded-xl border-2 border-dashed cursor-pointer
+          transition-all duration-300 ease-out
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
           ${state === 'success' ? 'border-[var(--status-green)] bg-[var(--status-green)]/5' : ''}
           ${state === 'error' ? 'border-[var(--status-red)] bg-[var(--status-red-bg)]' : ''}
+          ${state !== 'success' && state !== 'error' && !isDragging ? 'border-[var(--border-color)] hover:border-[var(--border-hover)]' : ''}
         `}
+        style={{
+          borderColor: isDragging ? 'var(--expedia-navy)' : undefined,
+          boxShadow: isDragging
+            ? '0 0 0 3px rgba(26, 31, 113, 0.15), 0 4px 12px rgba(26, 31, 113, 0.1)'
+            : undefined,
+          backgroundColor: isDragging ? 'rgba(26, 31, 113, 0.03)' : undefined,
+        }}
       >
         <input
           ref={inputRef}
@@ -127,7 +135,10 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
           <div className="text-center">
             <div className="mb-3">
               <svg
-                className="mx-auto h-10 w-10 text-[var(--text-muted)]"
+                className="mx-auto h-10 w-10 text-[var(--text-muted)] transition-transform duration-300"
+                style={{
+                  transform: isDragging ? 'translateY(-4px) scale(1.05)' : 'translateY(0) scale(1)',
+                }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -151,26 +162,31 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
         {state === 'processing' && (
           <div className="text-center">
-            <div className="mb-3">
-              <svg
-                className="mx-auto h-10 w-10 text-[var(--expedia-navy)] animate-spin"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
+            <div className="flex justify-center gap-1.5 mb-4">
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  backgroundColor: 'var(--expedia-navy)',
+                  animation: 'bounceDelay 0.6s ease-in-out infinite',
+                  animationDelay: '0ms',
+                }}
+              />
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  backgroundColor: 'var(--expedia-navy)',
+                  animation: 'bounceDelay 0.6s ease-in-out infinite',
+                  animationDelay: '150ms',
+                }}
+              />
+              <div
+                className="w-2.5 h-2.5 rounded-full"
+                style={{
+                  backgroundColor: 'var(--expedia-navy)',
+                  animation: 'bounceDelay 0.6s ease-in-out infinite',
+                  animationDelay: '300ms',
+                }}
+              />
             </div>
             <p className="text-sm font-medium text-[var(--text-primary)]">
               Processing {filename}...
@@ -180,7 +196,12 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
         {state === 'success' && (
           <div className="text-center">
-            <div className="mb-3">
+            <div
+              className="mb-3"
+              style={{
+                animation: 'scaleIn 0.3s ease-out forwards',
+              }}
+            >
               <svg
                 className="mx-auto h-10 w-10 text-[var(--status-green)]"
                 fill="none"
@@ -203,7 +224,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
                 e.stopPropagation();
                 handleReset();
               }}
-              className="text-xs text-[var(--text-muted)] underline mt-2 hover:text-[var(--text-secondary)]"
+              className="text-xs text-[var(--text-muted)] underline mt-2 hover:text-[var(--text-secondary)] transition-colors duration-200"
             >
               Upload a different file
             </button>
@@ -212,7 +233,12 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
         {state === 'error' && (
           <div className="text-center">
-            <div className="mb-3">
+            <div
+              className="mb-3"
+              style={{
+                animation: 'scaleIn 0.3s ease-out forwards',
+              }}
+            >
               <svg
                 className="mx-auto h-10 w-10 text-[var(--status-red)]"
                 fill="none"
@@ -233,7 +259,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
                 e.stopPropagation();
                 handleReset();
               }}
-              className="text-xs text-[var(--text-muted)] underline mt-2 hover:text-[var(--text-secondary)]"
+              className="text-xs text-[var(--text-muted)] underline mt-2 hover:text-[var(--text-secondary)] transition-colors duration-200"
             >
               Try again
             </button>
@@ -244,6 +270,27 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
       <p className="text-xs text-[var(--text-muted)] text-center">
         Word documents preserve formatting best. Tables will be converted to text.
       </p>
+
+      <style jsx>{`
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @keyframes bounceDelay {
+          0%, 80%, 100% {
+            transform: translateY(0);
+          }
+          40% {
+            transform: translateY(-8px);
+          }
+        }
+      `}</style>
     </div>
   );
 }
