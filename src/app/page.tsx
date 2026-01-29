@@ -921,7 +921,7 @@ export default function Home() {
           sections: state.sections,
           audience: state.selectedAudienceSegment,
           personification: state.personification?.narrative || '',
-          selectedTruths: state.selectedInsights, // API still uses selectedTruths name
+          selectedInsights: state.selectedInsights,
           includeResearchStimuli: state.includeResearchStimuli,
         }),
       });

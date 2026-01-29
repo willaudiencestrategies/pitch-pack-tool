@@ -16,16 +16,16 @@ import {
 } from './types';
 
 describe('Section Configuration', () => {
-  it('should include budget as the first section', () => {
-    expect(SECTION_KEYS[0]).toBe('budget');
+  it('should include objective as the first section', () => {
+    expect(SECTION_KEYS[0]).toBe('objective');
   });
 
-  it('should have 8 sections total', () => {
-    expect(SECTION_KEYS.length).toBe(8);
+  it('should have 9 sections total (4 Gate1 + 4 Gate2 + 1 Appendix)', () => {
+    expect(SECTION_KEYS.length).toBe(9);
   });
 
-  it('should have budget config with order 0', () => {
-    expect(SECTION_CONFIG.budget).toEqual({ name: 'Budget', order: 0 });
+  it('should have objective config with order 0', () => {
+    expect(SECTION_CONFIG.objective).toEqual({ name: 'Objective', order: 0, gate: 'gate1' });
   });
 });
 
@@ -121,13 +121,14 @@ describe('Enhanced Triage Types', () => {
     const emptySection: SynthesizedSection = { content: '', contradictions: [], vagueness: [], quotes: [] };
     const response: EnhancedTriageResponse = {
       synthesizedReplay: {
-        budget: emptySection,
         objective: emptySection,
-        creative_task: emptySection,
+        budget: emptySection,
         audience: emptySection,
-        human_truths: emptySection,
+        creative_task: emptySection,
+        brand_alignment: emptySection,
+        audience_insights: emptySection,
         creative_tenets: emptySection,
-        media_strategy: emptySection,
+        media_context: emptySection,
         research_stimuli: emptySection,
       },
       triageAssessment: [],

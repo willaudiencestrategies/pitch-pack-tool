@@ -230,7 +230,7 @@ export interface OutputRequest {
   sections: Section[];
   audience?: Segment;
   personification?: string;
-  selectedTruths?: Truth[];
+  selectedInsights?: Truth[];
   includeResearchStimuli?: boolean;
 }
 

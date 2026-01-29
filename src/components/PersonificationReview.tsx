@@ -53,7 +53,7 @@ export function PersonificationReview({
           disabled={loading}
           className="btn-secondary flex items-center gap-2"
         >
-          Confirm & Generate Human Truths
+          Confirm & Generate Insights
           <span>→</span>
         </button>
         <button onClick={onBack} disabled={loading} className="btn-outline">

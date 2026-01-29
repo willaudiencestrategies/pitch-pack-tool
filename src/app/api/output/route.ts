@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!body.sections || !Array.isArray(body.sections)) {
       return NextResponse.json({ error: 'sections array is required' }, { status: 400 });
     }
-    const { sections, audience, personification, selectedTruths } = body;
+    const { sections, audience, personification, selectedInsights } = body;
 
     const promptConfig = loadPrompt('output');
     const systemPrompt = buildSystemPrompt(promptConfig.generate);
@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
       userMessage += '\n';
     }
 
-    if (selectedTruths && selectedTruths.length > 0) {
-      userMessage += `## Selected Human Truths\n`;
-      for (const truth of selectedTruths) {
-        userMessage += `- ${truth.text}\n`;
+    if (selectedInsights && selectedInsights.length > 0) {
+      userMessage += `## Selected Audience Insights\n`;
+      for (const insight of selectedInsights) {
+        userMessage += `- ${insight.text}\n`;
       }
     }
 
