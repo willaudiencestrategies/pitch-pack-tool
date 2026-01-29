@@ -265,7 +265,8 @@ function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: 
 }
 
 // Global progress indicator with sliding focus design
-// Current step is prominent, completed steps are compact checkmarks, future steps are dots
+// Current step is prominent with scale animation, completed steps show green checkmarks,
+// future steps are muted dots, gradient lines connect steps
 function GlobalProgressBar({
   step,
   sectionIndex,
@@ -304,6 +305,39 @@ function GlobalProgressBar({
            index === currentStepIndex + 1;
   };
 
+  // Get connecting line style - gradient from completed to pending
+  const getLineStyle = (index: number) => {
+    const isBeforeCurrent = index < currentStepIndex;
+    const isAtCurrent = index === currentStepIndex - 1; // Line leading into current step
+    const showLabelContext = shouldShowLabel(index) || shouldShowLabel(index + 1);
+
+    if (isBeforeCurrent && !isAtCurrent) {
+      // Fully completed segment - solid green
+      return {
+        width: showLabelContext ? '1rem' : '0.5rem',
+        background: 'var(--status-green)',
+      };
+    } else if (isAtCurrent) {
+      // Transition line - gradient from green to navy
+      return {
+        width: '1rem',
+        background: 'linear-gradient(90deg, var(--status-green), var(--expedia-navy))',
+      };
+    } else if (index === currentStepIndex) {
+      // Line leaving current step - gradient from navy to grey
+      return {
+        width: showLabelContext ? '1rem' : '0.5rem',
+        background: 'linear-gradient(90deg, var(--expedia-navy), var(--border-color))',
+      };
+    } else {
+      // Future segments - grey
+      return {
+        width: showLabelContext ? '1rem' : '0.5rem',
+        background: 'var(--border-color)',
+      };
+    }
+  };
+
   return (
     <div className="bg-white border-b border-[var(--border-color)] sticky top-0 z-50">
       <div className="max-w-4xl mx-auto px-6 py-3">
@@ -328,22 +362,26 @@ function GlobalProgressBar({
                     }
                   } : undefined}
                   title={s.label}
-                  className={`flex items-center justify-center transition-all ${
+                  className={`flex items-center justify-center transition-all duration-200 ${
                     isCurrent
-                      ? 'px-4 py-2 rounded-full bg-[var(--expedia-navy)] text-white text-sm font-medium'
+                      ? 'px-4 py-2 rounded-full bg-[var(--expedia-navy)] text-white text-sm font-medium shadow-md'
                       : isCompleted
                       ? showLabel
-                        ? 'px-3 py-1.5 rounded-full bg-[var(--status-green)] text-white text-xs font-medium cursor-pointer hover:bg-[var(--status-green)]/80'
-                        : 'w-6 h-6 rounded-full bg-[var(--status-green)] text-white text-xs cursor-pointer hover:bg-[var(--status-green)]/80'
+                        ? 'px-3 py-1.5 rounded-full bg-[var(--status-green)]/15 text-[var(--status-green)] text-xs font-medium cursor-pointer hover:bg-[var(--status-green)]/25 border border-[var(--status-green)]/30'
+                        : 'w-6 h-6 rounded-full bg-[var(--status-green)]/15 text-[var(--status-green)] text-xs cursor-pointer hover:bg-[var(--status-green)]/25 border border-[var(--status-green)]/30'
                       : showLabel
                       ? 'px-3 py-1.5 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-muted)] text-xs'
                       : 'w-2 h-2 rounded-full bg-[var(--border-color)]'
                   }`}
+                  style={isCurrent ? {
+                    transform: 'scale(1.05)',
+                    animation: 'pulseActive 2s ease-in-out infinite',
+                  } : undefined}
                 >
-                  {isCompleted && !showLabel && <span className="text-[10px]">✓</span>}
+                  {isCompleted && !showLabel && <span className="text-[10px] font-bold">✓</span>}
                   {isCompleted && showLabel && (
                     <>
-                      <span className="mr-1">✓</span>
+                      <span className="mr-1 font-bold">✓</span>
                       {s.label}
                     </>
                   )}
@@ -358,13 +396,10 @@ function GlobalProgressBar({
                   {isFuture && showLabel && s.label}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`h-0.5 mx-1 transition-all ${
-                    i < currentStepIndex
-                      ? 'w-4 bg-[var(--status-green)]'
-                      : shouldShowLabel(i) || shouldShowLabel(i + 1)
-                      ? 'w-4 bg-[var(--border-color)]'
-                      : 'w-2 bg-[var(--border-color)]'
-                  }`} />
+                  <div
+                    className="h-0.5 mx-1 transition-all duration-300 rounded-full"
+                    style={getLineStyle(i)}
+                  />
                 )}
               </div>
             );
@@ -394,6 +429,18 @@ function GlobalProgressBar({
           </div>
         )}
       </div>
+
+      {/* Animation keyframes for active step pulse */}
+      <style jsx>{`
+        @keyframes pulseActive {
+          0%, 100% {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          }
+          50% {
+            box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.15), 0 4px 8px -2px rgba(0, 0, 0, 0.1);
+          }
+        }
+      `}</style>
     </div>
   );
 }
