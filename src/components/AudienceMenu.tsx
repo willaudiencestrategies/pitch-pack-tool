@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { AudienceSegment, AudienceSegmentMenu } from '@/lib/types';
+import { AudienceSegment, AudienceSegmentMenu, AudiencePrioritisation } from '@/lib/types';
 
 interface AudienceMenuProps {
   menu: AudienceSegmentMenu;
-  onSelect: (segments: AudienceSegment[]) => void;
+  onSelect: (segments: AudienceSegment[], prioritisation: AudiencePrioritisation) => void;
   onRegenerate: (feedback: string) => void;
   onBack: () => void;
   loading: boolean;
@@ -20,7 +20,8 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
   const [feedback, setFeedback] = useState('');
   const [editingSegment, setEditingSegment] = useState<EditedSegment | null>(null);
   const [editedSegments, setEditedSegments] = useState<Record<number, EditedSegment>>({});
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [primaryId, setPrimaryId] = useState<number | null>(null);
+  const [secondaryIds, setSecondaryIds] = useState<Set<number>>(new Set());
 
   const handleRegenerateClick = () => {
     if (feedback.trim()) {
@@ -44,25 +45,56 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
     return editedSegments[original.id] || original;
   };
 
-  const toggleSelection = (id: number) => {
+  const handleSetPrimary = (id: number) => {
     if (loading) return;
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
+    // If clicking the current primary, do nothing (primary is required)
+    if (primaryId === id) return;
+    // If this was a secondary, remove it from secondary
+    const newSecondary = new Set(secondaryIds);
+    newSecondary.delete(id);
+    setSecondaryIds(newSecondary);
+    setPrimaryId(id);
+  };
+
+  const handleToggleSecondary = (id: number) => {
+    if (loading) return;
+    // Can't toggle secondary on the primary
+    if (primaryId === id) return;
+
+    const newSecondary = new Set(secondaryIds);
+    if (newSecondary.has(id)) {
+      newSecondary.delete(id);
     } else {
-      newSelected.add(id);
+      // Max 2 secondary audiences
+      if (newSecondary.size >= 2) {
+        return;
+      }
+      newSecondary.add(id);
     }
-    setSelectedIds(newSelected);
+    setSecondaryIds(newSecondary);
   };
 
   const handleConfirmSelection = () => {
-    if (loading || selectedIds.size === 0) return;
-    // Get the segments (with edits applied) in order of their IDs
-    const selectedSegments = menu.segments
-      .filter(s => selectedIds.has(s.id))
+    if (loading || primaryId === null) return;
+
+    const primarySegment = editedSegments[primaryId] || menu.segments.find(s => s.id === primaryId)!;
+    const secondarySegments = menu.segments
+      .filter(s => secondaryIds.has(s.id))
       .map(s => editedSegments[s.id] || s);
-    onSelect(selectedSegments);
+
+    const allSelected = [primarySegment, ...secondarySegments];
+    const prioritisation: AudiencePrioritisation = {
+      primary: primarySegment,
+      secondary: secondarySegments,
+    };
+
+    onSelect(allSelected, prioritisation);
   };
+
+  const isPrimary = (id: number) => primaryId === id;
+  const isSecondary = (id: number) => secondaryIds.has(id);
+  const isSelected = (id: number) => isPrimary(id) || isSecondary(id);
+  const canAddSecondary = secondaryIds.size < 2;
 
   return (
     <div className="space-y-6">
@@ -81,47 +113,98 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
         <p className="text-[var(--text-secondary)]">{menu.intro}</p>
       </div>
 
-      <p className="text-sm text-[var(--text-muted)] mb-4">
-        Select one or more segments. Multiple selections will be merged into a unified profile.
-      </p>
+      {/* Instructions */}
+      <div className="bg-[var(--expedia-navy)]/5 rounded-xl p-4 border border-[var(--expedia-navy)]/20">
+        <p className="text-sm text-[var(--text-primary)] font-medium mb-2">
+          How to prioritise your audiences:
+        </p>
+        <ul className="text-sm text-[var(--text-secondary)] space-y-1">
+          <li className="flex items-start gap-2">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--expedia-navy)] text-white text-xs font-bold flex-shrink-0 mt-0.5">★</span>
+            <span><strong>Primary</strong> (required) — Gets the full persona treatment with rich detail</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[var(--expedia-yellow)] text-[var(--expedia-navy)] text-xs font-bold flex-shrink-0 mt-0.5">2</span>
+            <span><strong>Secondary</strong> (optional, max 2) — Supporting audiences, names only in output</span>
+          </li>
+        </ul>
+      </div>
 
       <div className="space-y-3">
         {menu.segments.map((original) => {
           const segment = getSegmentToDisplay(original);
-          const isEdited = editedSegments[original.id]?.isEdited;
-          const isSelected = selectedIds.has(original.id);
+          const isEditedFlag = editedSegments[original.id]?.isEdited;
+          const segmentIsPrimary = isPrimary(original.id);
+          const segmentIsSecondary = isSecondary(original.id);
+          const segmentIsSelected = isSelected(original.id);
 
           return (
             <div
               key={original.id}
-              className={`p-4 rounded-xl border-2 transition-all group relative cursor-pointer ${
-                isSelected
+              className={`p-4 rounded-xl border-2 transition-all group relative ${
+                segmentIsPrimary
                   ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5 shadow-md'
-                  : 'border-[var(--border-color)] hover:border-[var(--expedia-navy)]/50 hover:shadow-sm'
+                  : segmentIsSecondary
+                  ? 'border-[var(--expedia-yellow)] bg-[var(--expedia-yellow)]/10 shadow-sm'
+                  : 'border-[var(--border-color)] hover:border-[var(--expedia-navy)]/30 hover:shadow-sm'
               }`}
-              onClick={() => toggleSelection(original.id)}
             >
-              <div className="flex items-start gap-3">
-                {/* Checkbox */}
-                <div className="pt-1">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    onChange={() => toggleSelection(original.id)}
-                    onClick={(e) => e.stopPropagation()}
-                    className="h-5 w-5 rounded border-[var(--border-color)] accent-[var(--expedia-navy)] cursor-pointer"
-                  />
+              {/* Priority badges */}
+              {segmentIsPrimary && (
+                <div className="absolute -top-2 -right-2 flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--expedia-navy)] text-white text-xs font-semibold shadow-md">
+                  <span>★</span> Primary
+                </div>
+              )}
+              {segmentIsSecondary && (
+                <div className="absolute -top-2 -right-2 flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--expedia-yellow)] text-[var(--expedia-navy)] text-xs font-semibold shadow-md">
+                  Secondary
+                </div>
+              )}
+
+              <div className="flex items-start gap-4">
+                {/* Selection Controls */}
+                <div className="flex flex-col gap-2 pt-1">
+                  {/* Primary Radio */}
+                  <button
+                    onClick={() => handleSetPrimary(original.id)}
+                    disabled={loading}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                      segmentIsPrimary
+                        ? 'bg-[var(--expedia-navy)] border-[var(--expedia-navy)] text-white'
+                        : 'border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-navy)] hover:text-[var(--expedia-navy)]'
+                    }`}
+                    title="Set as primary audience"
+                  >
+                    <span className="text-sm font-bold">★</span>
+                  </button>
+                  {/* Secondary Toggle */}
+                  <button
+                    onClick={() => handleToggleSecondary(original.id)}
+                    disabled={loading || segmentIsPrimary || (!segmentIsSecondary && !canAddSecondary)}
+                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${
+                      segmentIsSecondary
+                        ? 'bg-[var(--expedia-yellow)] border-[var(--expedia-yellow)] text-[var(--expedia-navy)]'
+                        : segmentIsPrimary
+                        ? 'border-[var(--border-color)] text-[var(--text-muted)] opacity-30 cursor-not-allowed'
+                        : !canAddSecondary
+                        ? 'border-[var(--border-color)] text-[var(--text-muted)] opacity-50 cursor-not-allowed'
+                        : 'border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-yellow)] hover:text-[var(--expedia-yellow)]'
+                    }`}
+                    title={segmentIsPrimary ? 'Cannot set primary as secondary' : !canAddSecondary && !segmentIsSecondary ? 'Max 2 secondary audiences' : 'Toggle as secondary audience'}
+                  >
+                    <span className="text-sm font-bold">2</span>
+                  </button>
                 </div>
 
                 {/* Content */}
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
                     <h3 className={`font-semibold text-lg ${
-                      isSelected ? 'text-[var(--expedia-navy)]' : 'text-[var(--expedia-navy)] group-hover:underline'
+                      segmentIsSelected ? 'text-[var(--expedia-navy)]' : 'text-[var(--expedia-navy)]'
                     }`}>
                       {segment.name}
                     </h3>
-                    {isEdited && (
+                    {isEditedFlag && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--expedia-navy)]/10 text-[var(--expedia-navy)]">
                         (edited)
                       </span>
@@ -130,46 +213,63 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
                   <p className="text-[var(--text-primary)] mb-2">{segment.needsValues}</p>
                   <p className="text-sm text-[var(--text-muted)]">{segment.demographics}</p>
                 </div>
-              </div>
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEditingSegment({ ...segment });
-                }}
-                className="absolute top-4 right-4 text-xs px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-navy)] hover:text-[var(--expedia-navy)] transition-colors bg-white"
-              >
-                Edit
-              </button>
+                {/* Edit Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingSegment({ ...segment });
+                  }}
+                  className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--expedia-navy)] hover:text-[var(--expedia-navy)] transition-colors bg-white flex-shrink-0"
+                >
+                  Edit
+                </button>
+              </div>
             </div>
           );
         })}
       </div>
 
       {/* Selection Summary and Confirm Button */}
-      {selectedIds.size > 0 && (
-        <div className="pt-4 border-t border-[var(--border-color)] mt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="font-medium text-[var(--text-primary)]">
-                {selectedIds.size} segment{selectedIds.size > 1 ? 's' : ''} selected
+      <div className="pt-4 border-t border-[var(--border-color)] mt-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            {primaryId !== null ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--expedia-navy)] text-white text-xs font-semibold">
+                    ★ Primary
+                  </span>
+                  <span className="font-medium text-[var(--text-primary)]">
+                    {getSegmentToDisplay(menu.segments.find(s => s.id === primaryId)!).name}
+                  </span>
+                </div>
+                {secondaryIds.size > 0 && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--expedia-yellow)] text-[var(--expedia-navy)] text-xs font-semibold">
+                      Secondary
+                    </span>
+                    <span className="text-[var(--text-secondary)]">
+                      {Array.from(secondaryIds).map(id => getSegmentToDisplay(menu.segments.find(s => s.id === id)!).name).join(', ')}
+                    </span>
+                  </div>
+                )}
+              </>
+            ) : (
+              <span className="text-sm text-[var(--text-muted)]">
+                Select a primary audience to continue
               </span>
-              {selectedIds.size > 1 && (
-                <span className="text-sm text-[var(--text-muted)] ml-2">
-                  — will be merged into a unified profile
-                </span>
-              )}
-            </div>
-            <button
-              onClick={handleConfirmSelection}
-              disabled={loading}
-              className="px-5 py-2.5 text-sm font-medium bg-[var(--expedia-navy)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {loading ? 'Processing...' : 'Confirm & Continue →'}
-            </button>
+            )}
           </div>
+          <button
+            onClick={handleConfirmSelection}
+            disabled={loading || primaryId === null}
+            className="px-5 py-2.5 text-sm font-medium bg-[var(--expedia-navy)] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Processing...' : 'Confirm & Continue →'}
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Feedback and Regenerate Section */}
       <div className="pt-4 border-t border-[var(--border-color)]">

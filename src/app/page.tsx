@@ -16,6 +16,7 @@ import {
   OutputResponse,
   AudienceSegment,
   AudienceSegmentMenu,
+  AudiencePrioritisation,
   PersonificationResponse,
   OptionLevel,
   SectionOptionsResponse,
@@ -767,19 +768,19 @@ export default function Home() {
     }
   };
 
-  const handleSelectAudience = async (segments: AudienceSegment[]) => {
-    // If multiple segments selected, merge them into a unified profile
-    const segmentToPersonify = segments.length === 1
-      ? segments[0]
-      : {
-          id: 0,
-          name: segments.map(s => s.name).join(' + '),
-          needsValues: segments.map(s => s.needsValues).join('\n\n'),
-          demographics: segments.map(s => s.demographics).join('\n\n'),
-        };
+  const handleSelectAudience = async (segments: AudienceSegment[], prioritisation: AudiencePrioritisation) => {
+    // Primary audience gets full persona treatment
+    // Secondary audiences are captured but only names appear in output
+    const primarySegment = prioritisation.primary;
+    const secondarySegments = prioritisation.secondary;
 
-    updateState({ loading: true, error: null, selectedAudienceSegment: segmentToPersonify });
-    setLastAction(() => () => handleSelectAudience(segments));
+    updateState({
+      loading: true,
+      error: null,
+      selectedAudienceSegment: primarySegment,
+      audiencePrioritisation: prioritisation,
+    });
+    setLastAction(() => () => handleSelectAudience(segments, prioritisation));
 
     try {
       const response = await fetch('/api/generate/audience', {
@@ -788,8 +789,9 @@ export default function Home() {
         body: JSON.stringify({
           brief: state.brief,
           additionalContext: state.additionalContext,
-          selectedSegment: segmentToPersonify,
-          isMerged: segments.length > 1,
+          selectedSegment: primarySegment,
+          secondarySegments: secondarySegments.map(s => s.name), // Names only for secondary
+          isMerged: false, // No longer merging - using prioritisation instead
         }),
       });
 

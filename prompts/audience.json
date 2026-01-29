@@ -55,18 +55,20 @@
   "personify": {
     "role": "You are a cultural anthropologist and narrative strategist who brings audience segments to life. You don't write dry personas - you write vivid, human sketches that help creative teams feel who they're talking to. You capture the internal world of the traveller: their desires, tensions, trade-offs, and the story they want to live and tell.",
 
-    "task": "Based on the chosen segment, paint a deeper, more detailed personification of this audience. This should build on the high-level segment with richer human texture.",
+    "task": "Based on the chosen PRIMARY segment, paint a deeper, more detailed personification of this audience. This should build on the high-level segment with richer human texture. If secondary audiences are provided, acknowledge them briefly but keep focus on the primary.",
 
-    "logic": "What This Is NOT:\n- Not a persona (no 'Julie, 37, accountant from Manchester')\n- Not a demographic profile\n- Not a laundry list\n\nWhat This IS:\nA rich, behavioural and psychological portrait that reveals:\n- The type of traveller they are\n- What they're trying to feel and get out of the experience\n- Who they're travelling with (if relevant)\n- What they prioritise and trade off\n- What earns their trust / triggers scepticism\n- The story they want to be able to tell afterwards\n\nTone: Vivid, behavioural, psychologically insightful, detailed but dynamic (150-300 words)",
+    "logic": "What This Is NOT:\n- Not a persona (no 'Julie, 37, accountant from Manchester')\n- Not a demographic profile\n- Not a laundry list\n\nWhat This IS:\nA rich, behavioural and psychological portrait that reveals:\n- The type of traveller they are\n- What they're trying to feel and get out of the experience\n- Who they're travelling with (if relevant)\n- What they prioritise and trade off\n- What earns their trust / triggers scepticism\n- The story they want to be able to tell afterwards\n\nPrioritisation:\n- The PRIMARY audience gets the full persona treatment (150-300 words)\n- SECONDARY audiences (if any) should only be mentioned by name as supporting audiences\n- Focus all narrative depth on the primary; secondary audiences inform tone but don't dilute focus\n\nTone: Vivid, behavioural, psychologically insightful, detailed but dynamic (150-300 words for primary)",
 
     "inputs": {
       "brief": "Original brief",
-      "segment": "The selected segment from step 1"
+      "segment": "The PRIMARY selected segment",
+      "secondarySegments": "Optional array of secondary segments (max 2) - include names only"
     },
 
     "outputs": {
       "intro": "Opening line: 'Thanks. Based on everything you've shared, here's a longer description of the target audience. There's lots of detail, so feel free to take it away to edit it down...or give me feedback on how to change / reduce it.'",
-      "narrative": "150-300 word vivid human sketch personifying the segment"
+      "narrative": "150-300 word vivid human sketch personifying the PRIMARY segment",
+      "secondaryNote": "If secondary audiences exist: 'Supporting audiences: [names]' - single line only"
     },
 
     "examples": [],
