@@ -1881,13 +1881,26 @@ export default function Home() {
     // Show inline output if we have it
     if (state.outputMarkdown) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-6" style={{ animation: 'fadeSlideIn 0.4s ease-out' }}>
           {/* Back Button */}
           <BackButton onClick={() => updateState({ step: 'gate2_media', outputMarkdown: null })} label="Back to Media" />
 
+          {/* Success celebration header */}
           <div className="text-center pb-6 border-b border-[var(--border-color)]">
+            {/* Animated success checkmark */}
+            <div
+              className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+              style={{
+                backgroundColor: 'var(--status-green)',
+                animation: 'scaleIn 0.4s ease-out',
+              }}
+            >
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
             <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-              Your Pitch Pack
+              Your Pitch Pack is Ready!
             </h2>
             <p className="text-[var(--text-secondary)]">
               Review your completed Pitch Pack below. Copy or download when ready.
@@ -1895,20 +1908,56 @@ export default function Home() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3">
-            <button onClick={handleCopy} className="btn-secondary flex items-center gap-2">
-              <span>📋</span> Copy to Clipboard
+          <div className="flex flex-wrap gap-3">
+            <button onClick={handleCopy} className="btn-secondary flex items-center gap-2 hover:shadow-md transition-shadow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              Copy to Clipboard
             </button>
-            <button onClick={handleDownload} className="btn-outline flex items-center gap-2">
-              <span>⬇️</span> Download as Markdown
+            <button onClick={handleDownload} className="btn-outline flex items-center gap-2 hover:shadow-md transition-shadow">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              Download as Markdown
             </button>
           </div>
 
-          {/* Output display */}
-          <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-tertiary)] p-6 overflow-auto max-h-[500px]">
+          {/* Elevated output display card */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.05)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            {/* Gradient accent bar */}
+            <div
+              className="h-1"
+              style={{
+                background: 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))',
+              }}
+            />
+            <div className="bg-[var(--bg-primary)] p-6 overflow-auto max-h-[500px]">
+
+          {/* Animation keyframes */}
+          <style jsx>{`
+            @keyframes fadeSlideIn {
+              from { opacity: 0; transform: translateY(12px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes scaleIn {
+              from { opacity: 0; transform: scale(0.8); }
+              to { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
             <pre className="whitespace-pre-wrap text-sm text-[var(--text-primary)] font-mono leading-relaxed">
               {state.outputMarkdown}
             </pre>
+            </div>
           </div>
 
           {/* Start over */}
