@@ -3,7 +3,7 @@
 export type Status = 'green' | 'amber' | 'red';
 
 // Gate-based step flow
-export type Step = 'upload' | 'triage' | 'context' | 'gate1_sections' | 'gate_transition' | 'gate2_brand' | 'gate2_audience' | 'gate2_insights' | 'gate2_tenets' | 'gate2_media' | 'output';
+export type Step = 'upload' | 'tell_me_more' | 'triage' | 'context' | 'gate1_sections' | 'gate_transition' | 'gate2_brand' | 'gate2_audience' | 'gate2_insights' | 'gate2_tenets' | 'gate2_media' | 'output';
 
 // Section keys by gate
 export type Gate1SectionKey = 'objective' | 'budget' | 'audience' | 'creative_task';
@@ -110,6 +110,7 @@ export interface SessionState {
   currentGate: 'gate1' | 'gate2' | 'output';
   brief: string;
   additionalContext: string;
+  preTellMeMoreContext: string;
 
   // Enhanced triage
   triageResult: EnhancedTriageResponse | null;
@@ -153,6 +154,7 @@ export function createInitialState(): SessionState {
     currentGate: 'gate1',
     brief: '',
     additionalContext: '',
+    preTellMeMoreContext: '',
     triageResult: null,
     sections: SECTION_KEYS.map((key) => ({
       key,
