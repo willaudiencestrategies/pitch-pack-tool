@@ -144,6 +144,10 @@ export interface SessionState {
   // Analytics stub
   briefScore: BriefScore | null;
 
+  // Track reassessments for visual feedback
+  reassessCount: number;
+  lastReassessedAt: string | null;
+
   error: string | null;
   loading: boolean;
 }
@@ -177,6 +181,8 @@ export function createInitialState(): SessionState {
     outputMarkdown: null,
     includeResearchStimuli: false,
     briefScore: null,
+    reassessCount: 0,
+    lastReassessedAt: null,
     error: null,
     loading: false,
   };

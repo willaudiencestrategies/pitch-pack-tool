@@ -264,6 +264,32 @@ function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: 
   );
 }
 
+function ReassessConfirmation({ count }: { count: number }) {
+  if (count === 0) return null;
+
+  return (
+    <div
+      className="p-3 rounded-lg bg-[var(--status-green)]/10 text-[var(--status-green)] text-sm font-medium flex items-center gap-2"
+      style={{ animation: 'slideIn 0.3s ease-out' }}
+    >
+      <span>✓</span>
+      <span>Reassessed with new context ({count}x)</span>
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 // Global progress indicator with sliding focus design
 // Current step is prominent with scale animation, completed steps show green checkmarks,
 // future steps are muted dots, gradient lines connect steps
@@ -786,6 +812,64 @@ export default function Home() {
         sections,
         triageResult: data,
         step: 'triage',
+        loading: false,
+      });
+    } catch (err) {
+      updateState({
+        error: err instanceof Error ? err.message : 'Something went wrong',
+        loading: false,
+      });
+    }
+  };
+
+  const handleTriageReassess = async () => {
+    if (!state.brief.trim()) {
+      updateState({ error: 'Please paste your brief first' });
+      return;
+    }
+
+    updateState({ loading: true, error: null });
+    setLastAction(() => handleTriageReassess);
+
+    try {
+      const response = await fetch('/api/triage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brief: state.brief,
+          additionalContext: state.additionalContext,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to reassess brief');
+
+      const data: EnhancedTriageResponse = await response.json();
+
+      // Defensive: ensure triageAssessment is an array
+      const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
+
+      // Transform EnhancedTriageResponse into Section[] for UI
+      const sections: Section[] = triageAssessment.map((result) => ({
+        key: result.key,
+        name: SECTION_CONFIG[result.key]?.name || result.key,
+        status: result.status || 'red',
+        content: result.verbatimQuotes?.length
+          ? result.verbatimQuotes.join('\n\n')
+          : result.synthesizedContent || '',
+        feedback: (result.whyThisRating || '') + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
+        questions: result.questions || [],
+        gaps: [...(result.contradictions || []), ...(result.vagueness || [])],
+      }));
+
+      if (sections.length === 0) {
+        throw new Error('No sections returned from triage');
+      }
+
+      updateState({
+        sections,
+        triageResult: data,
+        reassessCount: state.reassessCount + 1,
+        lastReassessedAt: new Date().toISOString(),
         loading: false,
       });
     } catch (err) {
@@ -1412,6 +1496,23 @@ export default function Home() {
             value={state.additionalContext}
             onChange={(e) => updateState({ additionalContext: e.target.value })}
           />
+
+          {/* Reassess Button */}
+          <button
+            onClick={handleTriageReassess}
+            disabled={!state.additionalContext.trim() || state.loading}
+            className="btn-primary flex items-center gap-2 mt-4"
+          >
+            {state.loading ? (
+              <Spinner className="text-white" />
+            ) : (
+              <span>🔄</span>
+            )}
+            Reassess with New Context
+          </button>
+
+          {/* Reassess Confirmation */}
+          <ReassessConfirmation count={state.reassessCount} />
         </div>
 
         <button
