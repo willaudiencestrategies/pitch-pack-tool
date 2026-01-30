@@ -35,6 +35,7 @@ import { BrandAlignment } from '@/components/BrandAlignment';
 import { GateTransition } from '@/components/GateTransition';
 import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
+import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
 
 // ============================================
 // Helper Components
@@ -286,6 +287,70 @@ function ReassessConfirmation({ count }: { count: number }) {
           }
         }
       `}</style>
+    </div>
+  );
+}
+
+function ResearchSuggestions({ gaps }: { gaps: string[] }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const prompts = getSuggestedPrompts(gaps);
+
+  if (prompts.length === 0) return null;
+
+  const handleCopy = async (prompt: ResearchPrompt) => {
+    try {
+      await navigator.clipboard.writeText(prompt.prompt);
+      setCopied(prompt.id);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      // Clipboard API failed silently
+    }
+  };
+
+  return (
+    <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-lg">💡</span>
+        <span className="font-medium text-[var(--text-primary)]">Try asking an LLM</span>
+      </div>
+      <p className="text-sm text-[var(--text-muted)] mb-4">
+        These prompts can help you research gaps in your brief. Copy and paste into ChatGPT, Claude, or your preferred AI assistant.
+      </p>
+      <div className="space-y-2">
+        {prompts.map((prompt) => (
+          <div
+            key={prompt.id}
+            className="border border-[var(--border-color)] rounded-lg overflow-hidden"
+          >
+            <button
+              onClick={() => setExpanded(expanded === prompt.id ? null : prompt.id)}
+              className="w-full flex items-center justify-between p-3 text-left hover:bg-[var(--bg-tertiary)] transition-colors"
+            >
+              <span className="font-medium text-sm text-[var(--text-primary)]">
+                {prompt.title}
+              </span>
+              <span className="text-[var(--text-muted)]">
+                {expanded === prompt.id ? '▼' : '▶'}
+              </span>
+            </button>
+            {expanded === prompt.id && (
+              <div className="p-3 pt-0 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                <pre className="whitespace-pre-wrap text-sm text-[var(--text-secondary)] font-mono mb-3 leading-relaxed">
+                  {prompt.prompt}
+                </pre>
+                <button
+                  onClick={() => handleCopy(prompt)}
+                  className="text-xs text-[var(--expedia-navy)] hover:underline"
+                >
+                  {copied === prompt.id ? '✓ Copied!' : 'Copy prompt'}
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1454,6 +1519,11 @@ export default function Home() {
             to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
+
+        {/* Research Suggestions - show when there are gaps */}
+        <ResearchSuggestions
+          gaps={gate1Sections.filter(s => s.status !== 'green').map(s => s.key)}
+        />
 
         {/* Recommendation Summary */}
         <div className={`p-4 rounded-xl border-l-4 ${
