@@ -287,6 +287,14 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
         Word documents preserve formatting best. Tables will be converted to text.
       </p>
 
+      <div className="mt-4 p-3 rounded-lg bg-[var(--bg-tertiary)] text-xs text-[var(--text-muted)]">
+        <p className="font-medium mb-1">💡 About hyperlinks</p>
+        <p>
+          If your brief contains links, open them and copy the content manually.
+          The tool can't access password-protected pages or content behind logins.
+        </p>
+      </div>
+
       <style jsx>{`
         @keyframes scaleIn {
           from {
