@@ -12,27 +12,35 @@ type UploadState = 'idle' | 'processing' | 'success' | 'error';
 
 export function FileUpload({ onFileContent, disabled = false }: FileUploadProps) {
   const [state, setState] = useState<UploadState>('idle');
-  const [filename, setFilename] = useState<string>('');
+  const [filenames, setFilenames] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = useCallback(
-    async (file: File) => {
-      if (!isFileSupported(file.name)) {
+  const handleFiles = useCallback(
+    async (files: File[]) => {
+      // Check all files are supported first
+      const unsupportedFiles = files.filter(f => !isFileSupported(f.name));
+      if (unsupportedFiles.length > 0) {
         setState('error');
-        setError(`Unsupported file type. Please use: ${getSupportedExtensions().join(', ')}`);
+        setError(`Unsupported file type(s): ${unsupportedFiles.map(f => f.name).join(', ')}. Please use: ${getSupportedExtensions().join(', ')}`);
         return;
       }
 
       setState('processing');
-      setFilename(file.name);
+      setFilenames(files.map(f => f.name));
       setError('');
 
       try {
-        const content = await parseFile(file);
+        const results: string[] = [];
+        for (const file of files) {
+          const content = await parseFile(file);
+          results.push(`--- ${file.name} ---\n${content}`);
+        }
+        const combinedContent = results.join('\n\n');
+        const combinedFilenames = files.map(f => f.name).join(', ');
         setState('success');
-        onFileContent(content, file.name);
+        onFileContent(combinedContent, combinedFilenames);
       } catch (err) {
         setState('error');
         setError(err instanceof Error ? err.message : 'Failed to parse file');
@@ -48,12 +56,12 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
       if (disabled) return;
 
-      const files = e.dataTransfer.files;
+      const files = Array.from(e.dataTransfer.files || []);
       if (files.length > 0) {
-        handleFile(files[0]);
+        handleFiles(files);
       }
     },
-    [disabled, handleFile]
+    [disabled, handleFiles]
   );
 
   const handleDragOver = useCallback(
@@ -73,12 +81,12 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (files && files.length > 0) {
-        handleFile(files[0]);
+      const files = Array.from(e.target.files || []);
+      if (files.length > 0) {
+        handleFiles(files);
       }
     },
-    [handleFile]
+    [handleFiles]
   );
 
   const handleClick = useCallback(() => {
@@ -89,7 +97,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
   const handleReset = useCallback(() => {
     setState('idle');
-    setFilename('');
+    setFilenames([]);
     setError('');
     if (inputRef.current) {
       inputRef.current.value = '';
@@ -127,6 +135,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
           accept={acceptString}
           onChange={handleInputChange}
           disabled={disabled}
+          multiple
           className="hidden"
           aria-label="File upload"
         />
@@ -152,10 +161,10 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
               </svg>
             </div>
             <p className="text-sm font-medium text-[var(--text-primary)]">
-              Drop a file here or click to browse
+              Drop files here or click to browse
             </p>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Supports: Word (.docx), Markdown (.md), Text (.txt)
+              Supports .docx, .pdf, .txt — multiple files OK
             </p>
           </div>
         )}
@@ -189,7 +198,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
               />
             </div>
             <p className="text-sm font-medium text-[var(--text-primary)]">
-              Processing {filename}...
+              Processing {filenames.length === 1 ? filenames[0] : `${filenames.length} files`}...
             </p>
           </div>
         )}
@@ -217,8 +226,15 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
               </svg>
             </div>
             <p className="text-sm font-medium text-[var(--status-green)]">
-              {filename} loaded successfully
+              {filenames.length === 1 ? `${filenames[0]} loaded successfully` : `${filenames.length} files loaded successfully`}
             </p>
+            {filenames.length > 1 && (
+              <ul className="text-sm text-[var(--text-muted)] mt-2 space-y-0.5">
+                {filenames.map((name, idx) => (
+                  <li key={idx}>{name}</li>
+                ))}
+              </ul>
+            )}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -226,7 +242,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
               }}
               className="text-xs text-[var(--text-muted)] underline mt-2 hover:text-[var(--text-secondary)] transition-colors duration-200"
             >
-              Upload a different file
+              Upload different files
             </button>
           </div>
         )}
