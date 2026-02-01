@@ -83,8 +83,8 @@ export function PersonificationReview({
             borderColor: 'var(--border-color)',
           }}
         >
-          <p className="text-xs text-[var(--text-muted)] mb-3">
-            Edit this narrative to better match your understanding of the audience.
+          <p className="text-sm text-[var(--text-muted)] mb-3">
+            <strong>Edit this down.</strong> Keep what resonates, cut what doesn't.
           </p>
           <textarea
             className="w-full bg-transparent border-none resize-none text-[var(--text-primary)] leading-relaxed focus:outline-none focus:ring-0 p-0"

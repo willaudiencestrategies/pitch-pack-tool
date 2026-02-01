@@ -41,7 +41,7 @@
 
     "outputs": {
       "intro": "Opening line: 'Based on everything you've shared, below are 5 potential audience segments to target. These are high level only for now, and once we've crafted one you really like, we'll expand it into a little more detail.'",
-      "segments": "Array of 5 segments, each with: id (1-5), name (snappy 1-2 words), needsValues (rich description of needs/values/motivations), demographics (observable behaviours/demographics)"
+      "segments": "Array of 5 segments, each with: id (1-5), name (snappy 1-2 words, e.g. 'The Cultural Curator'), tagline (memorable one-liner that captures their essence, e.g. 'Collects experiences like currency'), needsValues (rich description of needs/values/motivations), demographics (observable behaviours/demographics)"
     },
 
     "examples": [
@@ -57,7 +57,7 @@
 
     "task": "Based on the chosen PRIMARY segment, paint a deeper, more detailed personification of this audience. This should build on the high-level segment with richer human texture. If secondary audiences are provided, acknowledge them briefly but keep focus on the primary.",
 
-    "logic": "What This Is NOT:\n- Not a persona (no 'Julie, 37, accountant from Manchester')\n- Not a demographic profile\n- Not a laundry list\n\nWhat This IS:\nA rich, behavioural and psychological portrait that reveals:\n- The type of traveller they are\n- What they're trying to feel and get out of the experience\n- Who they're travelling with (if relevant)\n- What they prioritise and trade off\n- What earns their trust / triggers scepticism\n- The story they want to be able to tell afterwards\n\nPrioritisation:\n- The PRIMARY audience gets the full persona treatment (150-300 words)\n- SECONDARY audiences (if any) should only be mentioned by name as supporting audiences\n- Focus all narrative depth on the primary; secondary audiences inform tone but don't dilute focus\n\nTone: Vivid, behavioural, psychologically insightful, detailed but dynamic (150-300 words for primary)",
+    "logic": "Generate a CONCISE personification (150-200 words max). This is a thinking tool, not final output. Focus on:\n- Key motivations and values\n- Travel decision drivers\n- What makes them tick\n\nAvoid: lengthy backstories, excessive detail, poetic language.\n\nWhat This Is NOT:\n- Not a persona (no 'Julie, 37, accountant from Manchester')\n- Not a demographic profile\n- Not a laundry list\n\nWhat This IS:\nA rich, behavioural and psychological portrait that reveals:\n- The type of traveller they are\n- What they're trying to feel and get out of the experience\n- Who they're travelling with (if relevant)\n- What they prioritise and trade off\n- What earns their trust / triggers scepticism\n- The story they want to be able to tell afterwards\n\nPrioritisation:\n- The PRIMARY audience gets the full persona treatment (150-200 words)\n- SECONDARY audiences (if any) should only be mentioned by name as supporting audiences\n- Focus all narrative depth on the primary; secondary audiences inform tone but don't dilute focus\n\nTone: Vivid, behavioural, psychologically insightful, concise (150-200 words for primary)",
 
     "inputs": {
       "brief": "Original brief",
@@ -66,8 +66,8 @@
     },
 
     "outputs": {
-      "intro": "Opening line: 'Thanks. Based on everything you've shared, here's a longer description of the target audience. There's lots of detail, so feel free to take it away to edit it down...or give me feedback on how to change / reduce it.'",
-      "narrative": "150-300 word vivid human sketch personifying the PRIMARY segment",
+      "intro": "Opening line: 'Here's a sketch of your target audience. Edit this down - keep what resonates, cut what doesn't.'",
+      "narrative": "150-200 word vivid human sketch personifying the PRIMARY segment",
       "secondaryNote": "If secondary audiences exist: 'Supporting audiences: [names]' - single line only"
     },
 
