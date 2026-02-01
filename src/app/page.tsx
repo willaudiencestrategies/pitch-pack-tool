@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   SessionState,
   Section,
@@ -28,6 +28,13 @@ import {
   CreativeTenetsResponse,
   HistoryEntry,
 } from '@/lib/types';
+import {
+  saveSession,
+  loadSession,
+  clearSession,
+  getSessionSavedAt,
+  getSessionTimeRemaining,
+} from '@/lib/session-storage';
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
@@ -244,6 +251,88 @@ function SaveReminder({ hasUnsavedWork }: { hasUnsavedWork: boolean }) {
           ×
         </button>
       </div>
+    </div>
+  );
+}
+
+function RestoreSessionPrompt({
+  savedAt,
+  timeRemaining,
+  onRestore,
+  onStartFresh,
+}: {
+  savedAt: string | null;
+  timeRemaining: string | null;
+  onRestore: () => void;
+  onStartFresh: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      style={{ animation: 'fadeIn 0.2s ease-out' }}
+    >
+      <div
+        className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden"
+        style={{ animation: 'scaleIn 0.3s ease-out' }}
+      >
+        {/* Header with gradient accent */}
+        <div
+          className="h-1"
+          style={{
+            background: 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))',
+          }}
+        />
+        <div className="p-6">
+          <div className="flex items-start gap-4">
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: 'var(--expedia-yellow)' }}
+            >
+              <span className="text-2xl">📂</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+                Welcome Back
+              </h2>
+              <p className="text-[var(--text-secondary)] text-sm">
+                You have an in-progress session{savedAt ? ` saved ${savedAt}` : ''}.
+                {timeRemaining && (
+                  <span className="block text-xs text-[var(--text-muted)] mt-1">
+                    Expires in {timeRemaining}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 mt-6">
+            <button
+              onClick={onRestore}
+              className="btn-secondary w-full flex items-center justify-center gap-2"
+            >
+              <span>Continue where I left off</span>
+              <span>→</span>
+            </button>
+            <button
+              onClick={onStartFresh}
+              className="btn-outline w-full"
+            >
+              Start fresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -827,10 +916,65 @@ function SectionStepContent({
 export default function Home() {
   const [state, setState] = useState<SessionState>(createInitialState());
   const [lastAction, setLastAction] = useState<(() => void) | null>(null);
+  const [showRestorePrompt, setShowRestorePrompt] = useState(false);
+  const [sessionSavedAt, setSessionSavedAt] = useState<string | null>(null);
+  const [sessionTimeRemaining, setSessionTimeRemaining] = useState<string | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // State update helper
   const updateState = (updates: Partial<SessionState>) => {
     setState((prev) => ({ ...prev, ...updates }));
+  };
+
+  // ============================================
+  // Session Persistence
+  // ============================================
+
+  // Check for stored session on mount
+  useEffect(() => {
+    const stored = loadSession();
+    if (stored && stored.state.step !== 'upload') {
+      setSessionSavedAt(getSessionSavedAt());
+      setSessionTimeRemaining(getSessionTimeRemaining());
+      setShowRestorePrompt(true);
+    }
+  }, []);
+
+  // Auto-save on state changes (debounced 1 second, skip if on upload step)
+  useEffect(() => {
+    // Skip if on upload step (nothing worth saving yet)
+    if (state.step === 'upload') return;
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Debounce save by 1 second
+    saveTimeoutRef.current = setTimeout(() => {
+      saveSession(state);
+    }, 1000);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [state]);
+
+  // Restore session from localStorage
+  const restoreSession = () => {
+    const stored = loadSession();
+    if (stored) {
+      setState(stored.state);
+    }
+    setShowRestorePrompt(false);
+  };
+
+  // Start fresh (clear stored session)
+  const startFresh = () => {
+    clearSession();
+    setShowRestorePrompt(false);
   };
 
   // ============================================
@@ -2256,6 +2400,8 @@ export default function Home() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      // Clear session after successful download
+      clearSession();
     };
 
     // Show inline output if we have it
@@ -2567,6 +2713,16 @@ export default function Home() {
 
       {/* Save Work Reminder */}
       <SaveReminder hasUnsavedWork={state.step !== 'upload' && state.step !== 'output'} />
+
+      {/* Restore Session Prompt */}
+      {showRestorePrompt && (
+        <RestoreSessionPrompt
+          savedAt={sessionSavedAt}
+          timeRemaining={sessionTimeRemaining}
+          onRestore={restoreSession}
+          onStartFresh={startFresh}
+        />
+      )}
     </div>
   );
 }

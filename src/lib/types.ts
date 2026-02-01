@@ -92,6 +92,12 @@ export interface BriefScore {
   gate1Scores: Partial<Record<Gate1SectionKey, Status>>;
 }
 
+export interface HistoryEntry {
+  timestamp: string;
+  action: string;
+  state: Partial<SessionState>;
+}
+
 export interface Segment {
   id: number;
   name: string;
@@ -148,6 +154,10 @@ export interface SessionState {
   reassessCount: number;
   lastReassessedAt: string | null;
 
+  // Undo history
+  history: HistoryEntry[];
+  historyIndex: number;
+
   error: string | null;
   loading: boolean;
 }
@@ -183,6 +193,8 @@ export function createInitialState(): SessionState {
     briefScore: null,
     reassessCount: 0,
     lastReassessedAt: null,
+    history: [],
+    historyIndex: -1,
     error: null,
     loading: false,
   };
