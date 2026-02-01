@@ -26,6 +26,7 @@ import {
   GATE2_SECTION_KEYS,
   BrandAlignment as BrandAlignmentType,
   CreativeTenetsResponse,
+  HistoryEntry,
 } from '@/lib/types';
 import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
@@ -217,6 +218,32 @@ function ErrorBanner({
           40%, 80% { transform: translateX(4px); }
         }
       `}</style>
+    </div>
+  );
+}
+
+function SaveReminder({ hasUnsavedWork }: { hasUnsavedWork: boolean }) {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (!hasUnsavedWork || dismissed) return null;
+
+  return (
+    <div className="fixed bottom-4 left-4 p-4 rounded-xl bg-[var(--expedia-navy)] text-white shadow-lg max-w-xs z-40">
+      <div className="flex items-start gap-3">
+        <span className="text-lg">💾</span>
+        <div>
+          <p className="font-medium text-sm">Don&apos;t forget to save</p>
+          <p className="text-xs opacity-80 mt-1">
+            This tool doesn&apos;t store your work. Download your output before leaving.
+          </p>
+        </div>
+        <button
+          onClick={() => setDismissed(true)}
+          className="text-white/60 hover:text-white"
+        >
+          ×
+        </button>
+      </div>
     </div>
   );
 }
@@ -806,6 +833,90 @@ export default function Home() {
     setState((prev) => ({ ...prev, ...updates }));
   };
 
+  // ============================================
+  // Undo/Redo Functionality
+  // ============================================
+
+  // Push a state snapshot to history before destructive actions
+  const pushHistory = (action: string, snapshot: Partial<SessionState>) => {
+    setState((prev) => {
+      // Create history entry
+      const entry: HistoryEntry = {
+        timestamp: new Date().toISOString(),
+        action,
+        state: snapshot,
+      };
+
+      // Trim future history if not at the end (we're branching)
+      const trimmedHistory = prev.history.slice(0, prev.historyIndex + 1);
+
+      // Add new entry (max 20 entries)
+      const newHistory = [...trimmedHistory, entry].slice(-20);
+
+      return {
+        ...prev,
+        history: newHistory,
+        historyIndex: newHistory.length - 1,
+      };
+    });
+  };
+
+  // Derived values for undo/redo availability
+  const canUndo = state.historyIndex > 0;
+  const canRedo = state.historyIndex < state.history.length - 1;
+
+  // Undo: restore previous history entry's state
+  const undo = () => {
+    if (!canUndo) return;
+
+    const previousEntry = state.history[state.historyIndex - 1];
+    if (previousEntry) {
+      setState((prev) => ({
+        ...prev,
+        ...previousEntry.state,
+        historyIndex: prev.historyIndex - 1,
+      }));
+    }
+  };
+
+  // Redo: restore next history entry's state
+  const redo = () => {
+    if (!canRedo) return;
+
+    const nextEntry = state.history[state.historyIndex + 1];
+    if (nextEntry) {
+      setState((prev) => ({
+        ...prev,
+        ...nextEntry.state,
+        historyIndex: prev.historyIndex + 1,
+      }));
+    }
+  };
+
+  // UndoRedoButtons component
+  function UndoRedoButtons() {
+    return (
+      <div className="fixed bottom-4 right-4 flex gap-2 z-40">
+        <button
+          onClick={undo}
+          disabled={!canUndo}
+          className="p-2 rounded-lg bg-white border border-[var(--border-color)] shadow-sm disabled:opacity-40 hover:bg-[var(--bg-secondary)] transition-colors"
+          title="Undo"
+        >
+          ↶
+        </button>
+        <button
+          onClick={redo}
+          disabled={!canRedo}
+          className="p-2 rounded-lg bg-white border border-[var(--border-color)] shadow-sm disabled:opacity-40 hover:bg-[var(--bg-secondary)] transition-colors"
+          title="Redo"
+        >
+          ↷
+        </button>
+      </div>
+    );
+  }
+
   // Navigation handler for progress bar
   const handleNavigateToStep = (step: Step) => {
     if (step === 'upload') {
@@ -947,6 +1058,10 @@ export default function Home() {
 
   const handleSectionReassess = async (additionalInfo: string) => {
     const section = state.sections[state.currentSectionIndex];
+
+    // Push current state to history before reassessing
+    pushHistory(`Reassess ${section.name}`, { sections: [...state.sections] });
+
     updateState({ loading: true, error: null });
     setLastAction(() => () => handleSectionReassess(additionalInfo));
 
@@ -1182,6 +1297,9 @@ export default function Home() {
 
   // Confirm tenets and continue to media step
   const handleConfirmTenets = (tenets: string[]) => {
+    // Push current state to history before confirming tenets
+    pushHistory('Confirm creative tenets', { sections: [...state.sections] });
+
     // Update the creative_tenets section with the confirmed tenets
     const updatedSections = [...state.sections];
     const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
@@ -1279,6 +1397,9 @@ export default function Home() {
   const acceptSuggestion = () => {
     const section = state.sections[state.currentSectionIndex];
     if (section.suggestion) {
+      // Push current state to history before accepting suggestion
+      pushHistory(`Accept suggestion for ${section.name}`, { sections: [...state.sections] });
+
       const updatedSections = [...state.sections];
       updatedSections[state.currentSectionIndex] = {
         ...updatedSections[state.currentSectionIndex],
@@ -2023,6 +2144,12 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
+                // Push current state to history before confirming insights
+                pushHistory('Confirm audience insights', {
+                  sections: [...state.sections],
+                  selectedInsights: [...state.selectedInsights],
+                });
+
                 // Update the audience_insights section and continue to tenets
                 const updatedSections = [...state.sections];
                 const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
@@ -2434,6 +2561,12 @@ export default function Home() {
       <footer className="text-center py-6 text-sm text-[var(--text-muted)]">
         Pitch Pack Tool for E Studio
       </footer>
+
+      {/* Undo/Redo Buttons */}
+      <UndoRedoButtons />
+
+      {/* Save Work Reminder */}
+      <SaveReminder hasUnsavedWork={state.step !== 'upload' && state.step !== 'output'} />
     </div>
   );
 }
