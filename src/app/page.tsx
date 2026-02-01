@@ -1432,6 +1432,49 @@ export default function Home() {
     }
   };
 
+  // Generate personification for a specific branch segment (used when processing multiple audiences)
+  const handleGeneratePersonificationForBranch = async (segment: AudienceSegment) => {
+    updateState({ loading: true, error: null });
+    setLastAction(() => () => handleGeneratePersonificationForBranch(segment));
+
+    try {
+      const response = await fetch('/api/generate/audience', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brief: state.brief,
+          additionalContext: state.additionalContext,
+          selectedSegment: segment,
+          isMerged: false,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to personify audience');
+
+      const data: PersonificationResponse = await response.json();
+
+      // Update the current branch with the personification
+      const updatedBranches = [...state.audienceBranches];
+      if (updatedBranches[state.currentBranchIndex]) {
+        updatedBranches[state.currentBranchIndex] = {
+          ...updatedBranches[state.currentBranchIndex],
+          personification: data,
+        };
+      }
+
+      updateState({
+        personification: data,
+        audienceBranches: updatedBranches,
+        loading: false,
+      });
+    } catch (err) {
+      updateState({
+        error: err instanceof Error ? err.message : 'Something went wrong',
+        loading: false,
+      });
+    }
+  };
+
   const handleGenerateInsights = async () => {
     if (!state.selectedAudienceSegment || !state.personification) return;
 
@@ -2153,6 +2196,9 @@ export default function Home() {
   };
 
   const renderGate2AudienceStep = () => {
+    const currentBranch = state.audienceBranches[state.currentBranchIndex];
+    const isSubsequentBranch = state.currentBranchIndex > 0 && state.audienceBranches.length > 1;
+
     // Loading state for audience generation
     if (state.loading && !state.audienceMenu) {
       return (
@@ -2183,22 +2229,61 @@ export default function Home() {
       );
     }
 
+    // For subsequent branches, auto-trigger personification if not already done
+    if (isSubsequentBranch && state.selectedAudienceSegment && !state.personification && !state.loading) {
+      // Trigger personification for this branch's segment
+      handleGeneratePersonificationForBranch(currentBranch.segment);
+      return (
+        <LoadingOverlay
+          message={`Developing ${currentBranch.segment.name}...`}
+          subMessage="Creating a rich personification of this audience segment"
+        />
+      );
+    }
+
     // Personification review using new component
     if (state.selectedAudienceSegment && state.personification) {
       return (
-        <PersonificationReview
-          segment={state.selectedAudienceSegment}
-          personification={state.personification}
-          onConfirm={(editedNarrative) => {
-            // Update personification with edited narrative
-            updateState({
-              personification: { ...state.personification!, narrative: editedNarrative },
-            });
-            handleGenerateInsights();
-          }}
-          onBack={() => updateState({ selectedAudienceSegment: null, personification: null })}
-          loading={state.loading}
-        />
+        <>
+          {/* Branch Progress - show when multiple segments selected */}
+          <BranchProgress branches={state.audienceBranches} currentIndex={state.currentBranchIndex} />
+          <PersonificationReview
+            segment={state.selectedAudienceSegment}
+            personification={state.personification}
+            onConfirm={(editedNarrative) => {
+              // Update personification with edited narrative and save to branch
+              const updatedBranches = [...state.audienceBranches];
+              if (updatedBranches[state.currentBranchIndex]) {
+                updatedBranches[state.currentBranchIndex] = {
+                  ...updatedBranches[state.currentBranchIndex],
+                  personification: { ...state.personification!, narrative: editedNarrative },
+                };
+              }
+              updateState({
+                personification: { ...state.personification!, narrative: editedNarrative },
+                audienceBranches: updatedBranches,
+              });
+              handleGenerateInsights();
+            }}
+            onBack={() => {
+              if (isSubsequentBranch) {
+                // Go back to previous branch's insights
+                const prevIndex = state.currentBranchIndex - 1;
+                const prevBranch = state.audienceBranches[prevIndex];
+                updateState({
+                  currentBranchIndex: prevIndex,
+                  selectedAudienceSegment: prevBranch.segment,
+                  personification: prevBranch.personification,
+                  selectedInsights: prevBranch.insights,
+                  step: 'gate2_insights',
+                });
+              } else {
+                updateState({ selectedAudienceSegment: null, personification: null });
+              }
+            }}
+            loading={state.loading}
+          />
+        </>
       );
     }
 
@@ -2238,6 +2323,9 @@ export default function Home() {
         />
       );
     }
+
+    const currentBranch = state.audienceBranches[state.currentBranchIndex];
+    const isLastBranch = state.currentBranchIndex >= state.audienceBranches.length - 1;
 
     const toggleInsight = (insight: Truth) => {
       const isSelected = state.selectedInsights.some((t) => t.id === insight.id);
@@ -2283,6 +2371,9 @@ export default function Home() {
         {/* Back Button */}
         <BackButton onClick={() => updateState({ step: 'gate2_audience' })} label="Back to Audience" />
 
+        {/* Branch Progress - show when multiple segments selected */}
+        <BranchProgress branches={state.audienceBranches} currentIndex={state.currentBranchIndex} />
+
         {/* Header */}
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <div
@@ -2296,7 +2387,7 @@ export default function Home() {
             Gate 2: Step 3
           </div>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Select Audience Insights
+            {currentBranch ? `Insights for ${currentBranch.segment.name}` : 'Select Audience Insights'}
           </h2>
           <p className="text-[var(--text-secondary)]">
             12 insights ranging from bolder to safer. Select up to 3 that resonate with your audience.
@@ -2394,36 +2485,92 @@ export default function Home() {
                 pushHistory('Confirm audience insights', {
                   sections: [...state.sections],
                   selectedInsights: [...state.selectedInsights],
+                  audienceBranches: [...state.audienceBranches],
                 });
 
-                // Update the audience_insights section and continue to tenets
-                const updatedSections = [...state.sections];
-                const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
-                if (insightsIndex >= 0) {
-                  updatedSections[insightsIndex] = {
-                    ...updatedSections[insightsIndex],
-                    status: 'green',
-                    content: state.selectedInsights.map((t) => `- ${t.text}`).join('\n'),
+                // Save insights to current branch
+                const updatedBranches = [...state.audienceBranches];
+                if (updatedBranches[state.currentBranchIndex]) {
+                  updatedBranches[state.currentBranchIndex] = {
+                    ...updatedBranches[state.currentBranchIndex],
+                    insights: [...state.selectedInsights],
                   };
                 }
-                // Also update audience section
-                const audienceIndex = updatedSections.findIndex((s) => s.key === 'audience');
-                if (audienceIndex >= 0 && state.selectedAudienceSegment) {
-                  updatedSections[audienceIndex] = {
-                    ...updatedSections[audienceIndex],
-                    status: 'green',
-                    content: `**${state.selectedAudienceSegment.name}**\n\n${state.selectedAudienceSegment.needsValues}\n\n${state.personification?.narrative || ''}`,
-                  };
+
+                // Check if there are more branches to process
+                const nextBranchIndex = state.currentBranchIndex + 1;
+                const hasMoreBranches = nextBranchIndex < state.audienceBranches.length;
+
+                if (hasMoreBranches) {
+                  // Move to next branch - go back to audience step for personification
+                  const nextBranch = state.audienceBranches[nextBranchIndex];
+                  updateState({
+                    audienceBranches: updatedBranches,
+                    currentBranchIndex: nextBranchIndex,
+                    selectedAudienceSegment: nextBranch.segment,
+                    personification: null, // Reset for new branch
+                    insightOptions: [], // Reset for new branch
+                    selectedInsights: [], // Reset for new branch
+                    step: 'gate2_audience', // Go back to generate personification for next segment
+                  });
+                } else {
+                  // All branches done - merge insights and proceed to tenets
+                  // Collect all insights from all branches
+                  const allInsights = updatedBranches.flatMap(b => b.insights);
+
+                  // Update the audience_insights section
+                  const updatedSections = [...state.sections];
+                  const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
+                  if (insightsIndex >= 0) {
+                    // Group insights by audience if multiple branches
+                    let content = '';
+                    if (updatedBranches.length > 1) {
+                      content = updatedBranches.map(branch => {
+                        const branchInsights = branch.insights.map((t) => `- ${t.text}`).join('\n');
+                        return `**${branch.segment.name}:**\n${branchInsights}`;
+                      }).join('\n\n');
+                    } else {
+                      content = allInsights.map((t) => `- ${t.text}`).join('\n');
+                    }
+                    updatedSections[insightsIndex] = {
+                      ...updatedSections[insightsIndex],
+                      status: 'green',
+                      content,
+                    };
+                  }
+
+                  // Update audience section with all audiences
+                  const audienceIndex = updatedSections.findIndex((s) => s.key === 'audience');
+                  if (audienceIndex >= 0) {
+                    let audienceContent = '';
+                    if (updatedBranches.length > 1) {
+                      audienceContent = updatedBranches.map(branch => {
+                        return `**${branch.segment.name}**\n${branch.segment.needsValues}\n\n${branch.personification?.narrative || ''}`;
+                      }).join('\n\n---\n\n');
+                    } else if (state.selectedAudienceSegment) {
+                      audienceContent = `**${state.selectedAudienceSegment.name}**\n\n${state.selectedAudienceSegment.needsValues}\n\n${state.personification?.narrative || ''}`;
+                    }
+                    updatedSections[audienceIndex] = {
+                      ...updatedSections[audienceIndex],
+                      status: 'green',
+                      content: audienceContent,
+                    };
+                  }
+
+                  updateState({
+                    sections: updatedSections,
+                    audienceBranches: updatedBranches,
+                    selectedInsights: allInsights, // Keep all for tenets generation
+                    step: 'gate2_tenets',
+                  });
                 }
-                updateState({
-                  sections: updatedSections,
-                  step: 'gate2_tenets',
-                });
               }}
               disabled={state.selectedInsights.length === 0}
               className="btn-secondary flex items-center gap-2"
             >
-              Confirm & Continue
+              {state.currentBranchIndex < state.audienceBranches.length - 1 && state.audienceBranches.length > 1
+                ? `Confirm & Next Audience`
+                : 'Confirm & Continue'}
               <span>→</span>
             </button>
           </div>
