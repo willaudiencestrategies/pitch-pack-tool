@@ -12,6 +12,7 @@ interface AudienceMenuProps {
 }
 
 interface EditedSegment extends AudienceSegment {
+  tagline?: string;
   isEdited?: boolean;
 }
 
@@ -198,16 +199,23 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className={`font-semibold text-lg ${
-                      segmentIsSelected ? 'text-[var(--expedia-navy)]' : 'text-[var(--expedia-navy)]'
-                    }`}>
-                      {segment.name}
-                    </h3>
-                    {isEditedFlag && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--expedia-navy)]/10 text-[var(--expedia-navy)]">
-                        (edited)
-                      </span>
+                  <div className="mb-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className={`font-semibold text-lg ${
+                        segmentIsSelected ? 'text-[var(--expedia-navy)]' : 'text-[var(--expedia-navy)]'
+                      }`}>
+                        {segment.name}
+                      </h3>
+                      {isEditedFlag && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--expedia-navy)]/10 text-[var(--expedia-navy)]">
+                          (edited)
+                        </span>
+                      )}
+                    </div>
+                    {segment.tagline && (
+                      <p className="text-sm text-[var(--text-muted)] italic">
+                        "{segment.tagline}"
+                      </p>
                     )}
                   </div>
                   <p className="text-[var(--text-primary)] mb-2">{segment.needsValues}</p>
@@ -334,6 +342,21 @@ export function AudienceMenu({ menu, onSelect, onRegenerate, onBack, loading }: 
                   value={editingSegment.name}
                   onChange={(e) =>
                     setEditingSegment({ ...editingSegment, name: e.target.value })
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+                  Tagline
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 rounded-lg border border-[var(--border-color)] focus:border-[var(--expedia-navy)] focus:outline-none text-sm"
+                  placeholder="e.g. Collects experiences like currency"
+                  value={editingSegment.tagline || ''}
+                  onChange={(e) =>
+                    setEditingSegment({ ...editingSegment, tagline: e.target.value })
                   }
                 />
               </div>

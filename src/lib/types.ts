@@ -263,6 +263,7 @@ export interface OutputResponse {
 export interface AudienceSegment {
   id: number;
   name: string;
+  tagline?: string; // e.g. "Collects experiences like currency"
   needsValues: string;
   demographics: string;
 }
