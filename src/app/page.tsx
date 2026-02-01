@@ -27,6 +27,7 @@ import {
   BrandAlignment as BrandAlignmentType,
   CreativeTenetsResponse,
   HistoryEntry,
+  AudienceBranch,
 } from '@/lib/types';
 import {
   saveSession,
@@ -44,6 +45,18 @@ import { GateTransition } from '@/components/GateTransition';
 import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
+import { exportToWord } from '@/lib/word-export';
+import { logAnalytics, captureBriefScore } from '@/lib/analytics';
+
+// ============================================
+// Constants
+// ============================================
+
+const CREATIVE_TASK_TEMPLATE = `Put forward 1-3 concepts that respond to [OBJECTIVES], including:
+- Creative overview
+- Insight used
+- Example executions across key channels
+- Campaign creative tenets`;
 
 // ============================================
 // Helper Components
@@ -751,18 +764,39 @@ function SectionStepContent({
         </div>
       )}
 
-      {/* Current Content */}
+      {/* Creative Task template */}
+      {section.key === 'creative_task' && (
+        <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+          <p className="text-sm font-medium text-[var(--text-muted)] mb-2">Suggested creative task:</p>
+          <textarea
+            aria-label="Creative task template"
+            className="w-full p-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm text-[var(--text-primary)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--expedia-navy)]/20 focus:border-[var(--expedia-navy)]"
+            rows={6}
+            value={section.content || CREATIVE_TASK_TEMPLATE}
+            onChange={(e) => onUpdateContent(e.target.value)}
+          />
+          <p className="text-xs text-[var(--text-muted)] mt-2">
+            Edit as needed. This is a starting point, not a constraint.
+          </p>
+        </div>
+      )}
+
+      {/* Current Content - hidden for creative_task since template is shown above */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-[var(--text-secondary)]">
-          Current Content
-        </label>
-        <textarea
-          aria-label={`Current content for ${section.name}`}
-          className="textarea-field"
-          style={{ minHeight: '180px' }}
-          value={section.content || '(No content found in brief)'}
-          onChange={(e) => onUpdateContent(e.target.value)}
-        />
+        {section.key !== 'creative_task' && (
+          <>
+            <label className="block text-sm font-medium text-[var(--text-secondary)]">
+              Current Content
+            </label>
+            <textarea
+              aria-label={`Current content for ${section.name}`}
+              className="textarea-field"
+              style={{ minHeight: '180px' }}
+              value={section.content || '(No content found in brief)'}
+              onChange={(e) => onUpdateContent(e.target.value)}
+            />
+          </>
+        )}
         {section.feedback && (
           <div className={`p-4 rounded-xl border-l-4 ${
             section.status === 'green'
@@ -1482,6 +1516,9 @@ export default function Home() {
 
       const data: OutputResponse = await response.json();
 
+      // Log analytics when output is generated
+      logAnalytics(captureBriefScore(state));
+
       // Store markdown for inline display
       updateState({
         step: 'output',
@@ -1605,6 +1642,26 @@ export default function Home() {
             placeholder="Paste the full brief content here..."
             value={state.brief}
             onChange={(e) => updateState({ brief: e.target.value })}
+          />
+        </div>
+
+        {/* Seller Name (optional, for tracking) */}
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Seller name (optional, for tracking)"
+            value={state.briefScore?.sellerName || ''}
+            onChange={(e) => updateState({
+              briefScore: {
+                sessionId: state.briefScore?.sessionId || '',
+                sellerName: e.target.value,
+                timestamp: state.briefScore?.timestamp || '',
+                gate1Scores: state.briefScore?.gate1Scores || {} as Record<'objective' | 'budget' | 'audience' | 'creative_task', Status>,
+                gate1OverallHealth: state.briefScore?.gate1OverallHealth || '',
+                completedSteps: state.briefScore?.completedSteps || [],
+              }
+            })}
+            className="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--expedia-navy)] focus:border-transparent"
           />
         </div>
 
@@ -2455,6 +2512,25 @@ export default function Home() {
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
               Download as Markdown
+            </button>
+            <button
+              onClick={() => exportToWord({
+                sections: state.sections,
+                audience: state.selectedAudienceSegment || undefined,
+                personification: state.personification?.narrative,
+                insights: state.selectedInsights,
+                brandAlignment: state.brandAlignment || undefined,
+              })}
+              className="btn-outline flex items-center gap-2 hover:shadow-md transition-shadow"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+              </svg>
+              Export as Word
             </button>
           </div>
 

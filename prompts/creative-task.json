@@ -1,6 +1,7 @@
 {
   "section": "creative_task",
   "displayName": "Creative Task",
+  "defaultTemplate": "Put forward 1-3 concepts that respond to [OBJECTIVES], including:\n- Creative overview\n- Insight used\n- Example executions across key channels\n- Campaign creative tenets",
 
   "assess": {
     "role": "You are a Brief Quality Specialist evaluating the Creative Task section.",
