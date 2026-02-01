@@ -394,6 +394,30 @@ function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: 
   );
 }
 
+function BranchProgress({ branches, currentIndex }: { branches: AudienceBranch[]; currentIndex: number }) {
+  if (branches.length <= 1) return null;
+
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      {branches.map((branch, i) => (
+        <div
+          key={i}
+          className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+            i === currentIndex
+              ? 'bg-[var(--expedia-navy)] text-white'
+              : i < currentIndex
+              ? 'bg-[var(--status-green)]/20 text-[var(--status-green)]'
+              : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
+          }`}
+        >
+          {i < currentIndex && <span className="mr-1">✓</span>}
+          {branch.segment.name}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ReassessConfirmation({ count }: { count: number }) {
   if (count === 0) return null;
 
@@ -1352,16 +1376,25 @@ export default function Home() {
   };
 
   const handleSelectAudience = async (segments: AudienceSegment[], prioritisation: AudiencePrioritisation) => {
-    // Primary audience gets full persona treatment
-    // Secondary audiences are captured but only names appear in output
+    // Create branches for all selected segments (primary + secondary)
+    // Primary is always first, secondary segments follow
+    const allSegments = [prioritisation.primary, ...prioritisation.secondary];
+    const branches: AudienceBranch[] = allSegments.map(segment => ({
+      segment,
+      personification: null,
+      insights: [],
+    }));
+
+    // Start with the first branch (primary segment)
     const primarySegment = prioritisation.primary;
-    const secondarySegments = prioritisation.secondary;
 
     updateState({
       loading: true,
       error: null,
       selectedAudienceSegment: primarySegment,
       audiencePrioritisation: prioritisation,
+      audienceBranches: branches,
+      currentBranchIndex: 0,
     });
     setLastAction(() => () => handleSelectAudience(segments, prioritisation));
 
@@ -1373,16 +1406,22 @@ export default function Home() {
           brief: state.brief,
           additionalContext: state.additionalContext,
           selectedSegment: primarySegment,
-          secondarySegments: secondarySegments.map(s => s.name), // Names only for secondary
-          isMerged: false, // No longer merging - using prioritisation instead
+          secondarySegments: prioritisation.secondary.map(s => s.name),
+          isMerged: false,
         }),
       });
 
       if (!response.ok) throw new Error('Failed to personify audience');
 
       const data: PersonificationResponse = await response.json();
+
+      // Update the first branch with the personification
+      const updatedBranches = [...branches];
+      updatedBranches[0] = { ...updatedBranches[0], personification: data };
+
       updateState({
         personification: data,
+        audienceBranches: updatedBranches,
         loading: false,
       });
     } catch (err) {

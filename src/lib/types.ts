@@ -85,11 +85,16 @@ export interface AudiencePrioritisation {
   secondary: AudienceSegment[]; // Max 2
 }
 
-// Brief Score (stub for analytics)
+// Brief Score (analytics tracking)
 export interface BriefScore {
+  sessionId: string;
   sellerName?: string;
+  briefFilename?: string;
   timestamp: string;
-  gate1Scores: Partial<Record<Gate1SectionKey, Status>>;
+  gate1Scores: Record<Gate1SectionKey, Status>;
+  gate1OverallHealth: string;
+  completedSteps: Step[];
+  timeSpentSeconds?: number;
 }
 
 export interface HistoryEntry {
@@ -139,6 +144,10 @@ export interface SessionState {
   personification: PersonificationResponse | null;
   audiencePrioritisation: AudiencePrioritisation | null;
 
+  // Gate 2: Audience Branching (v1.3) - One branch per selected segment
+  audienceBranches: AudienceBranch[];
+  currentBranchIndex: number;
+
   // Gate 2: Audience Insights (renamed from Human Truths)
   insightOptions: Truth[]; // Renamed from truthOptions
   selectedInsights: Truth[]; // Renamed from selectedTruths, max 3
@@ -186,6 +195,8 @@ export function createInitialState(): SessionState {
     selectedAudienceSegment: null,
     personification: null,
     audiencePrioritisation: null,
+    audienceBranches: [],
+    currentBranchIndex: 0,
     insightOptions: [],
     selectedInsights: [],
     outputMarkdown: null,
@@ -335,4 +346,11 @@ export interface CreativeTenetsRequest {
 export interface CreativeTenetsResponse {
   tenets: string[];
   intro: string;
+}
+
+// Audience Branching (v1.3) - One branch per selected segment
+export interface AudienceBranch {
+  segment: AudienceSegment;
+  personification: PersonificationResponse | null;
+  insights: Truth[];
 }
