@@ -1542,7 +1542,7 @@ export default function Home() {
     const section = state.sections[state.currentSectionIndex];
     if (section.suggestion) {
       // Push current state to history before accepting suggestion
-      pushHistory(`Accept suggestion for ${section.name}`, { sections: [...state.sections] });
+      pushHistory(`Use suggestion for ${section.name}`, { sections: [...state.sections] });
 
       const updatedSections = [...state.sections];
       updatedSections[state.currentSectionIndex] = {
@@ -1754,7 +1754,8 @@ export default function Home() {
           {gate1Sections.map((section, index) => (
             <div
               key={section.key}
-              className={`flex items-center justify-between p-4 transition-all hover:bg-[var(--bg-secondary)] ${
+              onClick={() => updateState({ step: 'gate1_sections', currentSectionIndex: index, currentGate: 'gate1' })}
+              className={`flex items-center justify-between p-4 transition-all cursor-pointer hover:bg-[var(--bg-secondary)] group ${
                 index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
               }`}
               style={{
@@ -1770,7 +1771,12 @@ export default function Home() {
                 >
                   {index + 1}
                 </span>
-                <span className="font-medium text-[var(--text-primary)]">{section.name}</span>
+                <div className="flex flex-col">
+                  <span className="font-medium text-[var(--text-primary)] group-hover:underline">{section.name}</span>
+                  <span className="text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">
+                    Click to edit this section
+                  </span>
+                </div>
               </div>
               <StatusBadge status={section.status} />
             </div>

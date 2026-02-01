@@ -84,7 +84,7 @@ export function PersonificationReview({
           }}
         >
           <p className="text-xs text-[var(--text-muted)] mb-3">
-            Feel free to edit this narrative to better match your understanding of the audience.
+            Edit this narrative to better match your understanding of the audience.
           </p>
           <textarea
             className="w-full bg-transparent border-none resize-none text-[var(--text-primary)] leading-relaxed focus:outline-none focus:ring-0 p-0"
