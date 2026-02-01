@@ -2,12 +2,13 @@
 
 /**
  * File parsing utility for handling different document formats.
- * Supports: Word (.docx), Markdown (.md), Text (.txt)
+ * Supports: Word (.docx), PDF (.pdf), PowerPoint (.pptx), Markdown (.md), Text (.txt)
  */
 
 import mammoth from 'mammoth';
+import { PDFParse } from 'pdf-parse';
 
-const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.docx'] as const;
+const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.docx', '.pdf', '.ppt', '.pptx'] as const;
 
 export type SupportedExtension = (typeof SUPPORTED_EXTENSIONS)[number];
 
@@ -39,6 +40,8 @@ function getExtension(filename: string): string {
  * Parses a file and returns its text content
  * - .txt and .md files are read as plain text
  * - .docx files are parsed using mammoth to extract raw text
+ * - .pdf files are parsed using pdf-parse to extract text
+ * - .ppt/.pptx files return a placeholder (text extraction requires manual copy)
  */
 export async function parseFile(file: File): Promise<string> {
   const ext = getExtension(file.name);
@@ -57,6 +60,18 @@ export async function parseFile(file: File): Promise<string> {
     const arrayBuffer = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer });
     return result.value;
+  }
+
+  if (ext === '.pdf') {
+    const arrayBuffer = await file.arrayBuffer();
+    const parser = new PDFParse({ data: arrayBuffer });
+    const result = await parser.getText();
+    await parser.destroy();
+    return result.text;
+  }
+
+  if (ext === '.ppt' || ext === '.pptx') {
+    return `[PowerPoint file: ${file.name}]\n[Text extraction from PPTX requires manual copy - please copy and paste the text content]`;
   }
 
   // This shouldn't be reached due to the isFileSupported check, but TypeScript needs it

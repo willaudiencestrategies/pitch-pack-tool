@@ -13,12 +13,15 @@ function createMockFile(content: string, name: string, type: string): File {
 }
 
 describe('getSupportedExtensions', () => {
-  it('returns array with .txt, .md, and .docx', () => {
+  it('returns array with all supported extensions', () => {
     const extensions = getSupportedExtensions();
     expect(extensions).toContain('.txt');
     expect(extensions).toContain('.md');
     expect(extensions).toContain('.docx');
-    expect(extensions.length).toBe(3);
+    expect(extensions).toContain('.pdf');
+    expect(extensions).toContain('.ppt');
+    expect(extensions).toContain('.pptx');
+    expect(extensions.length).toBe(6);
   });
 });
 
@@ -42,10 +45,19 @@ describe('isFileSupported', () => {
     expect(isFileSupported('readme.MD')).toBe(true);
   });
 
+  it('returns true for .pdf files', () => {
+    expect(isFileSupported('document.pdf')).toBe(true);
+  });
+
+  it('returns true for .pptx files', () => {
+    expect(isFileSupported('presentation.pptx')).toBe(true);
+    expect(isFileSupported('slides.ppt')).toBe(true);
+  });
+
   it('returns false for unsupported extensions', () => {
-    expect(isFileSupported('document.pdf')).toBe(false);
     expect(isFileSupported('image.png')).toBe(false);
     expect(isFileSupported('data.json')).toBe(false);
+    expect(isFileSupported('video.mp4')).toBe(false);
   });
 
   it('returns false for files without extension', () => {
