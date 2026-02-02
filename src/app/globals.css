@@ -132,6 +132,46 @@ body {
   cursor: not-allowed;
 }
 
+/* Prominent Edit Button */
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--expedia-navy);
+  background: rgba(26, 31, 113, 0.08);
+  border: 2px solid var(--expedia-navy);
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn-edit:hover:not(:disabled) {
+  background: rgba(26, 31, 113, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 31, 113, 0.15);
+}
+
+.btn-edit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-edit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-edit svg {
+  transition: transform 0.2s;
+}
+
+.btn-edit:hover svg {
+  transform: rotate(-5deg);
+}
+
 /* Card styles */
 .card {
   padding: 1.5rem;
