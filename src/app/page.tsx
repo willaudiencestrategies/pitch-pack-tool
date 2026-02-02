@@ -28,6 +28,7 @@ import {
   CreativeTenetsResponse,
   HistoryEntry,
   AudienceBranch,
+  BudgetDetails,
 } from '@/lib/types';
 import {
   saveSession,
@@ -47,6 +48,10 @@ import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
 import { exportToWord } from '@/lib/word-export';
 import { logAnalytics, captureBriefScore } from '@/lib/analytics';
+import { LoadingProgress } from '@/components/LoadingProgress';
+import { TRIAGE_STAGES } from '@/lib/loading-config';
+import { useLoadingProgress } from '@/hooks/useLoadingProgress';
+import { ProductionBudget } from '@/components/ProductionBudget';
 
 // ============================================
 // Constants
@@ -57,6 +62,16 @@ const CREATIVE_TASK_TEMPLATE = `Put forward 1-3 concepts that respond to [OBJECT
 - Insight used
 - Example executions across key channels
 - Campaign creative tenets`;
+
+// ============================================
+// Helper Functions
+// ============================================
+
+function extractBudgetFromContent(content: string): string | undefined {
+  // Look for currency patterns like $500,000 or £50K
+  const match = content.match(/[\$£€][\d,]+[KkMm]?/);
+  return match ? match[0] : undefined;
+}
 
 // ============================================
 // Helper Components
@@ -118,6 +133,17 @@ function Spinner({ className = '' }: { className?: string }) {
         strokeLinecap="round"
       />
     </svg>
+  );
+}
+
+function EditButton({ onClick, children = 'Edit', className = '' }: { onClick: () => void; children?: React.ReactNode; className?: string }) {
+  return (
+    <button onClick={onClick} className={`btn-edit ${className}`}>
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+      {children}
+    </button>
   );
 }
 
@@ -978,6 +1004,7 @@ export default function Home() {
   const [sessionSavedAt, setSessionSavedAt] = useState<string | null>(null);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const triageProgress = useLoadingProgress(TRIAGE_STAGES);
 
   // State update helper
   const updateState = (updates: Partial<SessionState>) => {
@@ -1152,6 +1179,7 @@ export default function Home() {
 
     updateState({ loading: true, error: null });
     setLastAction(() => handleTriage);
+    triageProgress.runSimulatedProgress();
 
     try {
       const response = await fetch('/api/triage', {
@@ -1186,6 +1214,7 @@ export default function Home() {
         throw new Error('No sections returned from triage');
       }
 
+      triageProgress.complete();
       updateState({
         sections,
         triageResult: data,
@@ -1193,6 +1222,7 @@ export default function Home() {
         loading: false,
       });
     } catch (err) {
+      triageProgress.reset();
       updateState({
         error: err instanceof Error ? err.message : 'Something went wrong',
         loading: false,
@@ -1208,6 +1238,7 @@ export default function Home() {
 
     updateState({ loading: true, error: null });
     setLastAction(() => handleTriageReassess);
+    triageProgress.runSimulatedProgress();
 
     try {
       const response = await fetch('/api/triage', {
@@ -1243,6 +1274,7 @@ export default function Home() {
         throw new Error('No sections returned from triage');
       }
 
+      triageProgress.complete();
       updateState({
         sections,
         triageResult: data,
@@ -1251,6 +1283,7 @@ export default function Home() {
         loading: false,
       });
     } catch (err) {
+      triageProgress.reset();
       updateState({
         error: err instanceof Error ? err.message : 'Something went wrong',
         loading: false,
@@ -1679,11 +1712,12 @@ export default function Home() {
   // ============================================
 
   const renderUploadStep = () => {
-    if (state.loading) {
+    if (state.loading && triageProgress.isActive) {
       return (
-        <LoadingOverlay
-          message="Analyzing your brief..."
-          subMessage="Extracting content and assessing each section"
+        <LoadingProgress
+          stages={TRIAGE_STAGES}
+          currentStageIndex={triageProgress.currentStageIndex}
+          showTips={true}
         />
       );
     }
@@ -1759,11 +1793,12 @@ export default function Home() {
   };
 
   const renderTellMeMoreStep = () => {
-    if (state.loading) {
+    if (state.loading && triageProgress.isActive) {
       return (
-        <LoadingOverlay
-          message="Analyzing your brief..."
-          subMessage="Extracting content and assessing each section"
+        <LoadingProgress
+          stages={TRIAGE_STAGES}
+          currentStageIndex={triageProgress.currentStageIndex}
+          showTips={true}
         />
       );
     }
