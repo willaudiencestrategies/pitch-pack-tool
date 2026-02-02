@@ -727,6 +727,8 @@ function SectionStepContent({
   onAcceptSuggestion,
   onNext,
   onBack,
+  budgetDetails,
+  onBudgetConfirm,
 }: {
   section: Section;
   sectionIndex: number;
@@ -738,6 +740,8 @@ function SectionStepContent({
   onAcceptSuggestion: () => void;
   onNext: () => void;
   onBack: () => void;
+  budgetDetails?: BudgetDetails | null;
+  onBudgetConfirm?: (budget: BudgetDetails) => void;
 }) {
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [reassessSuccess, setReassessSuccess] = useState(false);
@@ -1546,6 +1550,12 @@ export default function Home() {
       brandAlignment: alignment,
       step: 'gate2_audience',
     });
+  };
+
+  // Budget confirmation handler (Gate 1)
+  const handleBudgetConfirm = (budget: BudgetDetails) => {
+    pushHistory('Confirm budget', { budgetDetails: state.budgetDetails });
+    updateState({ budgetDetails: budget });
   };
 
   // Generate Creative Tenets (Gate 2)
