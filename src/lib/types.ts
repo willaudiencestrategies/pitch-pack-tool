@@ -169,6 +169,7 @@ export interface SessionState {
 
   error: string | null;
   loading: boolean;
+  loadingProgress: LoadingProgress | null;
 }
 
 export function createInitialState(): SessionState {
@@ -208,6 +209,7 @@ export function createInitialState(): SessionState {
     historyIndex: -1,
     error: null,
     loading: false,
+    loadingProgress: null,
   };
 }
 
@@ -353,4 +355,22 @@ export interface AudienceBranch {
   segment: AudienceSegment;
   personification: PersonificationResponse | null;
   insights: Truth[];
+}
+
+// Loading progress stages
+export type LoadingStage =
+  | 'uploading'
+  | 'parsing'
+  | 'analysing'
+  | 'extracting_objectives'
+  | 'assessing_audience'
+  | 'checking_budget'
+  | 'evaluating_creative'
+  | 'generating_assessment'
+  | 'complete';
+
+export interface LoadingProgress {
+  stage: LoadingStage;
+  percent: number;
+  startedAt: number;
 }
