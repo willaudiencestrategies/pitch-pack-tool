@@ -818,6 +818,18 @@ function SectionStepContent({
         </div>
       )}
 
+      {/* Budget section - Production Budget component */}
+      {section.key === 'budget' && onBudgetConfirm && (
+        <div className="mt-6 p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+          <ProductionBudget
+            extractedBudget={extractBudgetFromContent(section.content)}
+            onConfirm={onBudgetConfirm}
+            onBack={onBack}
+            initialValue={budgetDetails}
+          />
+        </div>
+      )}
+
       {/* Creative Task template */}
       {section.key === 'creative_task' && (
         <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
@@ -2076,6 +2088,8 @@ export default function Home() {
         onAcceptSuggestion={acceptSuggestion}
         onNext={goToNextGate1Section}
         onBack={goToPreviousGate1Section}
+        budgetDetails={state.budgetDetails}
+        onBudgetConfirm={handleBudgetConfirm}
       />
     );
   };
