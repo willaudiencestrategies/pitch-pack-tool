@@ -7,9 +7,10 @@ interface LoadingProgressProps {
   stages: StageConfig[];
   currentStageIndex: number;
   showTips?: boolean;
+  confirmationMessage?: string; // e.g., "Brief uploaded", "Brand selected"
 }
 
-export function LoadingProgress({ stages, currentStageIndex, showTips = true }: LoadingProgressProps) {
+export function LoadingProgress({ stages, currentStageIndex, showTips = true, confirmationMessage = 'Brief uploaded' }: LoadingProgressProps) {
   const [tip, setTip] = useState(() => getRandomTip());
   const [tipKey, setTipKey] = useState(0);
 
@@ -44,7 +45,7 @@ export function LoadingProgress({ stages, currentStageIndex, showTips = true }: 
               />
             </svg>
           </div>
-          <span>Brief uploaded</span>
+          <span>{confirmationMessage}</span>
         </div>
       )}
 

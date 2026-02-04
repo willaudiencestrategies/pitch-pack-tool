@@ -181,6 +181,7 @@ export function BrandAlignment({
             stages={BRAND_FIT_STAGES}
             currentStageIndex={fitProgress.currentStageIndex}
             showTips={false}
+            confirmationMessage="Brand selected"
           />
         </div>
       );
