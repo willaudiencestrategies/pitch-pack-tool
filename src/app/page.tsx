@@ -2129,6 +2129,12 @@ export default function Home() {
         onConfirm={handleBrandAlignment}
         onBack={() => updateState({ step: 'gate_transition' })}
         initialValue={state.brandAlignment}
+        briefAudienceContent={
+          state.triageResult?.triageAssessment.find((s) => s.key === 'audience')?.synthesizedContent || ''
+        }
+        briefObjectiveContent={
+          state.triageResult?.triageAssessment.find((s) => s.key === 'objective')?.synthesizedContent || ''
+        }
       />
     );
   };
