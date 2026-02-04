@@ -1,35 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { BrandAlignment as BrandAlignmentType, ExpediaBrand } from '@/lib/types';
+import { useState, useEffect } from 'react';
+import { BrandAlignment as BrandAlignmentType, ExpediaBrand, BrandFitResponse } from '@/lib/types';
+import { BRAND_CRITERIA, BrandCriteria } from '@/lib/brand-criteria';
+import { BRAND_FIT_STAGES } from '@/lib/loading-config';
+import { useLoadingProgress } from '@/hooks/useLoadingProgress';
+import { LoadingProgress } from './LoadingProgress';
+
+const BRANDS: ExpediaBrand[] = ['expedia', 'hotels_com', 'vrbo'];
 
 interface BrandAlignmentProps {
   onConfirm: (alignment: BrandAlignmentType) => void;
   onBack: () => void;
   initialValue?: BrandAlignmentType | null;
+  briefAudienceContent?: string;
+  briefObjectiveContent?: string;
 }
 
-const BRAND_INFO: Record<ExpediaBrand, { name: string; description: string; audience: string }> = {
-  expedia: {
-    name: 'Expedia',
-    description: 'For travellers who value quality and comprehensive trip planning.',
-    audience: 'Quality seekers, premium travellers',
-  },
-  hotels_com: {
-    name: 'Hotels.com',
-    description: 'For travellers who love rewards and finding the best deals.',
-    audience: 'Savvy travellers, deal hunters',
-  },
-  vrbo: {
-    name: 'Vrbo',
-    description: 'For families and groups who want whole-home rentals.',
-    audience: 'Family planners, group travellers',
-  },
-};
-
-const BRANDS: ExpediaBrand[] = ['expedia', 'hotels_com', 'vrbo'];
-
-export function BrandAlignment({ onConfirm, onBack, initialValue }: BrandAlignmentProps) {
+export function BrandAlignment({
+  onConfirm,
+  onBack,
+  initialValue,
+  briefAudienceContent,
+  briefObjectiveContent,
+}: BrandAlignmentProps) {
   const [selectedBrand, setSelectedBrand] = useState<ExpediaBrand | null>(
     initialValue?.brand ?? null
   );
@@ -40,7 +34,7 @@ export function BrandAlignment({ onConfirm, onBack, initialValue }: BrandAlignme
     onConfirm({
       brand: selectedBrand,
       hasDGMatch,
-      brandAudience: BRAND_INFO[selectedBrand].audience,
+      brandAudience: BRAND_CRITERIA[selectedBrand].targetAudience.name,
     });
   };
 
@@ -66,7 +60,7 @@ export function BrandAlignment({ onConfirm, onBack, initialValue }: BrandAlignme
       {/* Brand Selection Cards */}
       <div className="space-y-3">
         {BRANDS.map((brandKey) => {
-          const brand = BRAND_INFO[brandKey];
+          const brand = BRAND_CRITERIA[brandKey];
           const isSelected = selectedBrand === brandKey;
 
           return (
@@ -104,12 +98,12 @@ export function BrandAlignment({ onConfirm, onBack, initialValue }: BrandAlignme
                   >
                     {brand.name}
                   </h3>
-                  <p className="text-[var(--text-secondary)] mb-3">{brand.description}</p>
+                  <p className="text-[var(--text-secondary)] mb-3">{brand.tagline}</p>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[var(--bg-tertiary)] text-[var(--text-muted)]">
                       Core Audience
                     </span>
-                    <span className="text-sm text-[var(--text-primary)]">{brand.audience}</span>
+                    <span className="text-sm text-[var(--text-primary)]">{brand.targetAudience.name}</span>
                   </div>
                 </div>
               </div>
