@@ -367,7 +367,18 @@ export type LoadingStage =
   | 'checking_budget'
   | 'evaluating_creative'
   | 'generating_assessment'
-  | 'complete';
+  | 'complete'
+  // Audience generation stages
+  | 'researching'
+  | 'profiling'
+  | 'differentiating'
+  | 'validating'
+  // Insights generation stages
+  | 'understanding'
+  | 'exploring'
+  | 'generating_safer'
+  | 'generating_sharper'
+  | 'generating_bolder';
 
 export interface LoadingProgress {
   stage: LoadingStage;

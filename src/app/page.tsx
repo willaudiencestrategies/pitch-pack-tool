@@ -49,7 +49,7 @@ import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
 import { exportToWord } from '@/lib/word-export';
 import { logAnalytics, captureBriefScore } from '@/lib/analytics';
 import { LoadingProgress } from '@/components/LoadingProgress';
-import { TRIAGE_STAGES } from '@/lib/loading-config';
+import { TRIAGE_STAGES, AUDIENCE_STAGES, INSIGHTS_STAGES } from '@/lib/loading-config';
 import { useLoadingProgress } from '@/hooks/useLoadingProgress';
 import { ProductionBudget } from '@/components/ProductionBudget';
 
@@ -1021,6 +1021,8 @@ export default function Home() {
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triageProgress = useLoadingProgress(TRIAGE_STAGES);
+  const audienceProgress = useLoadingProgress(AUDIENCE_STAGES);
+  const insightsProgress = useLoadingProgress(INSIGHTS_STAGES);
 
   // State update helper
   const updateState = (updates: Partial<SessionState>) => {
@@ -1397,6 +1399,7 @@ export default function Home() {
     // Update step immediately so progress bar shows Audience during loading
     updateState({ loading: true, error: null, step: 'gate2_audience' });
     setLastAction(() => () => handleGenerateAudience(feedback));
+    audienceProgress.runSimulatedProgress();
 
     try {
       const response = await fetch('/api/generate/audience', {
@@ -1412,11 +1415,13 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to generate audience options');
 
       const data: AudienceSegmentMenu = await response.json();
+      audienceProgress.complete();
       updateState({
         audienceMenu: data,
         loading: false,
       });
     } catch (err) {
+      audienceProgress.reset();
       updateState({
         error: err instanceof Error ? err.message : 'Something went wrong',
         loading: false,
@@ -1530,6 +1535,7 @@ export default function Home() {
     // Update step immediately so progress bar shows Insights during loading
     updateState({ loading: true, error: null, step: 'gate2_insights' });
     setLastAction(() => handleGenerateInsights);
+    insightsProgress.runSimulatedProgress();
 
     try {
       const response = await fetch('/api/generate/truths', {
@@ -1544,11 +1550,13 @@ export default function Home() {
       if (!response.ok) throw new Error('Failed to generate insights');
 
       const data: TruthsResponse = await response.json();
+      insightsProgress.complete();
       updateState({
         insightOptions: data.truths,
         loading: false,
       });
     } catch (err) {
+      insightsProgress.reset();
       updateState({
         error: err instanceof Error ? err.message : 'Something went wrong',
         loading: false,
@@ -2259,11 +2267,12 @@ export default function Home() {
     const isSubsequentBranch = state.currentBranchIndex > 0 && state.audienceBranches.length > 1;
 
     // Loading state for audience generation
-    if (state.loading && !state.audienceMenu) {
+    if (state.loading && !state.audienceMenu && audienceProgress.isActive) {
       return (
-        <LoadingOverlay
-          message="Generating audience segments..."
-          subMessage="Creating 5 distinct audience profiles based on your brief"
+        <LoadingProgress
+          stages={AUDIENCE_STAGES}
+          currentStageIndex={audienceProgress.currentStageIndex}
+          showTips={true}
         />
       );
     }
@@ -2279,11 +2288,12 @@ export default function Home() {
     }
 
     // Loading state for insights generation
-    if (state.loading && state.personification) {
+    if (state.loading && state.personification && insightsProgress.isActive) {
       return (
-        <LoadingOverlay
-          message="Generating audience insights..."
-          subMessage="Creating 12 psychological insights for your audience"
+        <LoadingProgress
+          stages={INSIGHTS_STAGES}
+          currentStageIndex={insightsProgress.currentStageIndex}
+          showTips={true}
         />
       );
     }
@@ -2374,11 +2384,12 @@ export default function Home() {
   };
 
   const renderInsightsStep = () => {
-    if (state.loading && state.insightOptions.length === 0) {
+    if (state.loading && state.insightOptions.length === 0 && insightsProgress.isActive) {
       return (
-        <LoadingOverlay
-          message="Generating audience insights..."
-          subMessage="Creating 12 psychological insights across safer, sharper, and bolder levels"
+        <LoadingProgress
+          stages={INSIGHTS_STAGES}
+          currentStageIndex={insightsProgress.currentStageIndex}
+          showTips={true}
         />
       );
     }

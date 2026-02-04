@@ -56,11 +56,29 @@ export function ProductionBudget({
     });
   };
 
+  const parseBudgetValue = (value: string): number => {
+    // Handle K (thousands) and M (millions) suffixes
+    const upperValue = value.toUpperCase().trim();
+    const cleanedValue = upperValue.replace(/[^0-9.KM]/g, '');
+
+    let multiplier = 1;
+    let numericPart = cleanedValue;
+
+    if (cleanedValue.endsWith('K')) {
+      multiplier = 1000;
+      numericPart = cleanedValue.slice(0, -1);
+    } else if (cleanedValue.endsWith('M')) {
+      multiplier = 1000000;
+      numericPart = cleanedValue.slice(0, -1);
+    }
+
+    const baseValue = parseFloat(numericPart.replace(/[^0-9.]/g, ''));
+    return isNaN(baseValue) ? 0 : baseValue * multiplier;
+  };
+
   const calculateSuggested10Percent = () => {
-    // Parse the total budget, removing any currency symbols or commas
-    const cleanedValue = totalBudget.replace(/[^0-9.]/g, '');
-    const numericValue = parseFloat(cleanedValue);
-    if (!isNaN(numericValue) && numericValue > 0) {
+    const numericValue = parseBudgetValue(totalBudget);
+    if (numericValue > 0) {
       const suggested = Math.round(numericValue * 0.1);
       setProductionBudget(suggested.toLocaleString());
     }
@@ -133,7 +151,7 @@ export function ProductionBudget({
             type="text"
             value={totalBudget}
             onChange={(e) => setTotalBudget(formatInputValue(e.target.value))}
-            placeholder="e.g. 500,000"
+            placeholder="500,000"
             className="input-field pl-10"
           />
         </div>
@@ -201,7 +219,7 @@ export function ProductionBudget({
             type="text"
             value={productionBudget}
             onChange={(e) => setProductionBudget(formatInputValue(e.target.value))}
-            placeholder="e.g. 50,000"
+            placeholder="50,000"
             className={`input-field pl-10 ${
               !canConfirm
                 ? 'border-[var(--status-red)]/30 focus:border-[var(--status-red)] focus:ring-[var(--status-red)]/20'
@@ -231,9 +249,8 @@ export function ProductionBudget({
             </svg>
             Calculate suggested 10% ({CURRENCY_CONFIG[currency].symbol}
             {(() => {
-              const cleanedValue = totalBudget.replace(/[^0-9.]/g, '');
-              const numericValue = parseFloat(cleanedValue);
-              if (!isNaN(numericValue) && numericValue > 0) {
+              const numericValue = parseBudgetValue(totalBudget);
+              if (numericValue > 0) {
                 return Math.round(numericValue * 0.1).toLocaleString();
               }
               return '...';
