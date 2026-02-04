@@ -272,6 +272,22 @@ export interface OutputResponse {
   markdown: string;
 }
 
+// Brand Fit Assessment
+export interface BrandFitRequest {
+  brand: ExpediaBrand;
+  briefAudienceContent: string;
+  briefObjectiveContent: string;
+}
+
+export type BrandFitLevel = 'strong' | 'moderate' | 'weak';
+
+export interface BrandFitResponse {
+  fitLevel: BrandFitLevel;
+  reasoning: string;
+  suggestion?: string;
+  alternativeBrand?: ExpediaBrand;
+}
+
 // Two-Step Audience Types
 export interface AudienceSegment {
   id: number;
@@ -365,6 +381,7 @@ export type LoadingStage =
   | 'extracting_objectives'
   | 'assessing_audience'
   | 'checking_budget'
+  | 'checking_fit'
   | 'evaluating_creative'
   | 'generating_assessment'
   | 'complete'
