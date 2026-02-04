@@ -38,6 +38,17 @@ export const INSIGHTS_STAGES: StageConfig[] = [
   { stage: 'complete', message: 'Insights ready', percent: 100, minDuration: 500 },
 ];
 
+export const BRAND_FIT_STAGES: StageConfig[] = [
+  {
+    stage: 'checking_fit',
+    message: 'Checking brand alignment',
+    subMessage: 'Comparing audience to brand targets...',
+    percent: 50,
+    minDuration: 2000,
+  },
+  { stage: 'complete', message: 'Assessment ready', percent: 100, minDuration: 500 },
+];
+
 export const LOADING_TIPS = [
   { tip: 'Good briefs have clear objectives tied to budget', icon: '💡' },
   { tip: 'Psychographic audiences outperform demographics', icon: '🎯' },
