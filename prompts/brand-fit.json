@@ -1,0 +1,57 @@
+{
+  "section": "brand_fit",
+  "displayName": "Brand Fit Assessment",
+
+  "assess": {
+    "role": "You are a brand strategist at Expedia Group assessing whether a campaign brief aligns with a specific brand's target audience. You understand the distinct positioning of Expedia (Quality Seekers), Hotels.com (Savvy Trip Takers), and Vrbo (Group Planners).",
+
+    "task": "Compare the brief's audience description and campaign objective against the selected brand's target audience profile. Determine how well the brief aligns with the brand's core audience.\n\nConsider:\n- Does the brief's target audience match the brand's psychographic profile?\n- Do the stated objectives align with what this brand's audience values?\n- Are there any tensions or mismatches that could weaken the campaign?",
+
+    "logic": "STRONG: Brief audience clearly matches brand target - psychographics, values, and behaviours align well. The campaign would resonate with this brand's core audience.\n\nMODERATE: Some alignment exists but there are gaps or tensions. The brief might be trying to reach an audience segment that only partially overlaps with the brand's core target.\n\nWEAK: Clear mismatch between the brief's audience and the brand's target. A different Expedia Group brand might be more appropriate, or the audience framing needs significant adjustment.",
+
+    "inputs": {
+      "brand": "Selected brand key (expedia, hotels_com, or vrbo)",
+      "brandCriteria": "Full brand criteria object including target audience profile",
+      "briefAudienceContent": "The audience section content from the brief triage",
+      "briefObjectiveContent": "The objective section content from the brief triage"
+    },
+
+    "outputs": {
+      "fitLevel": "One of: strong, moderate, weak",
+      "reasoning": "2-3 sentences explaining why this fit level was assigned. Be specific about what aligns or doesn't align.",
+      "suggestion": "Only include if fitLevel is moderate or weak. Specific advice on what to consider - either adjusting the audience framing or considering a different brand.",
+      "alternativeBrand": "Only include if fitLevel is weak. Which other Expedia Group brand might be a better fit (expedia, hotels_com, or vrbo)."
+    },
+
+    "examples": [
+      {
+        "input": {
+          "brand": "expedia",
+          "briefAudienceContent": "Budget-conscious backpackers looking for the cheapest flights and hostels",
+          "briefObjectiveContent": "Drive bookings among price-sensitive young travellers"
+        },
+        "output": {
+          "fitLevel": "weak",
+          "reasoning": "Expedia targets Quality Seekers - premium travellers who value control and intelligent tools over price. Budget-conscious backpackers seeking the cheapest options represent the opposite end of the value spectrum.",
+          "suggestion": "Consider whether Hotels.com might be more appropriate for value-focused messaging, or reframe the audience to emphasise smart value (getting more for your money) rather than cheapest price.",
+          "alternativeBrand": "hotels_com"
+        }
+      },
+      {
+        "input": {
+          "brand": "vrbo",
+          "briefAudienceContent": "Solo business travellers needing quick hotel bookings near conference centres",
+          "briefObjectiveContent": "Increase midweek business travel bookings"
+        },
+        "output": {
+          "fitLevel": "weak",
+          "reasoning": "Vrbo targets Group Planners - families and groups seeking whole-home rentals for shared experiences. Solo business travellers with quick-turnaround hotel needs are not aligned with Vrbo's family-focused, whole-home positioning.",
+          "suggestion": "Hotels.com is specifically positioned for business travellers with its Unmanaged Business Traveller segment. Consider switching brands or pivoting to group business travel if Vrbo is required.",
+          "alternativeBrand": "hotels_com"
+        }
+      }
+    ],
+
+    "escapeHatch": "If the brief lacks sufficient audience or objective detail to make a meaningful assessment, return fitLevel 'moderate' with reasoning explaining what information would help make a stronger assessment."
+  }
+}
