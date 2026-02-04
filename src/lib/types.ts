@@ -253,6 +253,7 @@ export interface AudienceResponse {
 export interface TruthsRequest {
   audience: Segment;
   personification: string;
+  brandAlignment?: BrandAlignment;
 }
 
 export interface TruthsResponse {
@@ -359,6 +360,7 @@ export interface CreativeTenetsRequest {
   audience: AudienceSegment;
   insights: Truth[];
   additionalContext?: string;
+  brandAlignment?: BrandAlignment;
 }
 
 export interface CreativeTenetsResponse {

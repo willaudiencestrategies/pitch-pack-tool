@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { callClaudeJSON } from '@/lib/claude';
 import { loadPrompt, buildSystemPrompt } from '@/lib/prompts';
 import { CreativeTenetsRequest, CreativeTenetsResponse } from '@/lib/types';
+import { getBrandContextForPrompt } from '@/lib/brand-criteria';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,7 +20,19 @@ export async function POST(request: NextRequest) {
     }
 
     const promptConfig = loadPrompt('creative-tenets');
-    const systemPrompt = buildSystemPrompt(promptConfig.generate);
+
+    // Inject brand context if provided
+    const brandContext = body.brandAlignment?.brand
+      ? getBrandContextForPrompt(body.brandAlignment.brand)
+      : '';
+
+    // Replace {brandContext} placeholder in task
+    const generateConfig = {
+      ...promptConfig.generate,
+      task: promptConfig.generate.task.replace('{brandContext}', brandContext),
+    };
+
+    const systemPrompt = buildSystemPrompt(generateConfig);
 
     const userMessage = `INPUTS:
 - Objective: ${objective}
