@@ -12,6 +12,7 @@ import {
   GATE1_SECTION_KEYS,
   LEGACY_SECTION_MAP,
   Status,
+  CoherenceAnalysis,
 } from '@/lib/types';
 
 export async function POST(request: NextRequest) {
@@ -47,11 +48,36 @@ export async function POST(request: NextRequest) {
         questions: string[];
       }>;
       overallBriefHealth?: string;
+      coherenceAnalysis?: {
+        tensions?: Array<{
+          title?: string;
+          description?: string;
+          severity?: string;
+        }>;
+        overallCoherence?: string;
+      };
     }>(systemPrompt, userMessage, { endpoint: 'triage' });
 
     // Defensive: ensure we have arrays even if Claude returns unexpected structure
     const rawSynthesizedReplay = response.synthesizedReplay || {};
     const rawTriageAssessment = Array.isArray(response.triageAssessment) ? response.triageAssessment : [];
+
+    // Parse coherence analysis with defensive defaults
+    const coherenceAnalysis: CoherenceAnalysis = {
+      tensions: Array.isArray(response.coherenceAnalysis?.tensions)
+        ? response.coherenceAnalysis.tensions.map((t: any) => ({
+            title: t.title || 'Untitled tension',
+            description: t.description || '',
+            severity: t.severity === 'critical' ? 'critical' : 'notable',
+          }))
+        : [],
+      overallCoherence:
+        response.coherenceAnalysis?.overallCoherence === 'coherent'
+          ? 'coherent'
+          : response.coherenceAnalysis?.overallCoherence === 'incoherent'
+            ? 'incoherent'
+            : 'mixed',
+    };
 
     // Helper to map legacy section names to current names
     const mapLegacyKey = (key: string): SectionKey => {
@@ -121,6 +147,7 @@ export async function POST(request: NextRequest) {
       synthesizedReplay,
       triageAssessment,
       overallBriefHealth: response.overallBriefHealth || '',
+      coherenceAnalysis,
     } as EnhancedTriageResponse);
   } catch (error) {
     console.error('Triage error:', error);
