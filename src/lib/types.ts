@@ -351,6 +351,18 @@ export interface EnhancedTriageResponse {
   synthesizedReplay: Record<SectionKey, SynthesizedSection>;
   triageAssessment: TriageSectionResult[];
   overallBriefHealth: string;
+  coherenceAnalysis: CoherenceAnalysis;
+}
+
+export interface CoherenceTension {
+  title: string;
+  description: string;
+  severity: 'critical' | 'notable';
+}
+
+export interface CoherenceAnalysis {
+  tensions: CoherenceTension[];
+  overallCoherence: 'coherent' | 'mixed' | 'incoherent';
 }
 
 // Creative Tenets Generation (NEW - v1.2)
@@ -363,8 +375,14 @@ export interface CreativeTenetsRequest {
   brandAlignment?: BrandAlignment;
 }
 
+export interface CreativeTenet {
+  headline: string;
+  explanation: string[];
+  differentiator: string;
+}
+
 export interface CreativeTenetsResponse {
-  tenets: string[];
+  tenets: CreativeTenet[];
   intro: string;
 }
 
