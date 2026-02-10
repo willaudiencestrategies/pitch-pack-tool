@@ -1,11 +1,10 @@
 {
   "section": "objective",
   "displayName": "Objective",
-
   "assess": {
-    "role": "You are a Brief Quality Specialist evaluating the Objective section of a creative brief.",
+    "role": "You are a Brief Quality Specialist evaluating the Objective section of a creative brief. In E Studio's process, strong briefs always distinguish between business objectives (revenue, growth, market share) and marketing objectives (awareness, consideration, conversion, preference). Both must be present and coherent with each other and with the budget.",
     "task": "Evaluate whether the objective is specific, measurable, and budget-aligned.",
-    "logic": "GREEN: Clear goal with metrics, timeframe, and realistic scope for budget. AMBER: Has a goal but missing specifics like metrics or timeframe. RED: No clear objective or contradictory goals (e.g., awareness AND conversion with small budget).",
+    "logic": "GREEN: Rare. Award only when:\n- Business AND marketing objectives clearly distinguished\n- Both are specific with metrics or measurable outcomes\n- Timeframe stated\n- Realistic scope for budget\n- Objectives reinforce each other (business goal ladders to marketing goal)\n- A creative team could start work immediately\n\nAMBER: Most common. Default when:\n- Has a goal but objectives are blended (business and marketing mixed together)\n- OR only one type present (business without marketing, or vice versa)\n- OR missing specifics like metrics, timeframe, or scope\n- OR objectives present but not clearly coherent with budget\n\nRED: Serious issues:\n- No clear objective\n- OR contradictory goals (e.g. awareness AND conversion with small budget)\n- OR objectives that actively work against each other",
     "inputs": {
       "brief": "The full brief text",
       "additionalContext": "Any extra context provided"
@@ -16,14 +15,26 @@
       "feedback": "Explanation of the rating",
       "gaps": "Array of specific missing elements"
     },
-    "examples": [],
+    "examples": [
+      {
+        "input": "Business objective: Increase park ticket revenue and on-site spend from US visitors. Marketing objective: Drive consideration of Disneyland Paris as a must-do day trip for US travelers visiting Paris. Drive awareness of new park opening (World of Frozen, UP attraction). Budget: Tier 1 50K EUR production (500K EUR full campaign); Tier 2 75K EUR production (750K EUR full campaign). Channels: Programmatic banners, influencer social. Constraints: No access to Frozen until after launch, limited to under 10 assets.",
+        "output": "{ \"status\": \"green\", \"feedback\": \"Business and marketing objectives clearly distinguished. Business is revenue-focused (ticket sales, on-site spend), marketing is consideration/awareness-focused (day trip positioning, new park opening). Budget tiers match scope. Constraints acknowledged. A creative team could start immediately.\", \"gaps\": [] }"
+      },
+      {
+        "input": "Business objective: Increase economic value of inbound tourism — grow revenue from city tourism and extend average length of stay. Marketing objective: Drive measurable lifts in awareness, brand preference, intent to book city breaks. Reposition Germany as attractive, sustainable city break destination. Budget: 50K / 120K / 200K production tiers. Channels: Not specified.",
+        "output": "{ \"status\": \"amber\", \"feedback\": \"Business and marketing objectives are distinguished and improved from scattered original. However, no channel detail — budget tiers exist but without indicative media mix it's unclear what's achievable at each tier.\", \"gaps\": [\"No channel specification\", \"No media mix to validate budget-objective coherence\"] }"
+      },
+      {
+        "input": "Business objective: Increase revenue from non-endemic clients via Amazon Advertising partnership. Marketing objective: Campaign platforms must be modular full funnel — Premium $1M+ full funnel; Enhanced $600K mid tier; Essential $300K conversion only.",
+        "output": "{ \"status\": \"amber\", \"feedback\": \"Paradox — the ask is broad (creative platforms, clients undefined) but all parameters, tiers, and deliverables are clearly specified. Business and marketing objectives present. Amber because post-pitch development needed to define client applications.\", \"gaps\": [\"Clients still undefined\", \"Post-pitch development needed\"] }"
+      }
+    ],
     "escapeHatch": "If no objective is discernible, return RED and list what a good objective needs."
   },
-
   "reassess": {
     "role": "You are a Brief Quality Specialist.",
     "task": "Re-evaluate the objective given new information from the user.",
-    "logic": "Apply same criteria. If new info fills gaps, upgrade status.",
+    "logic": "Apply same criteria. If new info fills gaps, upgrade status. When re-evaluating, specifically check whether the additional context resolves any blending of business and marketing objectives. If objectives were previously mixed, note whether they're now distinguished.",
     "inputs": {
       "brief": "Original brief",
       "currentContent": "Previously extracted content",
@@ -38,11 +49,10 @@
     "examples": [],
     "escapeHatch": "If new info doesn't help, explain what's still needed."
   },
-
   "generate": {
     "role": "You are a strategic clarity specialist working to help define the sharpest possible objective and focus for a campaign brief. You don't just rewrite what's given - you diagnose what's working, what's muddled, and what's missing, then offer a spectrum of options from conservative (staying close to the brief) to bold (bringing ruthless clarity where chaos exists).",
     "task": "Based on the Objective and Focus section identified in the triage, present the current state clearly, then offer up to four distinct options for how to articulate the objective and focus. These options should range from preserving what's there to reimagining it for maximum coherence and strategic clarity.",
-    "logic": "A strong Objective and Focus should contain:\n1. A single, specific problem the campaign is solving (not multiple competing objectives)\n2. A clear strategic angle or focus (the lens through which the campaign will operate)\n3. Coherence with the customer journey stage (awareness / consideration / conversion)\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief, minimal cleanup\n- Option 2 (Light Edits): Brief's content with targeted edits for clarity\n- Option 3 (Inspired Coherence): Interpretation finding coherence across scattered elements\n- Option 4 (Ruthless Clarity): Bold reframe making hard choices for strategic clarity",
+    "logic": "A strong Objective and Focus should contain:\n1. A single, specific problem the campaign is solving (not multiple competing objectives)\n2. A clear strategic angle or focus (the lens through which the campaign will operate)\n3. Coherence with the customer journey stage (awareness / consideration / conversion)\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief, minimal cleanup\n- Option 2 (Light Edits): Brief's content with targeted edits for clarity\n- Option 3 (Inspired Coherence): Interpretation finding coherence across scattered elements\n- Option 4 (Ruthless Clarity): Bold reframe making hard choices for strategic clarity\n\nWhen generating objective options, each option should clearly separate business objective from marketing objective. Even Option 1 (Lifted Directly) should annotate which parts are business vs marketing if the brief blends them. Option 4 (Ruthless Clarity) should always present them as distinct statements.",
     "inputs": {
       "brief": "Original brief",
       "triageResult": "The triage assessment for this section",
@@ -53,7 +63,12 @@
       "options": "Array of 4 options: lifted, light, inspired, ruthless. Each with: level, content (the proposed objective text), reasoning (why this option), watchFor (potential issues), whenToChoose (when to pick this option)",
       "questions": "Array of clarifying questions if needed"
     },
-    "examples": [],
+    "examples": [
+      {
+        "input": "Brief says: 'We want to increase visitation and build awareness of our destination as a cultural hub'",
+        "output": "{ \"level\": \"ruthless\", \"content\": \"Business objective: Increase inbound tourism revenue by driving incremental visits from [market].\\nMarketing objective: Shift destination perception from [current positioning] to cultural destination, measured by unaided awareness lift and consideration intent.\", \"reasoning\": \"The brief blends business (visitation) with marketing (awareness/positioning) into one sentence. Splitting them forces clarity on what success looks like at each level.\" }"
+      }
+    ],
     "escapeHatch": "If objective is completely absent, state clearly and ask user to provide minimum: what problem the campaign solves, what success looks like, where in customer journey. If brief is too contradictory even for Option 4, list the specific contradictions that must be resolved."
   }
 }
