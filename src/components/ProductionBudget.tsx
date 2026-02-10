@@ -144,7 +144,7 @@ export function ProductionBudget({
           <span className="text-[var(--text-muted)] font-normal ml-1">(optional)</span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium pointer-events-none">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
@@ -152,7 +152,7 @@ export function ProductionBudget({
             value={totalBudget}
             onChange={(e) => setTotalBudget(formatInputValue(e.target.value))}
             placeholder="500,000"
-            className="input-field pl-10"
+            className="input-field pl-12"
           />
         </div>
         {extractedBudget && totalBudget === extractedBudget && (
@@ -212,7 +212,7 @@ export function ProductionBudget({
         )}
 
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium pointer-events-none">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
@@ -220,7 +220,7 @@ export function ProductionBudget({
             value={productionBudget}
             onChange={(e) => setProductionBudget(formatInputValue(e.target.value))}
             placeholder="50,000"
-            className={`input-field pl-10 ${
+            className={`input-field pl-12 ${
               !canConfirm
                 ? 'border-[var(--status-red)]/30 focus:border-[var(--status-red)] focus:ring-[var(--status-red)]/20'
                 : ''
