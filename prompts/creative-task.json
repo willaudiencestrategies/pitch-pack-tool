@@ -1,12 +1,11 @@
 {
   "section": "creative_task",
   "displayName": "Creative Task",
-  "defaultTemplate": "Put forward 1-3 concepts that respond to [OBJECTIVES], including:\n- Creative overview\n- Insight used\n- Example executions across key channels\n- Campaign creative tenets",
-
+  "defaultTemplate": "Put forward 1-3 concepts that respond to [OBJECTIVES], each including:\n- Concept name and tone descriptors (3 adjectives)\n- Audience/market insight driving the concept\n- Creative overview (2-3 paragraphs: what the concept is and why it works)\n- Brand film treatment (60-90s hero content with narrative arc)\n- Social native formats (platform-specific executions for TikTok/Meta/Pinterest/YouTube)\n- Editorial magazine concept (shoppable Expedia article angle)\n- On-site media (conversion banners/modules)\n- Campaign creative tenets (3-4 guiding principles)\n- Investment tiers if applicable (Essential / Enhance / Grow with indicative budgets)",
   "assess": {
-    "role": "You are a Brief Quality Specialist evaluating the Creative Task section.",
+    "role": "You are a Brief Quality Specialist evaluating the Creative Task — what the creative team is being asked to deliver. You understand that vague asks produce vague work. A strong creative task names specific deliverable types, format expectations, and channels — not just 'come up with some ideas.'",
     "task": "Evaluate whether the creative task clearly defines what the creative team is being asked to deliver.",
-    "logic": "GREEN: Clear deliverables with format expectations. AMBER: Has an ask but vague on specifics. RED: No clear task or buried/implicit asks.",
+    "logic": "GREEN: Clear deliverable types named (films, social content, editorial, on-site, etc.), format expectations stated (lengths, platforms, channels), number of concepts specified, scope realistic for budget. Creative team knows what they're making.\n\nAMBER: Has an ask but vague on deliverable types, or says 'concepts' without specifying what a concept includes, or lists some channels but not format expectations, or scope seems mismatched with budget.\n\nRED: No clear task, or buried/implicit asks that creative team would have to guess at, or contradictory asks (e.g. 'be bold and innovative' but 'use existing assets').",
     "inputs": {
       "brief": "The full brief text",
       "additionalContext": "Any extra context"
@@ -17,10 +16,18 @@
       "feedback": "Explanation of rating",
       "gaps": "Missing elements"
     },
-    "examples": [],
+    "examples": [
+      {
+        "input": "Develop a creative campaign concept for the destination",
+        "output": "{ \"status\": \"red\", \"feedback\": \"This tells a creative team almost nothing. What deliverables? How many concepts? What channels? What formats? 'Creative campaign concept' could mean a tagline or a full multi-channel ecosystem.\", \"gaps\": [\"No deliverable types specified\", \"No channel or format expectations\", \"No concept quantity\", \"No scope indication\"] }"
+      },
+      {
+        "input": "Put forward 2 creative concepts responding to the campaign objective. Each concept should include a creative overview, audience insight, hero brand film (60-90s), social-native executions across TikTok and Instagram, and an editorial magazine angle. Include Essential and Enhance investment tiers.",
+        "output": "{ \"status\": \"green\", \"feedback\": \"Clear, specific, and actionable. Creative team knows exactly what to produce: 2 concepts, each with named deliverable types across specific channels. Investment tiers requested. A team could scope and price this immediately.\", \"gaps\": [] }"
+      }
+    ],
     "escapeHatch": "If no task found, return RED with guidance on what should be specified."
   },
-
   "reassess": {
     "role": "You are a Brief Quality Specialist.",
     "task": "Re-evaluate the creative task given new information.",
@@ -39,30 +46,28 @@
     "examples": [],
     "escapeHatch": "Explain what's still missing."
   },
-
   "generate": {
     "role": "You are a creative brief translator who turns strategic objectives into clear, actionable creative tasks. You understand that a great creative task gives teams enough clarity to know what they're making, enough freedom to do their best work, and enough alignment with the objective that success is measurable.",
-
     "task": "Based on the finalized Objective and Focus and the Creative Task section from triage, present the current state with an alignment check, then offer up to four distinct options for how to articulate the creative task.",
-
-    "logic": "A strong Creative Task should:\n1. Be clear and specific about what creative is being asked to produce or solve\n2. Be appropriate for the objective (awareness needs different outputs than conversion)\n3. Be singular and focused (not a laundry list)\n4. Give creative teams clarity without being overly prescriptive\n5. Align with the objective, audience, and budget\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity and alignment\n- Option 3 (Inspired Coherence): Reframed around core creative challenge\n- Option 4 (Ruthless Clarity): Bold reframe for strategic coherence and feasibility",
-
+    "logic": "A strong Creative Task should:\n1. Be clear and specific about what creative is being asked to produce or solve\n2. Be appropriate for the objective (awareness needs different outputs than conversion)\n3. Be singular and focused (not a laundry list)\n4. Give creative teams clarity without being overly prescriptive\n5. Align with the objective, audience, and budget\n\nThe Four-Option Spectrum:\n- Option 1 (Lifted Directly): Verbatim from brief\n- Option 2 (Light Edits): Tightened for clarity and alignment\n- Option 3 (Inspired Coherence): Reframed around core creative challenge\n- Option 4 (Ruthless Clarity): Bold reframe for strategic coherence and feasibility\n\nA strong creative task should be specific about deliverable types. E Studio's standard output includes: concept name + insight + overview + brand films + social native formats (platform-specific) + editorial magazine concepts + on-site media + investment tiers. Option 4 (Ruthless Clarity) should approach this specificity. Options 1-2 can be lighter but should still name channels and format expectations where possible.",
     "inputs": {
       "brief": "Original brief",
       "objective": "The finalized objective",
       "triageResult": "The triage assessment for creative task",
       "additionalContext": "User context"
     },
-
     "outputs": {
       "currentState": "Present the synthesized creative task content from triage",
       "alignmentCheck": "Assessment of how well current creative task serves the finalized objective",
       "options": "Array of 4 options with level (lifted/light/inspired/ruthless), content, reasoning, watchFor, whenToChoose",
       "questions": "Clarifying questions if needed"
     },
-
-    "examples": [],
-
+    "examples": [
+      {
+        "input": "Brief says: 'We'd like some creative ideas for the campaign'",
+        "output": "{ \"level\": \"ruthless\", \"content\": \"Develop 2 creative concepts responding to [objective], each including:\\n- Concept name and 3 tone descriptors\\n- Audience insight driving the concept\\n- Creative overview (what the concept is and why)\\n- Hero brand film (60-90s treatment with narrative arc)\\n- Social native formats for [relevant platforms]\\n- Editorial magazine angle (shoppable article concept)\\n- On-site media (conversion modules)\\n- Essential / Enhance investment tiers with indicative budgets\", \"reasoning\": \"The original brief gives creative teams nothing to scope against. This specifies exact deliverables, channels, and formats.\" }"
+      }
+    ],
     "escapeHatch": "If creative task is completely absent, build options from scratch based on objective, audience, and budget. If creative task fundamentally contradicts objective, state this clearly in alignment check."
   }
 }
