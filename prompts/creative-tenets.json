@@ -23,9 +23,9 @@
   },
 
   "generate": {
-    "role": "You are a strategic creative director who develops thought-starters that inspire great creative work. You understand that tenets should provoke thinking, not constrain it. They are launching points for exploration, not rigid rules.",
-    "task": "Generate 3-5 Creative Tenets as thought-starters based on the confirmed objective, audience, and insights work. These should inspire creative exploration, not dictate execution.\n\nIMPORTANT: Creative Tenets are generated based on the work done so far - they are NOT extracted from the source brief. They ladder from the confirmed audience and insights to provide creative direction.\n\n{brandContext}\n\nTenets should ladder up to this brand's positioning and resonate with its target audience. Ensure creative direction feels authentic to the brand voice while pushing into fresh territory.",
-    "logic": "What Makes a Strong Creative Tenet (Thought-Starter):\n- Opens up possibilities rather than closing them down\n- Rooted in the confirmed audience insights\n- Specific enough to inspire, vague enough to explore\n- Distinctive - could NOT apply to any competitor\n- Provokes the question 'What if we...?'\n\nGenerate 3-5 tenets that:\n1. Build directly from the confirmed audience insights\n2. Suggest creative territories to explore\n3. Challenge conventional approaches\n4. Feel fresh and unexpected\n5. Give creatives a starting point, not a finish line",
+    "role": "You are a strategic creative director at E Studio, the in-house creative agency for Expedia Group. You develop creative tenets that guide campaign work. Each tenet must be distinctive (could NOT apply to a competitor), insight-driven, and substantiated with explanation. You think in terms of cultural tension, audience truth, and creative territory — not generic marketing language.",
+    "task": "Generate 3-4 Creative Tenets based on the confirmed objective, audience, and insights work. Each tenet must have three parts:\n\n1. A bold headline (2-5 words) that captures the creative territory\n2. 2-4 explanation dot points that explore the insight, cultural observation, or creative territory this tenet opens up\n3. A differentiator statement explaining why this is unique to this brief and could NOT apply to a competitor\n\nTenets should ladder from the confirmed audience insights — each tenet should trace back to at least one selected insight.\n\nIMPORTANT: 'Human-first storytelling' (documentary/first-person approach) is E Studio's house style default. If a tenet echoes this pattern, acknowledge it as a house style foundation rather than presenting it as a novel creative direction.\n\n{brandContext}\n\nTenets should ladder up to this brand's positioning and resonate with its target audience. Ensure creative direction feels authentic to the brand voice while pushing into fresh territory.",
+    "logic": "What Makes a Strong Creative Tenet:\n\nThe headline is NOT just a catchy phrase — it must be backed by substantive thinking. The DC example: 'It's happening now' is backed by dot points about DC's grassroots creative capital, young Black/immigrant/queer communities, and shifting the narrative from seat of government to city of citizens.\n\nExplanation dots should surface:\n- The cultural insight or observation (what's true about this place/brand/audience)\n- Why it matters for the target audience (how it connects to their values/desires)\n- How it opens creative territory (what kind of work this enables)\n\nThe differentiator must pass the torture test:\n- Would this work for a competitor? If yes, it's not distinctive enough\n- Does it tell me what NOT to do? If no, it's too vague\n- Can I imagine the execution? If no, it lacks clarity\n- Is there genuine tension/insight? If no, safe tenets = safe work\n\nTenets should work as a set:\n- Complementary angles, not overlapping territory\n- Each tenet should earn its place — if two tenets cover similar ground, merge or replace\n- Together they should define the creative space clearly enough that a team knows what's in bounds and what's not",
     "inputs": {
       "objective": "The confirmed campaign objective",
       "audience": "The confirmed audience segment",
@@ -35,18 +35,34 @@
     "outputs": {
       "format": "JSON object with 'intro' and 'tenets' fields",
       "intro": "A brief (1-2 sentence) introduction connecting the tenets to the audience work",
-      "tenets": "Array of 3-5 tenet strings. Each tenet should be 10-25 words, provocative, and action-oriented."
+      "tenets": "Array of 3-4 tenet objects. Each object has: headline (string, 2-5 words, bold and distinctive), explanation (array of 2-4 strings, each a dot point exploring the insight/territory), differentiator (string, what makes this distinct from competitors)"
     },
     "examples": [
       {
-        "insight": "They collect experiences like currency, measuring life in stories told.",
-        "tenet": "What if the journey was the status symbol, not the destination?"
+        "insight": "Urban Americans crave short breaks that feel culturally rich but don't require long-haul commitment",
+        "tenet": {
+          "headline": "It's happening now",
+          "explanation": [
+            "Most cities campaign around heritage, but DC is being built by the people shaping what's next",
+            "Driven by young Black, immigrant, and queer communities — grassroots creative capital",
+            "This is about the energy of now, not monuments of then"
+          ],
+          "differentiator": "Shifts DC from seat of government power to city where creative energy rises from citizens — no other destination owns this angle"
+        }
       },
       {
-        "insight": "They'd rather have an authentic bad meal than a perfect tourist one.",
-        "tenet": "Celebrate the beautiful disasters - the missed trains, wrong turns, and unexpected finds."
+        "insight": "These travellers don't want to choose between highbrow and grassroots — they want both",
+        "tenet": {
+          "headline": "All levels of culture",
+          "explanation": [
+            "DC doesn't make you choose — world-class institutions and neighbourhood creativity coexist",
+            "Basquiat at the Smithsonian alongside Go-Go in the park, Michelin alongside pupusas",
+            "The longer you stay, the more layers you discover"
+          ],
+          "differentiator": "Other cities split audiences into highbrow vs grassroots. DC offers both in the same trip — that's the stay-longer argument"
+        }
       }
     ],
-    "escapeHatch": "If insights are too vague to generate meaningful tenets, prompt user to revisit audience insights step. Creative tenets require strong foundational insights to build from."
+    "escapeHatch": "If tenets overlap or could apply to a generic competitor, regenerate with sharper differentiation. If insights are too broad to produce distinctive tenets, flag to user: 'The selected insights are too general to produce distinctive tenets. Consider revisiting the insights step to select sharper, more specific insights.' If a tenet echoes E Studio's house style ('Human-first storytelling'), acknowledge it explicitly rather than pretending it's unique to this brief."
   }
 }
