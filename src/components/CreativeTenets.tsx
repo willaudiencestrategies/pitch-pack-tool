@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { AudienceSegment, Truth } from '@/lib/types';
+import { AudienceSegment, Truth, CreativeTenet } from '@/lib/types';
 
 interface CreativeTenetsProps {
   audience: AudienceSegment;
   insights: Truth[];
-  onConfirm: (tenets: string[]) => void;
+  onConfirm: (tenets: CreativeTenet[]) => void;
   onBack: () => void;
-  onGenerate: () => Promise<{ intro: string; tenets: string[] }>;
+  onGenerate: () => Promise<{ intro: string; tenets: CreativeTenet[] }>;
   loading: boolean;
 }
 
@@ -22,7 +22,7 @@ export function CreativeTenets({
 }: CreativeTenetsProps) {
   const [generated, setGenerated] = useState(false);
   const [intro, setIntro] = useState('');
-  const [tenets, setTenets] = useState<string[]>([]);
+  const [tenets, setTenets] = useState<CreativeTenet[]>([]);
 
   const handleGenerate = async () => {
     try {
@@ -35,10 +35,35 @@ export function CreativeTenets({
     }
   };
 
-  const handleTenetChange = (index: number, value: string) => {
-    const newTenets = [...tenets];
-    newTenets[index] = value;
-    setTenets(newTenets);
+  const handleTenetChange = (index: number, field: 'headline' | 'differentiator', value: string) => {
+    const updated = [...tenets];
+    updated[index] = { ...updated[index], [field]: value };
+    setTenets(updated);
+  };
+
+  const handleExplanationChange = (tenetIndex: number, dotIndex: number, value: string) => {
+    const updated = [...tenets];
+    const explanation = [...updated[tenetIndex].explanation];
+    explanation[dotIndex] = value;
+    updated[tenetIndex] = { ...updated[tenetIndex], explanation };
+    setTenets(updated);
+  };
+
+  const handleAddDot = (tenetIndex: number) => {
+    const updated = [...tenets];
+    updated[tenetIndex] = {
+      ...updated[tenetIndex],
+      explanation: [...updated[tenetIndex].explanation, ''],
+    };
+    setTenets(updated);
+  };
+
+  const handleRemoveDot = (tenetIndex: number, dotIndex: number) => {
+    const updated = [...tenets];
+    const explanation = updated[tenetIndex].explanation.filter((_, i) => i !== dotIndex);
+    if (explanation.length === 0) return;
+    updated[tenetIndex] = { ...updated[tenetIndex], explanation };
+    setTenets(updated);
   };
 
   const handleRegenerate = () => {
@@ -48,9 +73,8 @@ export function CreativeTenets({
   };
 
   const handleConfirm = () => {
-    // Filter out empty tenets
-    const validTenets = tenets.filter((t) => t.trim().length > 0);
-    onConfirm(validTenets);
+    const valid = tenets.filter((t) => t.headline.trim().length > 0);
+    onConfirm(valid);
   };
 
   // Pre-generation view
@@ -234,7 +258,7 @@ export function CreativeTenets({
     );
   }
 
-  // Post-generation view
+  // Post-generation view — structured tenet cards
   return (
     <div className="space-y-6">
       {/* Back Button */}
@@ -280,14 +304,14 @@ export function CreativeTenets({
         </div>
       )}
 
-      {/* Editable Tenet Cards */}
+      {/* Editable Structured Tenet Cards */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Tenets
           </h3>
           <span className="text-xs text-[var(--text-muted)]">
-            Click to edit
+            Click any field to edit
           </span>
         </div>
 
@@ -320,16 +344,66 @@ export function CreativeTenets({
                   {index + 1}
                 </div>
 
-                {/* Editable content */}
-                <div className="flex-1 min-w-0">
+                {/* Structured content */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  {/* Headline */}
                   <textarea
-                    value={tenet}
-                    onChange={(e) => handleTenetChange(index, e.target.value)}
-                    className="w-full bg-transparent border-none resize-none text-[var(--text-primary)] leading-relaxed focus:outline-none focus:ring-0 p-0"
-                    style={{ minHeight: '48px' }}
-                    rows={2}
-                    placeholder="Enter tenet..."
+                    value={tenet.headline}
+                    onChange={(e) => handleTenetChange(index, 'headline', e.target.value)}
+                    className="w-full bg-transparent border-none resize-none text-[var(--text-primary)] font-semibold text-lg leading-snug focus:outline-none focus:ring-0 p-0"
+                    style={{ minHeight: '28px' }}
+                    rows={1}
+                    placeholder="Tenet headline..."
                   />
+
+                  {/* Explanation dot points */}
+                  <div className="space-y-1.5">
+                    {tenet.explanation.map((dot, dotIndex) => (
+                      <div key={dotIndex} className="flex items-start gap-2 group/dot">
+                        <span className="text-[var(--text-muted)] mt-1.5 text-xs flex-shrink-0">•</span>
+                        <input
+                          type="text"
+                          value={dot}
+                          onChange={(e) => handleExplanationChange(index, dotIndex, e.target.value)}
+                          className="flex-1 bg-transparent border-none text-sm text-[var(--text-secondary)] leading-relaxed focus:outline-none focus:ring-0 p-0"
+                          placeholder="Explanation point..."
+                        />
+                        {tenet.explanation.length > 1 && (
+                          <button
+                            onClick={() => handleRemoveDot(index, dotIndex)}
+                            className="text-[var(--text-muted)] hover:text-[var(--status-red)] opacity-0 group-hover/dot:opacity-100 transition-opacity flex-shrink-0 text-xs mt-1"
+                            title="Remove point"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => handleAddDot(index)}
+                      className="text-xs text-[var(--text-muted)] hover:text-[var(--expedia-navy)] transition-colors pl-4"
+                    >
+                      + Add point
+                    </button>
+                  </div>
+
+                  {/* Differentiator */}
+                  <div
+                    className="pt-3 mt-2"
+                    style={{ borderTop: '1px dashed var(--border-color)' }}
+                  >
+                    <label className="text-[10px] font-medium text-[var(--text-muted)] uppercase tracking-wider mb-1 block">
+                      Differentiator
+                    </label>
+                    <textarea
+                      value={tenet.differentiator}
+                      onChange={(e) => handleTenetChange(index, 'differentiator', e.target.value)}
+                      className="w-full bg-transparent border-none resize-none text-sm text-[var(--text-secondary)] italic leading-relaxed focus:outline-none focus:ring-0 p-0"
+                      style={{ minHeight: '20px' }}
+                      rows={1}
+                      placeholder="What makes this distinct from competitors..."
+                    />
+                  </div>
                 </div>
 
                 {/* Edit indicator */}
@@ -364,7 +438,7 @@ export function CreativeTenets({
       <div className="pt-4 border-t border-[var(--border-color)] flex flex-wrap gap-3">
         <button
           onClick={handleConfirm}
-          disabled={tenets.filter((t) => t.trim()).length === 0}
+          disabled={tenets.filter((t) => t.headline.trim()).length === 0}
           className="btn-secondary flex items-center gap-2"
         >
           <span>Confirm & Continue</span>
