@@ -26,6 +26,9 @@ import {
   GATE2_SECTION_KEYS,
   BrandAlignment as BrandAlignmentType,
   CreativeTenetsResponse,
+  CreativeTenet,
+  CoherenceAnalysis,
+  CoherenceTension,
   HistoryEntry,
   AudienceBranch,
   BudgetDetails,
@@ -1619,21 +1622,21 @@ export default function Home() {
   };
 
   // Confirm tenets and continue to media step
-  const handleConfirmTenets = (tenets: string[]) => {
-    // Push current state to history before confirming tenets
+  const handleConfirmTenets = (tenets: CreativeTenet[]) => {
     pushHistory('Confirm creative tenets', { sections: [...state.sections] });
-
-    // Update the creative_tenets section with the confirmed tenets
     const updatedSections = [...state.sections];
     const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
     if (tenetsIndex >= 0) {
+      const content = tenets.map((t) => {
+        const dots = t.explanation.map((e) => `- ${e}`).join('\n');
+        return `**${t.headline}**\n${dots}\nDifferentiator: ${t.differentiator}`;
+      }).join('\n\n');
       updatedSections[tenetsIndex] = {
         ...updatedSections[tenetsIndex],
         status: 'green',
-        content: tenets.map((t, i) => `${i + 1}. ${t}`).join('\n'),
+        content,
       };
     }
-
     updateState({
       sections: updatedSections,
       step: 'gate2_media',
@@ -1953,6 +1956,64 @@ export default function Home() {
             Here's my review of the core brief elements. We'll build the creative brief in Gate 2.
           </p>
         </div>
+
+        {/* Coherence Analysis Panel */}
+        {state.triageResult &&
+          state.triageResult.coherenceAnalysis &&
+          state.triageResult.coherenceAnalysis.tensions &&
+          state.triageResult.coherenceAnalysis.tensions.length > 0 && (() => {
+            const { coherenceAnalysis } = state.triageResult;
+            return (
+          <div
+            className="rounded-xl border overflow-hidden"
+            style={{
+              borderColor: 'var(--border-color)',
+              borderLeftWidth: '4px',
+              borderLeftColor:
+                coherenceAnalysis.overallCoherence === 'coherent'
+                  ? 'var(--status-green)'
+                  : coherenceAnalysis.overallCoherence === 'incoherent'
+                    ? 'var(--status-red)'
+                    : 'var(--status-amber)',
+            }}
+          >
+            <div className="p-4">
+              <h3 className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wider mb-3">
+                Brief Coherence
+              </h3>
+              <div className="space-y-3">
+                {coherenceAnalysis.tensions.map((tension: CoherenceTension, idx: number) => (
+                  <div key={idx} className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-[var(--text-primary)]">
+                        {tension.title}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] mt-0.5 leading-relaxed">
+                        {tension.description}
+                      </p>
+                    </div>
+                    <span
+                      className="flex-shrink-0 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor:
+                          tension.severity === 'critical'
+                            ? 'var(--status-red-bg)'
+                            : 'var(--status-amber-bg, rgba(245, 158, 11, 0.1))',
+                        color:
+                          tension.severity === 'critical'
+                            ? 'var(--status-red)'
+                            : 'var(--status-amber)',
+                      }}
+                    >
+                      {tension.severity}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+            );
+          })()}
 
         <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
           {gate1Sections.map((section, index) => (

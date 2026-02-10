@@ -133,6 +133,7 @@ describe('Enhanced Triage Types', () => {
       },
       triageAssessment: [],
       overallBriefHealth: 'Summary...',
+      coherenceAnalysis: { tensions: [], overallCoherence: 'mixed' },
     };
     expect(response.overallBriefHealth).toBeDefined();
   });
