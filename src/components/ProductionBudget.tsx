@@ -39,6 +39,7 @@ export function ProductionBudget({
     initialValue?.productionBudget || ''
   );
   const [showHelp, setShowHelp] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Pre-fill total budget if extracted
   useEffect(() => {
@@ -144,7 +145,7 @@ export function ProductionBudget({
           <span className="text-[var(--text-muted)] font-normal ml-1">(optional)</span>
         </label>
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium pointer-events-none">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-primary)] font-semibold pointer-events-none">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
@@ -212,13 +213,14 @@ export function ProductionBudget({
         )}
 
         <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] font-medium pointer-events-none">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-primary)] font-semibold pointer-events-none">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
             type="text"
             value={productionBudget}
             onChange={(e) => setProductionBudget(formatInputValue(e.target.value))}
+            onBlur={() => setHasInteracted(true)}
             placeholder="50,000"
             className={`input-field pl-12 ${
               !canConfirm
@@ -227,6 +229,12 @@ export function ProductionBudget({
             }`}
           />
         </div>
+
+        {hasInteracted && !productionBudget.trim() && (
+          <p className="text-xs text-[var(--text-muted)] mt-1">
+            Just enter the number — currency symbol is already included
+          </p>
+        )}
 
         {/* Suggested 10% Calculation */}
         {hasTotalBudget && (

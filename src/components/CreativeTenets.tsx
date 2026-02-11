@@ -24,6 +24,11 @@ export function CreativeTenets({
   const [intro, setIntro] = useState('');
   const [tenets, setTenets] = useState<CreativeTenet[]>([]);
 
+  const autoResize = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
   const handleGenerate = async () => {
     try {
       const result = await onGenerate();
@@ -348,10 +353,11 @@ export function CreativeTenets({
                 <div className="flex-1 min-w-0 space-y-3">
                   {/* Headline */}
                   <textarea
+                    ref={(el) => { if (el) autoResize(el); }}
+                    onInput={(e) => autoResize(e.currentTarget)}
                     value={tenet.headline}
                     onChange={(e) => handleTenetChange(index, 'headline', e.target.value)}
-                    className="w-full bg-transparent border-none resize-none text-[var(--text-primary)] font-semibold text-lg leading-snug focus:outline-none focus:ring-0 p-0"
-                    style={{ minHeight: '28px' }}
+                    className="w-full bg-transparent border-none resize-none overflow-hidden text-[var(--text-primary)] font-semibold text-lg leading-snug focus:outline-none focus:ring-0 p-0"
                     rows={1}
                     placeholder="Tenet headline..."
                   />
@@ -361,11 +367,13 @@ export function CreativeTenets({
                     {tenet.explanation.map((dot, dotIndex) => (
                       <div key={dotIndex} className="flex items-start gap-2 group/dot">
                         <span className="text-[var(--text-muted)] mt-1.5 text-xs flex-shrink-0">•</span>
-                        <input
-                          type="text"
+                        <textarea
+                          ref={(el) => { if (el) autoResize(el); }}
+                          onInput={(e) => autoResize(e.currentTarget)}
                           value={dot}
                           onChange={(e) => handleExplanationChange(index, dotIndex, e.target.value)}
-                          className="flex-1 bg-transparent border-none text-sm text-[var(--text-secondary)] leading-relaxed focus:outline-none focus:ring-0 p-0"
+                          className="flex-1 bg-transparent border-none resize-none overflow-hidden text-sm text-[var(--text-secondary)] leading-relaxed focus:outline-none focus:ring-0 p-0"
+                          rows={1}
                           placeholder="Explanation point..."
                         />
                         {tenet.explanation.length > 1 && (
@@ -396,11 +404,12 @@ export function CreativeTenets({
                       Differentiator
                     </label>
                     <textarea
+                      ref={(el) => { if (el) autoResize(el); }}
+                      onInput={(e) => autoResize(e.currentTarget)}
                       value={tenet.differentiator}
                       onChange={(e) => handleTenetChange(index, 'differentiator', e.target.value)}
-                      className="w-full bg-transparent border-none resize-none text-sm text-[var(--text-secondary)] italic leading-relaxed focus:outline-none focus:ring-0 p-0"
-                      style={{ minHeight: '20px' }}
-                      rows={1}
+                      className="w-full bg-transparent border-none resize-none overflow-hidden text-sm text-[var(--text-secondary)] italic leading-relaxed focus:outline-none focus:ring-0 p-0"
+                      rows={2}
                       placeholder="What makes this distinct from competitors..."
                     />
                   </div>

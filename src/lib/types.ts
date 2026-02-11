@@ -167,6 +167,9 @@ export interface SessionState {
   history: HistoryEntry[];
   historyIndex: number;
 
+  // Navigation state
+  hasReachedOutput: boolean;
+
   error: string | null;
   loading: boolean;
   loadingProgress: LoadingProgress | null;
@@ -207,6 +210,7 @@ export function createInitialState(): SessionState {
     lastReassessedAt: null,
     history: [],
     historyIndex: -1,
+    hasReachedOutput: false,
     error: null,
     loading: false,
     loadingProgress: null,
@@ -345,6 +349,7 @@ export interface TriageSectionResult {
   whatNeeded?: string;
   realityCheck: string;
   questions: string[];
+  suggestedPrompts?: string[];
 }
 
 export interface EnhancedTriageResponse {
