@@ -473,6 +473,94 @@ function ReassessConfirmation({ count }: { count: number }) {
   );
 }
 
+function PerSectionPrompts({
+  sectionName,
+  prompts,
+  onReassessWithContext,
+}: {
+  sectionName: string;
+  prompts: string[];
+  onReassessWithContext: (context: string) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState<number | null>(null);
+  const [pastedContext, setPastedContext] = useState('');
+
+  const handleCopy = async (prompt: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(prompt);
+      setCopied(index);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      // Clipboard API failed silently
+    }
+  };
+
+  return (
+    <div className="px-4 pb-3">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
+        className="flex items-center gap-2 text-xs text-[var(--text-muted)] hover:text-[var(--expedia-navy)] transition-colors py-1"
+      >
+        <span className={`transition-transform ${isOpen ? 'rotate-90' : ''}`}>▸</span>
+        Research prompts ({prompts.length})
+      </button>
+
+      {isOpen && (
+        <div
+          className="mt-2 p-4 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-3"
+          style={{ animation: 'fadeSlideIn 0.2s ease-out' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="text-xs text-[var(--text-muted)]">
+            <strong>Tip:</strong> These prompts can help you research gaps in your {sectionName.toLowerCase()} section. Copy and paste into ChatGPT, Claude, or your preferred AI assistant. Then paste the additional context below.
+          </p>
+
+          {prompts.map((prompt, idx) => (
+            <div key={idx} className="flex items-start gap-2 p-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-primary)]">
+              <p className="flex-1 text-sm text-[var(--text-secondary)] leading-relaxed">{prompt}</p>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(prompt, idx);
+                }}
+                className="flex-shrink-0 text-xs text-[var(--expedia-navy)] hover:underline whitespace-nowrap"
+              >
+                {copied === idx ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+          ))}
+
+          <textarea
+            value={pastedContext}
+            onChange={(e) => setPastedContext(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            placeholder="Paste additional context here..."
+            className="textarea-field text-sm w-full"
+            style={{ minHeight: '80px' }}
+          />
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (pastedContext.trim()) {
+                onReassessWithContext(pastedContext);
+              }
+            }}
+            disabled={!pastedContext.trim()}
+            className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50"
+          >
+            Re-assess with new context →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ResearchSuggestions({ gaps }: { gaps: string[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -2019,36 +2107,62 @@ export default function Home() {
           })()}
 
         <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
-          {gate1Sections.map((section, index) => (
-            <div
-              key={section.key}
-              onClick={() => updateState({ step: 'gate1_sections', currentSectionIndex: index, currentGate: 'gate1' })}
-              className={`flex items-center justify-between p-4 transition-all cursor-pointer hover:bg-[var(--bg-secondary)] group ${
-                index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
-              }`}
-              style={{
-                animation: 'fadeSlideIn 0.3s ease-out forwards',
-                animationDelay: `${index * 80}ms`,
-                opacity: 0,
-              }}
-            >
-              <div className="flex items-center gap-4">
-                <span
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold"
-                  style={{ backgroundColor: 'var(--expedia-navy)', color: 'white' }}
+          {gate1Sections.map((section, index) => {
+            const triageSection = state.triageResult?.triageAssessment.find(s => s.key === section.key);
+            const hasPrompts = triageSection?.suggestedPrompts && triageSection.suggestedPrompts.length > 0 && section.status !== 'green';
+
+            return (
+              <div key={section.key}>
+                <div
+                  onClick={() => updateState({ step: 'gate1_sections', currentSectionIndex: index, currentGate: 'gate1' })}
+                  className={`flex items-center justify-between p-4 transition-all cursor-pointer hover:bg-[var(--bg-secondary)] group ${
+                    !hasPrompts && index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+                  }`}
+                  style={{
+                    animation: 'fadeSlideIn 0.3s ease-out forwards',
+                    animationDelay: `${index * 80}ms`,
+                    opacity: 0,
+                  }}
                 >
-                  {index + 1}
-                </span>
-                <div className="flex flex-col">
-                  <span className="font-medium text-[var(--text-primary)] group-hover:underline">{section.name}</span>
-                  <span className="text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">
-                    Click to edit this section
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold"
+                      style={{ backgroundColor: 'var(--expedia-navy)', color: 'white' }}
+                    >
+                      {index + 1}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-[var(--text-primary)] group-hover:underline">{section.name}</span>
+                      <span className="text-xs text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click to edit this section
+                      </span>
+                    </div>
+                  </div>
+                  <StatusBadge status={section.status} />
                 </div>
+
+                {/* Per-section research prompts */}
+                {hasPrompts && (
+                  <PerSectionPrompts
+                    sectionName={section.name}
+                    prompts={triageSection!.suggestedPrompts!}
+                    onReassessWithContext={(context) => {
+                      updateState({
+                        step: 'gate1_sections',
+                        currentSectionIndex: index,
+                        currentGate: 'gate1',
+                        additionalContext: (state.additionalContext ? state.additionalContext + '\n' : '') + context,
+                      });
+                    }}
+                  />
+                )}
+
+                {index !== gate1Sections.length - 1 && (
+                  <div className="border-b border-[var(--border-color)]" />
+                )}
               </div>
-              <StatusBadge status={section.status} />
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Animation keyframes */}
@@ -2058,11 +2172,6 @@ export default function Home() {
             to { opacity: 1; transform: translateY(0); }
           }
         `}</style>
-
-        {/* Research Suggestions - show when there are gaps */}
-        <ResearchSuggestions
-          gaps={gate1Sections.filter(s => s.status !== 'green').map(s => s.key)}
-        />
 
         {/* Recommendation Summary */}
         <div className={`p-4 rounded-xl border-l-4 ${
