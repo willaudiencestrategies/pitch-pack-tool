@@ -820,6 +820,7 @@ function SectionStepContent({
   onBack,
   budgetDetails,
   onBudgetConfirm,
+  suggestedPrompts,
 }: {
   section: Section;
   sectionIndex: number;
@@ -833,6 +834,7 @@ function SectionStepContent({
   onBack: () => void;
   budgetDetails?: BudgetDetails | null;
   onBudgetConfirm?: (budget: BudgetDetails) => void;
+  suggestedPrompts?: string[];
 }) {
   const [additionalInfo, setAdditionalInfo] = useState('');
   const [reassessSuccess, setReassessSuccess] = useState(false);
@@ -991,6 +993,19 @@ function SectionStepContent({
               <p className="text-xs text-[var(--text-muted)] mt-3 pt-3 border-t border-current/10">
                 Answer the questions above in the text box below, then click "Re-assess with Info"
               </p>
+            )}
+
+            {/* Per-section research prompts - below AI Analysis */}
+            {suggestedPrompts && suggestedPrompts.length > 0 && section.status !== 'green' && (
+              <div className="mt-4 pt-4 border-t border-current/10">
+                <PerSectionPrompts
+                  sectionName={section.name}
+                  prompts={suggestedPrompts}
+                  onReassessWithContext={(context) => {
+                    onReassess(context);
+                  }}
+                />
+              </div>
             )}
           </div>
         )}
@@ -1231,8 +1246,40 @@ export default function Home() {
     }
   };
 
-  // UndoRedoButtons component
-  function UndoRedoButtons() {
+  // FloatingNavButtons component - section navigation on Gate 1, undo/redo elsewhere
+  function FloatingNavButtons() {
+    const isGate1Sections = state.step === 'gate1_sections';
+    const gate1Sections = state.sections.filter((s) =>
+      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+    );
+
+    if (isGate1Sections) {
+      const canGoBack = state.currentSectionIndex > 0;
+      const canGoForward = state.currentSectionIndex < gate1Sections.length - 1;
+
+      return (
+        <div className="fixed bottom-4 right-4 flex gap-2 z-40">
+          <button
+            onClick={goToPreviousGate1Section}
+            disabled={!canGoBack}
+            className="p-2 rounded-lg bg-white border border-[var(--border-color)] shadow-sm disabled:opacity-40 hover:bg-[var(--bg-secondary)] transition-colors"
+            title={canGoBack ? `Back to ${gate1Sections[state.currentSectionIndex - 1]?.name}` : 'First section'}
+          >
+            ←
+          </button>
+          <button
+            onClick={goToNextGate1Section}
+            disabled={!canGoForward}
+            className="p-2 rounded-lg bg-white border border-[var(--border-color)] shadow-sm disabled:opacity-40 hover:bg-[var(--bg-secondary)] transition-colors"
+            title={canGoForward ? `Next: ${gate1Sections[state.currentSectionIndex + 1]?.name}` : 'Last section'}
+          >
+            →
+          </button>
+        </div>
+      );
+    }
+
+    // Default: undo/redo buttons
     return (
       <div className="fixed bottom-4 right-4 flex gap-2 z-40">
         <button
@@ -2108,15 +2155,12 @@ export default function Home() {
 
         <div className="rounded-xl border border-[var(--border-color)] overflow-hidden">
           {gate1Sections.map((section, index) => {
-            const triageSection = state.triageResult?.triageAssessment.find(s => s.key === section.key);
-            const hasPrompts = triageSection?.suggestedPrompts && triageSection.suggestedPrompts.length > 0 && section.status !== 'green';
-
             return (
               <div key={section.key}>
                 <div
                   onClick={() => updateState({ step: 'gate1_sections', currentSectionIndex: index, currentGate: 'gate1' })}
                   className={`flex items-center justify-between p-4 transition-all cursor-pointer hover:bg-[var(--bg-secondary)] group ${
-                    !hasPrompts && index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
+                    index !== gate1Sections.length - 1 ? 'border-b border-[var(--border-color)]' : ''
                   }`}
                   style={{
                     animation: 'fadeSlideIn 0.3s ease-out forwards',
@@ -2140,22 +2184,6 @@ export default function Home() {
                   </div>
                   <StatusBadge status={section.status} />
                 </div>
-
-                {/* Per-section research prompts */}
-                {hasPrompts && (
-                  <PerSectionPrompts
-                    sectionName={section.name}
-                    prompts={triageSection!.suggestedPrompts!}
-                    onReassessWithContext={(context) => {
-                      updateState({
-                        step: 'gate1_sections',
-                        currentSectionIndex: index,
-                        currentGate: 'gate1',
-                        additionalContext: (state.additionalContext ? state.additionalContext + '\n' : '') + context,
-                      });
-                    }}
-                  />
-                )}
 
                 {index !== gate1Sections.length - 1 && (
                   <div className="border-b border-[var(--border-color)]" />
@@ -2256,6 +2284,10 @@ export default function Home() {
       return null;
     }
 
+    // Get suggested prompts from triage result for this section
+    const triageSection = state.triageResult?.triageAssessment.find(s => s.key === section.key);
+    const sectionPrompts = triageSection?.suggestedPrompts;
+
     return (
       <SectionStepContent
         key={section.key}
@@ -2271,6 +2303,7 @@ export default function Home() {
         onBack={goToPreviousGate1Section}
         budgetDetails={state.budgetDetails}
         onBudgetConfirm={handleBudgetConfirm}
+        suggestedPrompts={sectionPrompts}
       />
     );
   };
@@ -3261,8 +3294,8 @@ export default function Home() {
         Pitch Pack Tool for E Studio
       </footer>
 
-      {/* Undo/Redo Buttons */}
-      <UndoRedoButtons />
+      {/* Floating Navigation / Undo-Redo Buttons */}
+      <FloatingNavButtons />
 
       {/* Save Work Reminder */}
       <SaveReminder hasUnsavedWork={state.step !== 'upload' && state.step !== 'output'} />
