@@ -8,10 +8,11 @@ interface ExportData {
   personification?: string;
   insights?: Truth[];
   brandAlignment?: BrandAlignment;
+  briefFilename?: string;
 }
 
 export async function exportToWord(data: ExportData): Promise<void> {
-  const { sections, audience, personification, insights, brandAlignment } = data;
+  const { sections, audience, personification, insights, brandAlignment, briefFilename } = data;
 
   const children: Paragraph[] = [
     new Paragraph({ text: 'Creative Brief', heading: HeadingLevel.TITLE }),
@@ -58,5 +59,8 @@ export async function exportToWord(data: ExportData): Promise<void> {
 
   const doc = new Document({ sections: [{ properties: {}, children }] });
   const blob = await Packer.toBlob(doc);
-  saveAs(blob, `creative-brief-${Date.now()}.docx`);
+  const exportName = briefFilename
+    ? briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
+    : 'creative-brief';
+  saveAs(blob, `${exportName}.docx`);
 }

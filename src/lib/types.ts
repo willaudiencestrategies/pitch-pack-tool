@@ -120,6 +120,7 @@ export interface SessionState {
   step: Step;
   currentGate: 'gate1' | 'gate2' | 'output';
   brief: string;
+  briefFilename: string;
   additionalContext: string;
   preTellMeMoreContext: string;
 
@@ -180,6 +181,7 @@ export function createInitialState(): SessionState {
     step: 'upload',
     currentGate: 'gate1',
     brief: '',
+    briefFilename: '',
     additionalContext: '',
     preTellMeMoreContext: '',
     triageResult: null,

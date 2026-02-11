@@ -1875,7 +1875,7 @@ export default function Home() {
 
         {/* File Upload */}
         <FileUpload
-          onFileContent={(content) => updateState({ brief: content, error: null })}
+          onFileContent={(content, filename) => updateState({ brief: content, briefFilename: filename, error: null })}
           disabled={state.loading}
         />
 
@@ -2934,7 +2934,10 @@ export default function Home() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'pitch-pack.md';
+      const baseName = state.briefFilename
+        ? state.briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
+        : 'pitch-pack';
+      a.download = `${baseName}.md`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -2996,6 +2999,7 @@ export default function Home() {
                 personification: state.personification?.narrative,
                 insights: state.selectedInsights,
                 brandAlignment: state.brandAlignment || undefined,
+                briefFilename: state.briefFilename || undefined,
               })}
               className="btn-outline flex items-center gap-2 hover:shadow-md transition-shadow"
             >
