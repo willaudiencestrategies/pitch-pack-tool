@@ -39,7 +39,6 @@ export function ProductionBudget({
     initialValue?.productionBudget || ''
   );
   const [showHelp, setShowHelp] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Pre-fill total budget if extracted (strip currency symbols since they're shown separately)
   useEffect(() => {
@@ -49,7 +48,6 @@ export function ProductionBudget({
   }, [extractedBudget, totalBudget]);
 
   const handleConfirm = () => {
-    if (!productionBudget.trim()) return;
     onConfirm({
       totalBudget: totalBudget.trim(),
       productionBudget: productionBudget.trim(),
@@ -95,7 +93,6 @@ export function ProductionBudget({
     return value.replace(/[A$£€\u00A3\u20AC]/g, '').trim();
   };
 
-  const canConfirm = productionBudget.trim().length > 0;
   const hasTotalBudget = totalBudget.trim().length > 0;
 
   return (
@@ -176,7 +173,7 @@ export function ProductionBudget({
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-[var(--text-secondary)]">
             Production Budget
-            <span className="text-[var(--status-red)] ml-0.5">*</span>
+            <span className="text-[var(--text-muted)] font-normal ml-1">(optional)</span>
           </label>
           <button
             onClick={() => setShowHelp(!showHelp)}
@@ -225,21 +222,10 @@ export function ProductionBudget({
             type="text"
             value={productionBudget}
             onChange={(e) => setProductionBudget(formatInputValue(e.target.value))}
-            onBlur={() => setHasInteracted(true)}
             placeholder="50,000"
-            className={`input-field flex-1 ${
-              !canConfirm
-                ? 'border-[var(--status-red)]/30 focus:border-[var(--status-red)] focus:ring-[var(--status-red)]/20'
-                : ''
-            }`}
+            className="input-field flex-1"
           />
         </div>
-
-        {hasInteracted && !productionBudget.trim() && (
-          <p className="text-xs text-[var(--text-muted)] mt-1">
-            Enter the number only
-          </p>
-        )}
 
         {/* Suggested 10% Calculation */}
         {hasTotalBudget && (
@@ -272,18 +258,12 @@ export function ProductionBudget({
           </button>
         )}
 
-        {!canConfirm && (
-          <p className="text-xs text-[var(--status-red)]">
-            Production budget is required to continue
-          </p>
-        )}
       </div>
 
       {/* Actions */}
       <div className="pt-6 border-t border-[var(--border-color)] space-y-3">
         <button
           onClick={handleConfirm}
-          disabled={!canConfirm}
           className="btn-secondary w-full flex items-center justify-center gap-2"
         >
           <span>Confirm Budget</span>
