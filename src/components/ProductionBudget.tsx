@@ -33,7 +33,7 @@ export function ProductionBudget({
     (initialValue?.currency as Currency) || 'USD'
   );
   const [totalBudget, setTotalBudget] = useState(
-    initialValue?.totalBudget || extractedBudget || ''
+    initialValue?.totalBudget || (extractedBudget ? extractedBudget.replace(/[A$£€\u00A3\u20AC]/g, '').trim() : '')
   );
   const [productionBudget, setProductionBudget] = useState(
     initialValue?.productionBudget || ''
@@ -41,10 +41,10 @@ export function ProductionBudget({
   const [showHelp, setShowHelp] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Pre-fill total budget if extracted
+  // Pre-fill total budget if extracted (strip currency symbols since they're shown separately)
   useEffect(() => {
     if (extractedBudget && !totalBudget) {
-      setTotalBudget(extractedBudget);
+      setTotalBudget(stripCurrencySymbols(extractedBudget));
     }
   }, [extractedBudget, totalBudget]);
 
@@ -86,8 +86,13 @@ export function ProductionBudget({
   };
 
   const formatInputValue = (value: string) => {
-    // Allow only numbers, commas, and decimal points
-    return value.replace(/[^0-9,.\s]/g, '');
+    // Allow only numbers, commas, decimal points, and K/M suffixes
+    return value.replace(/[^0-9,.KkMm\s-]/g, '');
+  };
+
+  // Strip currency symbols from pre-filled values
+  const stripCurrencySymbols = (value: string) => {
+    return value.replace(/[A$£€\u00A3\u20AC]/g, '').trim();
   };
 
   const canConfirm = productionBudget.trim().length > 0;
@@ -144,8 +149,8 @@ export function ProductionBudget({
           Total Campaign Budget
           <span className="text-[var(--text-muted)] font-normal ml-1">(optional)</span>
         </label>
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-primary)] font-semibold pointer-events-none">
+        <div className="flex items-center gap-2">
+          <span className="text-base font-semibold text-[var(--text-primary)] whitespace-nowrap min-w-[2rem] text-right">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
@@ -153,7 +158,7 @@ export function ProductionBudget({
             value={totalBudget}
             onChange={(e) => setTotalBudget(formatInputValue(e.target.value))}
             placeholder="500,000"
-            className="input-field pl-12"
+            className="input-field flex-1"
           />
         </div>
         {extractedBudget && totalBudget === extractedBudget && (
@@ -212,8 +217,8 @@ export function ProductionBudget({
           </div>
         )}
 
-        <div className="relative">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-primary)] font-semibold pointer-events-none">
+        <div className="flex items-center gap-2">
+          <span className="text-base font-semibold text-[var(--text-primary)] whitespace-nowrap min-w-[2rem] text-right">
             {CURRENCY_CONFIG[currency].symbol}
           </span>
           <input
@@ -222,7 +227,7 @@ export function ProductionBudget({
             onChange={(e) => setProductionBudget(formatInputValue(e.target.value))}
             onBlur={() => setHasInteracted(true)}
             placeholder="50,000"
-            className={`input-field pl-12 ${
+            className={`input-field flex-1 ${
               !canConfirm
                 ? 'border-[var(--status-red)]/30 focus:border-[var(--status-red)] focus:ring-[var(--status-red)]/20'
                 : ''
@@ -232,7 +237,7 @@ export function ProductionBudget({
 
         {hasInteracted && !productionBudget.trim() && (
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            Just enter the number — currency symbol is already included
+            Enter the number only
           </p>
         )}
 

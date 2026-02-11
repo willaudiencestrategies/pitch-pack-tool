@@ -476,15 +476,12 @@ function ReassessConfirmation({ count }: { count: number }) {
 function PerSectionPrompts({
   sectionName,
   prompts,
-  onReassessWithContext,
 }: {
   sectionName: string;
   prompts: string[];
-  onReassessWithContext: (context: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState<number | null>(null);
-  const [pastedContext, setPastedContext] = useState('');
 
   const handleCopy = async (prompt: string, index: number) => {
     try {
@@ -516,7 +513,7 @@ function PerSectionPrompts({
           onClick={(e) => e.stopPropagation()}
         >
           <p className="text-xs text-[var(--text-muted)]">
-            <strong>Tip:</strong> These prompts can help you research gaps in your {sectionName.toLowerCase()} section. Copy and paste into ChatGPT, Claude, or your preferred AI assistant. Then paste the additional context below.
+            <strong>Tip:</strong> Copy these into ChatGPT, Claude, or your preferred AI assistant to research gaps in your {sectionName.toLowerCase()} section. Then paste any useful findings into the "Tell me more" box below.
           </p>
 
           {prompts.map((prompt, idx) => (
@@ -533,28 +530,6 @@ function PerSectionPrompts({
               </button>
             </div>
           ))}
-
-          <textarea
-            value={pastedContext}
-            onChange={(e) => setPastedContext(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-            placeholder="Paste additional context here..."
-            className="textarea-field text-sm w-full"
-            style={{ minHeight: '80px' }}
-          />
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (pastedContext.trim()) {
-                onReassessWithContext(pastedContext);
-              }
-            }}
-            disabled={!pastedContext.trim()}
-            className="btn-primary text-sm flex items-center gap-2 disabled:opacity-50"
-          >
-            Re-assess with new context →
-          </button>
         </div>
       )}
     </div>
@@ -1001,9 +976,6 @@ function SectionStepContent({
                 <PerSectionPrompts
                   sectionName={section.name}
                   prompts={suggestedPrompts}
-                  onReassessWithContext={(context) => {
-                    onReassess(context);
-                  }}
                 />
               </div>
             )}

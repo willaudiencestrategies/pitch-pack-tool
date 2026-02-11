@@ -219,8 +219,10 @@ body {
   background-color: var(--bg-primary);
   transition: all 0.2s;
   font-size: 1rem;
-  resize: none;
+  resize: vertical;
   min-height: 120px;
+  overflow-y: auto;
+  field-sizing: content;
 }
 
 .textarea-field:hover {
