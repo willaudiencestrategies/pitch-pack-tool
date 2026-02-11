@@ -11,6 +11,7 @@ const BRANDS: ExpediaBrand[] = ['expedia', 'hotels_com', 'vrbo'];
 
 interface BrandAlignmentProps {
   onConfirm: (alignment: BrandAlignmentType) => void;
+  onBrandContent?: (content: string) => void;
   onBack: () => void;
   initialValue?: BrandAlignmentType | null;
   briefAudienceContent?: string;
@@ -19,6 +20,7 @@ interface BrandAlignmentProps {
 
 export function BrandAlignment({
   onConfirm,
+  onBrandContent,
   onBack,
   initialValue,
   briefAudienceContent,
@@ -28,6 +30,7 @@ export function BrandAlignment({
     initialValue?.brand ?? null
   );
   const [hasDGMatch, setHasDGMatch] = useState(initialValue?.hasDGMatch ?? false);
+  const [isNotBrandSpecific, setIsNotBrandSpecific] = useState(false);
   const [fitResult, setFitResult] = useState<BrandFitResponse | null>(null);
   const [fitAcknowledged, setFitAcknowledged] = useState(false);
   const [isCheckingFit, setIsCheckingFit] = useState(false);
@@ -82,10 +85,30 @@ export function BrandAlignment({
     }
   };
 
-  const canProceed = selectedBrand && (fitAcknowledged || !fitResult);
+  const canProceed = (selectedBrand && (fitAcknowledged || !fitResult)) || isNotBrandSpecific;
 
   const handleConfirm = () => {
+    if (isNotBrandSpecific) {
+      if (onBrandContent) {
+        onBrandContent('Not brand-specific — brief applies across Expedia Group brands');
+      }
+      onConfirm({
+        brand: null,
+        hasDGMatch,
+        brandAudience: 'Cross-brand',
+      });
+      return;
+    }
     if (!selectedBrand || !canProceed) return;
+
+    // Write brand alignment content for output view
+    if (onBrandContent && fitResult) {
+      const content = `Brand: ${BRAND_CRITERIA[selectedBrand].name} (${fitResult.fitLevel} fit${fitResult.fitLevel !== 'strong' ? ' — acknowledged' : ''})\n\nAssessment: ${fitResult.reasoning}`;
+      onBrandContent(content);
+    } else if (onBrandContent && selectedBrand) {
+      onBrandContent(`Brand: ${BRAND_CRITERIA[selectedBrand].name}`);
+    }
+
     onConfirm({
       brand: selectedBrand,
       hasDGMatch,
@@ -101,7 +124,7 @@ export function BrandAlignment({
     return (
       <div
         key={brandKey}
-        onClick={() => setSelectedBrand(brandKey)}
+        onClick={() => { setSelectedBrand(brandKey); setIsNotBrandSpecific(false); }}
         className={`p-5 rounded-xl border-2 transition-all cursor-pointer ${
           isSelected
             ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5 shadow-md'
@@ -281,6 +304,43 @@ export function BrandAlignment({
 
       {/* Brand Selection Cards */}
       <div className="space-y-3">{BRANDS.map(renderBrandCard)}</div>
+
+      {/* "Not brand-specific" option */}
+      <div
+        onClick={() => {
+          setSelectedBrand(null);
+          setIsNotBrandSpecific(true);
+          setFitResult(null);
+          setFitAcknowledged(true);
+        }}
+        className={`p-5 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
+          isNotBrandSpecific
+            ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]/5 shadow-md'
+            : 'border-[var(--border-color)] hover:border-[var(--expedia-navy)]/50 hover:shadow-sm'
+        }`}
+      >
+        <div className="flex items-start gap-3">
+          <div className="pt-0.5">
+            <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all ${
+              isNotBrandSpecific
+                ? 'border-[var(--expedia-navy)] bg-[var(--expedia-navy)]'
+                : 'border-[var(--border-color)]'
+            }`}>
+              {isNotBrandSpecific && <div className="h-2 w-2 rounded-full bg-white" />}
+            </div>
+          </div>
+          <div className="flex-1">
+            <h3 className={`font-semibold text-lg mb-1 ${
+              isNotBrandSpecific ? 'text-[var(--expedia-navy)]' : 'text-[var(--text-primary)]'
+            }`}>
+              Not brand-specific
+            </h3>
+            <p className="text-sm text-[var(--text-muted)]">
+              Brief applies across Expedia Group brands
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Fit Assessment Result */}
       {selectedBrand && renderFitResult()}

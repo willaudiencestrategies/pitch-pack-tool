@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         whatNeeded?: string;
         realityCheck: string;
         questions: string[];
+        suggestedPrompts?: string[];
       }>;
       overallBriefHealth?: string;
       coherenceAnalysis?: {
@@ -125,6 +126,7 @@ export async function POST(request: NextRequest) {
           whatNeeded: found?.whatNeeded,
           realityCheck: found?.realityCheck || '',
           questions: found?.questions || [],
+          suggestedPrompts: Array.isArray(found?.suggestedPrompts) ? found.suggestedPrompts : [],
         };
       } else {
         // Gate 2 / Appendix: Initialise with pending state (not assessed in triage)
@@ -139,6 +141,7 @@ export async function POST(request: NextRequest) {
           whatNeeded: undefined,
           realityCheck: '',
           questions: [],
+          suggestedPrompts: [],
         };
       }
     });

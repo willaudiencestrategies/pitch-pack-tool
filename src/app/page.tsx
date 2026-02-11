@@ -1938,8 +1938,11 @@ export default function Home() {
 
     return (
       <div className="space-y-6" style={{ animation: 'fadeSlideIn 0.4s ease-out' }}>
-        {/* Back Button */}
-        <BackButton onClick={() => updateState({ step: 'tell_me_more' })} label="Back to Context" />
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <BackButton onClick={() => updateState({ step: 'tell_me_more' })} label="Back to Context" />
+          <ReturnToOutputButton />
+        </div>
 
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           {/* Gate 1 Badge */}
@@ -2186,8 +2189,26 @@ export default function Home() {
   // Brand Alignment step renderer (Gate 2)
   const renderBrandAlignmentStep = () => {
     return (
+      <div className="space-y-4">
+        {state.hasReachedOutput && (
+          <div className="flex justify-end">
+            <ReturnToOutputButton />
+          </div>
+        )}
       <BrandAlignment
         onConfirm={handleBrandAlignment}
+        onBrandContent={(content) => {
+          const updatedSections = [...state.sections];
+          const brandIdx = updatedSections.findIndex(s => s.key === 'brand_alignment');
+          if (brandIdx >= 0) {
+            updatedSections[brandIdx] = {
+              ...updatedSections[brandIdx],
+              content,
+              status: 'green',
+            };
+            updateState({ sections: updatedSections });
+          }
+        }}
         onBack={() => updateState({ step: 'gate_transition' })}
         initialValue={state.brandAlignment}
         briefAudienceContent={
@@ -2197,6 +2218,7 @@ export default function Home() {
           state.triageResult?.triageAssessment.find((s) => s.key === 'objective')?.synthesizedContent || ''
         }
       />
+      </div>
     );
   };
 
@@ -2716,7 +2738,24 @@ export default function Home() {
     );
   };
 
+  const ReturnToOutputButton = () => {
+    if (!state.hasReachedOutput || state.step === 'output') return null;
+    return (
+      <button
+        onClick={() => updateState({ step: 'output', currentGate: 'output' })}
+        className="text-sm text-[var(--expedia-navy)] hover:text-[var(--expedia-navy-dark)] font-medium flex items-center gap-1 transition-colors"
+      >
+        Return to Output →
+      </button>
+    );
+  };
+
   const renderOutputStep = () => {
+    // Mark that user has reached output (for forward navigation)
+    if (!state.hasReachedOutput) {
+      updateState({ hasReachedOutput: true });
+    }
+
     if (state.loading) {
       return (
         <LoadingOverlay
