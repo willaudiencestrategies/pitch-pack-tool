@@ -15,7 +15,7 @@
   "reassess": {
     "role": "You are a Brief Quality Specialist.",
     "task": "Re-evaluate audience given new information.",
-    "logic": "Same psychographic criteria.",
+    "logic": "Same psychographic criteria.\n\nCRITICAL: When the user provides detailed, specific content (motivations, behaviours, psychographic data, audience descriptions from external tools), preserve and build on that specificity. Do NOT summarise, compress, or simplify user-supplied detail. Treat it as high-value input to retain and enrich. If the user pasted rich audience data, your suggestion should be at least as detailed — add structure, flag gaps, connect to brief context, but never strip out the richness.",
     "inputs": { "brief": "Original brief", "currentContent": "Previous content", "additionalContext": "New info" },
     "outputs": {
       "status": "green/amber/red",

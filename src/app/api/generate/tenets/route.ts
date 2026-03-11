@@ -43,9 +43,9 @@ ${insights.map((i: any, idx: number) => `  ${idx + 1}. ${i.text}`).join('\n')}
 ${additionalContext ? `- Additional Context: ${additionalContext}` : ''}
 ${brief ? `- Original Brief Context: ${brief.substring(0, 500)}...` : ''}
 
-Generate 3-4 Creative Tenets. Return JSON with:
+Generate exactly 3 Creative Tenets. Return JSON with:
 - "intro": 1-2 sentences connecting tenets to audience work
-- "tenets": array of 3-4 objects, each with:
+- "tenets": array of exactly 3 objects, each with:
   - "headline": bold 2-5 word headline
   - "explanation": array of 2-4 dot point strings
   - "differentiator": string explaining what makes this distinct`;
@@ -58,7 +58,7 @@ Generate 3-4 Creative Tenets. Return JSON with:
 
     // Defensive: ensure tenets is an array of structured objects
     const tenets: CreativeTenet[] = (Array.isArray(response.tenets) ? response.tenets : [])
-      .slice(0, 4) // Max 4 tenets
+      .slice(0, 3) // Max 3 tenets
       .map((t: any) => ({
         headline: typeof t.headline === 'string' ? t.headline.replace(/^\d+[\.\)]\s*/, '').trim() : (typeof t === 'string' ? t : 'Untitled tenet'),
         explanation: Array.isArray(t.explanation)

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { parseFile, isFileSupported, getSupportedExtensions } from '@/lib/file-parser';
+import { isFileSupported, getSupportedExtensions } from '@/lib/file-utils';
 
 interface FileUploadProps {
   onFileContent: (content: string, filename: string) => void;
@@ -19,7 +19,6 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
 
   const handleFiles = useCallback(
     async (files: File[]) => {
-      // Check all files are supported first
       const unsupportedFiles = files.filter(f => !isFileSupported(f.name));
       if (unsupportedFiles.length > 0) {
         setState('error');
@@ -32,15 +31,24 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
       setError('');
 
       try {
-        const results: string[] = [];
+        const formData = new FormData();
         for (const file of files) {
-          const content = await parseFile(file);
-          results.push(`--- ${file.name} ---\n${content}`);
+          formData.append('files', file);
         }
-        const combinedContent = results.join('\n\n');
-        const combinedFilenames = files.map(f => f.name).join(', ');
+
+        const response = await fetch('/api/parse', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to parse file');
+        }
+
+        const data = await response.json();
         setState('success');
-        onFileContent(combinedContent, combinedFilenames);
+        onFileContent(data.content, data.filenames);
       } catch (err) {
         setState('error');
         setError(err instanceof Error ? err.message : 'Failed to parse file');

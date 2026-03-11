@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   },
 
   // Extend function timeout (Vercel-style, but Railway may respect this)
-  serverExternalPackages: ['@anthropic-ai/sdk'],
+  serverExternalPackages: ['@anthropic-ai/sdk', 'pdf-parse', 'mammoth'],
 };
 
 export default nextConfig;

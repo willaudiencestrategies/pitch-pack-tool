@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const userMessage = `Audience segment:
 Name: ${audience.name}
-Description: ${audience.description}
+Needs & Values: ${audience.description || (audience as any).needsValues || ''}
 Demographics: ${audience.demographics}
 
 Personification:

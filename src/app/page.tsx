@@ -1686,6 +1686,7 @@ export default function Home() {
   const handleBudgetConfirm = (budget: BudgetDetails) => {
     pushHistory('Confirm budget', { budgetDetails: state.budgetDetails });
     updateState({ budgetDetails: budget });
+    goToNextGate1Section();
   };
 
   // Generate Creative Tenets (Gate 2)
@@ -1879,29 +1880,7 @@ export default function Home() {
           disabled={state.loading}
         />
 
-        {/* Divider */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-px bg-[var(--border-color)]" />
-          <span className="text-sm text-[var(--text-muted)]">or paste directly</span>
-          <div className="flex-1 h-px bg-[var(--border-color)]" />
-        </div>
-
-        {/* Text Input */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-[var(--text-secondary)]">
-            Brief Content
-          </label>
-          <textarea
-            aria-label="Paste your brief content here"
-            className="textarea-field font-mono text-sm"
-            style={{ minHeight: '250px' }}
-            placeholder="Paste the full brief content here..."
-            value={state.brief}
-            onChange={(e) => updateState({ brief: e.target.value })}
-          />
-        </div>
-
-        {/* Seller Name (optional, for tracking) */}
+        {/* Seller Name + Continue — immediately after upload, before the long textarea */}
         <div className="space-y-2">
           <input
             type="text"
@@ -1928,6 +1907,28 @@ export default function Home() {
         >
           Continue →
         </button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4">
+          <div className="flex-1 h-px bg-[var(--border-color)]" />
+          <span className="text-sm text-[var(--text-muted)]">or paste directly</span>
+          <div className="flex-1 h-px bg-[var(--border-color)]" />
+        </div>
+
+        {/* Text Input */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-[var(--text-secondary)]">
+            Brief Content
+          </label>
+          <textarea
+            aria-label="Paste your brief content here"
+            className="textarea-field font-mono text-sm"
+            style={{ minHeight: '250px' }}
+            placeholder="Paste the full brief content here..."
+            value={state.brief}
+            onChange={(e) => updateState({ brief: e.target.value })}
+          />
+        </div>
       </div>
     );
   };
