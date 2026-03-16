@@ -1,6 +1,6 @@
 // src/lib/file-utils.ts
 
-const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.docx', '.pdf', '.ppt', '.pptx'] as const;
+const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.doc', '.docx', '.pdf', '.ppt', '.pptx'] as const;
 
 export type SupportedExtension = (typeof SUPPORTED_EXTENSIONS)[number];
 

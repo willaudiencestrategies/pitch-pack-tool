@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import mammoth from 'mammoth';
 import { PDFParse } from 'pdf-parse';
 
-const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.docx', '.pdf', '.ppt', '.pptx'];
+const SUPPORTED_EXTENSIONS = ['.txt', '.md', '.doc', '.docx', '.pdf', '.ppt', '.pptx'];
 
 function getExtension(filename: string): string {
   const lastDot = filename.lastIndexOf('.');
@@ -19,8 +19,8 @@ async function parseFileBuffer(buffer: ArrayBuffer, filename: string): Promise<s
     return new TextDecoder().decode(buffer);
   }
 
-  if (ext === '.docx') {
-    const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+  if (ext === '.doc' || ext === '.docx') {
+    const result = await mammoth.extractRawText({ buffer: Buffer.from(buffer) });
     return result.value;
   }
 

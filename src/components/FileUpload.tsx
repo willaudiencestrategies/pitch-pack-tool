@@ -172,7 +172,7 @@ export function FileUpload({ onFileContent, disabled = false }: FileUploadProps)
               Drop files here or click to browse
             </p>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Supports: .docx, .pdf, .txt, .pptx (text only)
+              Supports: .doc, .docx, .pdf, .txt, .pptx (text only)
             </p>
           </div>
         )}
