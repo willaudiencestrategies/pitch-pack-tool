@@ -1,6 +1,6 @@
 import { Document, Paragraph, TextRun, HeadingLevel, Packer } from 'docx';
 import { saveAs } from 'file-saver';
-import { Section, AudienceSegment, Truth, BrandAlignment } from './types';
+import { Section, AudienceSegment, Truth, BrandAlignment, VaultResult, NarrativeDraft } from './types';
 
 interface ExportData {
   sections: Section[];
@@ -181,4 +181,97 @@ export async function exportToWord(data: ExportData): Promise<void> {
     ? briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
     : 'creative-brief';
   saveAs(blob, `${exportName}.docx`);
+}
+
+// ============================================
+// Vault pitch pack export
+// ============================================
+
+interface VaultExportData {
+  briefFilename: string;
+  partnerName: string;
+  vaultResult: VaultResult;
+  resumeUrl: string;
+}
+
+export async function exportVaultPack(data: VaultExportData): Promise<void> {
+  const { briefFilename, partnerName, vaultResult, resumeUrl } = data;
+
+  const sections: Paragraph[] = [];
+
+  // Title page
+  sections.push(new Paragraph({
+    text: `Vault Pitch Pack — ${partnerName}`,
+    heading: HeadingLevel.HEADING_1,
+    spacing: { before: 200, after: 200 },
+  }));
+  sections.push(new Paragraph({
+    children: [new TextRun({ text: `Brief: ${briefFilename}`, italics: true })],
+    spacing: { after: 400 },
+  }));
+
+  // Matches summary
+  sections.push(new Paragraph({ text: 'Matches Summary', heading: HeadingLevel.HEADING_2 }));
+  for (const match of vaultResult.rankedConcepts) {
+    sections.push(new Paragraph({
+      children: [
+        new TextRun({ text: `Top Match ${match.slot}: ${match.conceptName}`, bold: true }),
+        new TextRun({ text: ` — ${match.confidence.toUpperCase()}`, bold: true, italics: true }),
+      ],
+      spacing: { before: 200, after: 100 },
+    }));
+    sections.push(new Paragraph({ text: match.confidenceReason, spacing: { after: 100 } }));
+    sections.push(new Paragraph({ text: `Production timeline: ${match.estimatedProductionTimeline}`, spacing: { after: 100 } }));
+  }
+
+  // Six-slide draft per selected concept
+  for (const conceptId of vaultResult.selectedConceptIds) {
+    const draft = vaultResult.narrativeDrafts[conceptId];
+    const match = vaultResult.rankedConcepts.find(m => m.conceptId === conceptId);
+    if (!draft || !match) continue;
+
+    sections.push(new Paragraph({
+      text: `Concept: ${match.conceptName}`,
+      heading: HeadingLevel.HEADING_2,
+      spacing: { before: 400, after: 200 },
+    }));
+
+    const slides: { label: string; key: keyof NarrativeDraft['slides'] }[] = [
+      { label: 'Slide 1: Key Brief Points', key: 'keyBriefPoints' },
+      { label: 'Slide 2: Creative Problem', key: 'creativeProblemWeAreSolving' },
+      { label: 'Slide 3: Narrative Pitch', key: 'narrativePitch' },
+      { label: 'Slide 4: Concept Description', key: 'conceptDescriptionFull' },
+      { label: 'Slide 5: Tailoring', key: 'tailoringTo' },
+      { label: 'Slide 6: Strategic Fit & Budget', key: 'strategicFitAndBudget' },
+    ];
+
+    for (const slide of slides) {
+      sections.push(new Paragraph({ text: slide.label, heading: HeadingLevel.HEADING_3, spacing: { before: 200, after: 100 } }));
+      sections.push(...markdownToParagraphs(draft.slides[slide.key]));
+    }
+
+    if (match.referenceLinks.length) {
+      sections.push(new Paragraph({ text: 'Reference materials', heading: HeadingLevel.HEADING_3, spacing: { before: 200 } }));
+      for (const link of match.referenceLinks) {
+        sections.push(new Paragraph({ text: link, spacing: { after: 100 } }));
+      }
+    }
+  }
+
+  // Resume URL footer
+  sections.push(new Paragraph({ text: '', spacing: { before: 600 } }));
+  sections.push(new Paragraph({
+    children: [
+      new TextRun({ text: 'Internal: resume in the tool: ', italics: true, size: 16 }),
+      new TextRun({ text: resumeUrl, italics: true, size: 16 }),
+    ],
+  }));
+
+  const doc = new Document({
+    sections: [{ properties: {}, children: sections }],
+  });
+
+  const blob = await Packer.toBlob(doc);
+  const safePartner = partnerName.toLowerCase().replace(/\s+/g, '-');
+  saveAs(blob, `vault-pitch-pack-${safePartner}.docx`);
 }

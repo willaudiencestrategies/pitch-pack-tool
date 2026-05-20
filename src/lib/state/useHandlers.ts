@@ -25,6 +25,8 @@ import {
   createInitialState,
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
+import { encodeResumeToken, buildResumeUrl } from '../vault-resume-token';
+import { exportVaultPack } from '../word-export';
 import { UseProgressHooksReturn } from './useProgressHooks';
 
 export interface UseHandlersReturn {
@@ -889,7 +891,28 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     }
   };
   const handleVaultExport = async () => {
-    throw new Error('handleVaultExport: not implemented until Phase 2');
+    if (!state.vaultResult) return;
+
+    const baseUrl =
+      typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : 'https://pitch-pack-tool-production.up.railway.app';
+    const resumeUrl = buildResumeUrl(baseUrl, state);
+
+    await exportVaultPack({
+      briefFilename: state.briefFilename || 'brief',
+      partnerName: state.brandAlignment?.brand || 'Partner',
+      vaultResult: state.vaultResult,
+      resumeUrl,
+    });
+
+    updateState({
+      vaultResult: {
+        ...state.vaultResult,
+        exportedAt: new Date().toISOString(),
+        resumeToken: encodeResumeToken(state),
+      },
+    });
   };
 
   return {

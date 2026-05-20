@@ -35,6 +35,7 @@ import { VaultAudiencePickerStep } from '@/components/steps/VaultAudiencePickerS
 import { VaultProductionBudgetStep } from '@/components/steps/VaultProductionBudgetStep';
 import { VaultMatchListStep } from '@/components/steps/VaultMatchListStep';
 import { VaultNarrativeDraftStep } from '@/components/steps/VaultNarrativeDraftStep';
+import { VaultExportStep } from '@/components/steps/VaultExportStep';
 import { MediaContextStep } from '@/components/steps/MediaContextStep';
 import { OutputStep } from '@/components/steps/OutputStep';
 
@@ -650,6 +651,8 @@ export default function Home() {
         return <VaultMatchListStep />;
       case 'vault_narrative_draft':
         return <VaultNarrativeDraftStep />;
+      case 'vault_export':
+        return <VaultExportStep />;
       case 'gate2_tenets':
         return <CreativeTenetsStep />;
       case 'gate2_media':
