@@ -3,7 +3,25 @@
 export type Status = 'green' | 'amber' | 'red';
 
 // Gate-based step flow
-export type Step = 'upload' | 'tell_me_more' | 'triage' | 'context' | 'gate1_sections' | 'gate_transition' | 'gate2_brand' | 'gate2_audience' | 'gate2_insights' | 'gate2_tenets' | 'gate2_media' | 'output';
+export type Step =
+  | 'upload'
+  | 'tell_me_more'
+  | 'triage'
+  | 'context'
+  | 'gate1_sections'
+  | 'gate_transition'
+  | 'gate2_brand'
+  | 'gate2_audience'
+  | 'gate2_insights'
+  | 'vault_decision'
+  | 'vault_audience_picker'
+  | 'vault_production_budget'
+  | 'vault_matches'
+  | 'vault_narrative_draft'
+  | 'vault_export'
+  | 'gate2_tenets'
+  | 'gate2_media'
+  | 'output';
 
 // Section keys by gate
 export type Gate1SectionKey = 'objective' | 'budget' | 'audience' | 'creative_task';
@@ -174,6 +192,15 @@ export interface SessionState {
   error: string | null;
   loading: boolean;
   loadingProgress: LoadingProgress | null;
+
+  // Vault fields (added 2026-05-21)
+  briefId: string;
+  productionBudgetUsd: number | null;
+  partnerType: VaultCategory | null;
+  vaultAudienceBranchIndex: number | 'all' | null;
+  vaultMatchPreview: VaultMatchPreview | null;
+  vaultResult: VaultResult | null;
+  resumedFromToken: boolean;
 }
 
 export function createInitialState(): SessionState {
@@ -216,6 +243,13 @@ export function createInitialState(): SessionState {
     error: null,
     loading: false,
     loadingProgress: null,
+    briefId: crypto.randomUUID(),
+    productionBudgetUsd: null,
+    partnerType: null,
+    vaultAudienceBranchIndex: null,
+    vaultMatchPreview: null,
+    vaultResult: null,
+    resumedFromToken: false,
   };
 }
 
@@ -428,4 +462,91 @@ export interface LoadingProgress {
   stage: LoadingStage;
   percent: number;
   startedAt: number;
+}
+
+// ============================================================================
+// Vault Types
+// ============================================================================
+
+export type VaultCategory =
+  | 'destination'
+  | 'lodging'
+  | 'airline'
+  | 'car'
+  | 'non-endemic';
+
+export type VaultConfidence = 'strong' | 'plausible' | 'stretch';
+
+export interface VaultConcept {
+  id: string;
+  name: string;
+  conceptType: 'one-off' | 'franchise';
+  category: VaultCategory;
+  archetype: string[];
+  ideaSummary: string;
+  creativeMechanism: string;
+  coreMessage: string;
+  whatItsGoodFor: string[];
+  audienceFit: string[];
+  channelsFormats: string[];
+  watchouts: string[];
+  previouslyPitchedTo: string[];
+  productionTimelineRaw: string | null;
+  productionTimeline: { minWeeks: number; maxWeeks: number } | null;
+  productionBudgetRaw: string | null;
+  productionBudget: { label: string; minUsd: number; maxUsd: number }[];
+  referenceLinks: string[];
+  lastValidated: string | null;
+  eraTags: string[];
+}
+
+export interface VaultContent {
+  sourceFile: string;
+  parsedAt: string;
+  concepts: VaultConcept[];
+}
+
+export interface VaultMatchPreview {
+  signal: 'strong' | 'plausible' | 'stretch' | 'none';
+  rankedCount: number;
+  topConceptName: string | null;
+  cachedAt: string;
+}
+
+export interface VaultConceptMatch {
+  conceptId: string;
+  conceptName: string;
+  slot: 'A' | 'B' | 'C' | 'D' | 'E';
+  confidence: VaultConfidence;
+  confidenceReason: string;
+  partnerTypeMatch: 'same-category' | 'adjacent';
+  budgetFlag: 'within-range' | 'close-to-edge';
+  conceptDescription: string;
+  estimatedProductionTimeline: string;
+  estimatedProductionBudget: string;
+  qualityFlags: ('too-destination-specific' | 'overly-generic')[];
+  referenceLinks: string[];
+}
+
+export interface NarrativeDraft {
+  conceptId: string;
+  slides: {
+    keyBriefPoints: string;
+    creativeProblemWeAreSolving: string;
+    narrativePitch: string;
+    conceptDescriptionFull: string;
+    tailoringTo: string;
+    strategicFitAndBudget: string;
+  };
+  creativeLabFlag: boolean;
+}
+
+export interface VaultResult {
+  rankedConcepts: VaultConceptMatch[];
+  selectedConceptIds: string[];
+  narrativeDrafts: Record<string, NarrativeDraft>;
+  customEdits: Record<string, string>;
+  exportedAt: string | null;
+  resumeToken: string | null;
+  topLineNote: string | null;
 }
