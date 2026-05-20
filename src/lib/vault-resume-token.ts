@@ -74,7 +74,10 @@ function fromBase64(input: string): string {
 export function encodeResumeToken(state: SessionState): string {
   const slice: Partial<ResumeSlice> = {};
   for (const key of SLICE_KEYS) {
-    (slice as any)[key] = state[key];
+    // Type assertion safe here: SLICE_KEYS is constrained to (keyof ResumeSlice)[],
+    // and ResumeSlice is `Pick<SessionState, ...>`, so state[key] always matches
+    // the expected shape of slice[key]. TypeScript can't narrow this generically.
+    (slice[key] as ResumeSlice[typeof key]) = state[key] as ResumeSlice[typeof key];
   }
   const json = JSON.stringify(slice);
   return toBase64(json);

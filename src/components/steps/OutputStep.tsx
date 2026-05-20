@@ -202,6 +202,9 @@ export function OutputStep() {
           <button
             onClick={() => {
               if (window.confirm('Are you sure? This will clear all your work.')) {
+                if (state.briefId) {
+                  clearSession(state.briefId);
+                }
                 updateState(createInitialState());
               }
             }}
