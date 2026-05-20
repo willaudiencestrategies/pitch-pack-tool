@@ -14,13 +14,25 @@ export function CreativeTenetsStep() {
   }
 
   return (
-    <CreativeTenets
-      audience={state.selectedAudienceSegment}
-      insights={state.selectedInsights}
-      onConfirm={handleConfirmTenets}
-      onBack={() => updateState({ step: 'gate2_insights' })}
-      onGenerate={handleGenerateTenets}
-      loading={state.loading}
-    />
+    <>
+      {state.resumedFromToken && state.vaultResult && (
+        <div className="bg-[var(--bg-tertiary)] border-l-4 border-[var(--status-amber)] p-4 mb-6 rounded">
+          <div className="font-medium mb-1">Returning from a Vault attempt</div>
+          <div className="text-sm text-[var(--text-muted)]">
+            The buying client didn&apos;t go for the Vault concept. Earlier matches surfaced:{' '}
+            {state.vaultResult.rankedConcepts.map((m) => m.conceptName).join(', ')}.
+            Continuing through Creative Tenets for net-new ideation.
+          </div>
+        </div>
+      )}
+      <CreativeTenets
+        audience={state.selectedAudienceSegment}
+        insights={state.selectedInsights}
+        onConfirm={handleConfirmTenets}
+        onBack={() => updateState({ step: 'gate2_insights' })}
+        onGenerate={handleGenerateTenets}
+        loading={state.loading}
+      />
+    </>
   );
 }

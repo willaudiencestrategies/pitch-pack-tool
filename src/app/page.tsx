@@ -21,6 +21,7 @@ import {
 import { BriefStateProvider, BriefStateContextValue } from '@/lib/state/BriefStateContext';
 import { useHandlers } from '@/lib/state/useHandlers';
 import { useProgressHooks } from '@/lib/state/useProgressHooks';
+import { decodeResumeToken } from '@/lib/vault-resume-token';
 import { UploadStep } from '@/components/steps/UploadStep';
 import { TellMeMoreStep } from '@/components/steps/TellMeMoreStep';
 import { TriageStep } from '@/components/steps/TriageStep';
@@ -396,8 +397,36 @@ export default function Home() {
   // Session Persistence
   // ============================================
 
+  // Resume-token re-entry: check URL for ?resume= on mount BEFORE session restore.
+  // If a valid token is present, restore the brief slice, route to gate2_tenets,
+  // and clean the URL. Takes precedence over the localStorage restore prompt.
+  const resumedFromTokenRef = useRef(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    const token = url.searchParams.get('resume');
+    if (!token) return;
+
+    const slice = decodeResumeToken(token);
+    if (!slice) return;
+
+    resumedFromTokenRef.current = true;
+    updateState({
+      ...slice,
+      step: 'gate2_tenets',
+      resumedFromToken: true,
+    });
+    setShowRestorePrompt(false);
+
+    // Clean the URL so refresh doesn't re-trigger
+    url.searchParams.delete('resume');
+    window.history.replaceState({}, '', url.toString());
+  }, []);
+
   // Check for stored session on mount
   useEffect(() => {
+    // Skip if a resume token already restored state
+    if (resumedFromTokenRef.current) return;
     const stored = loadSession();
     if (stored && stored.state.step !== 'upload') {
       setSessionSavedAt(getSessionSavedAt());
