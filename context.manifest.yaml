@@ -1,0 +1,19 @@
+goal: "AI-powered creative brief interrogation and enhancement tool for Expedia Group brands"
+description: "Next.js application deployed on Railway — analyses briefs via multi-persona triage, builds sections with four-option spectrum, generates audiences and human truths"
+species: outcome
+status: active
+version: v0.1
+sensitivity: private
+pii: false
+created: 2026-03-31
+updated: 2026-03-31
+squirrels: []
+sources: []
+linked_bundles: ["[[reference-library]]", "[[communications]]", "[[docs]]", "[[v1.7-feedback-response]]", "[[v1.8-launch-sprint]]"]
+tags: [codebase, nextjs, pitch-pack-tool, expedia, ai-tool, deployed]
+context: |
+  Live Next.js 16 + React 19 application using Anthropic Claude API for brief analysis. Deployed on Railway at pitch-pack-tool-production.up.railway.app. The tool walks users through brief upload, multi-persona triage (5 expert personas), section-by-section review with a four-option builder spectrum (lifted directly through ruthless clarity), audience generation with personification, and 12 human truths on a safer-to-bolder spectrum.
+
+  Supports Expedia, Hotels.com, and Vrbo brand alignment with demographic fit scoring. Features include session persistence, Word/PDF upload, .docx export, per-section AI research prompts, and editable JSON prompt configs. Tech stack includes Tailwind CSS 4, Vitest, mammoth.js for document parsing. Currently at v1.8+ with 47+ tests passing.
+
+  This is a graduated codebase bundle — lives in place, not inside bundles/.
