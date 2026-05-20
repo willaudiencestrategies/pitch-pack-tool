@@ -1,108 +1,12 @@
 'use client';
 
 import { useBriefState } from '@/lib/state/BriefStateContext';
-import { GATE1_SECTION_KEYS, CoherenceTension, Status } from '@/lib/types';
-
-function BackButton({ onClick, label = 'Back' }: { onClick: () => void; label?: string }) {
-  return (
-    <button
-      onClick={onClick}
-      className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors"
-    >
-      ← {label}
-    </button>
-  );
-}
-
-function StatusBadge({ status }: { status: Status }) {
-  const config = {
-    green: { className: 'status-green', label: 'Good', icon: '✓' },
-    amber: { className: 'status-amber', label: 'Needs Work', icon: '!' },
-    red: { className: 'status-red', label: 'Missing', icon: '✗' },
-  };
-  const { className, label, icon } = config[status];
-
-  return (
-    <span className={`status-badge ${className}`}>
-      <span
-        className="text-xs"
-        style={{
-          display: 'inline-block',
-          animation: 'scaleIn 0.2s ease-out',
-        }}
-      >
-        {icon}
-      </span>
-      {label}
-      <style jsx>{`
-        @keyframes scaleIn {
-          from {
-            transform: scale(0);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-      `}</style>
-    </span>
-  );
-}
-
-function Spinner({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      className={`animate-spin h-4 w-4 ${className}`}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ReassessConfirmation({ count }: { count: number }) {
-  if (count === 0) return null;
-
-  return (
-    <div
-      className="p-3 rounded-lg bg-[var(--status-green)]/10 text-[var(--status-green)] text-sm font-medium flex items-center gap-2"
-      style={{ animation: 'slideIn 0.3s ease-out' }}
-    >
-      <span>✓</span>
-      <span>Reassessed with new context ({count}x)</span>
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function ReturnToOutputButton() {
-  const { state, updateState } = useBriefState();
-  if (!state.hasReachedOutput || state.step === 'output') return null;
-  return (
-    <button
-      onClick={() => updateState({ step: 'output', currentGate: 'output' })}
-      className="text-sm text-[var(--expedia-navy)] hover:text-[var(--expedia-navy-dark)] font-medium flex items-center gap-1 transition-colors"
-    >
-      Return to Output →
-    </button>
-  );
-}
+import { GATE1_SECTION_KEYS, CoherenceTension } from '@/lib/types';
+import { BackButton } from '@/components/steps/shared/BackButton';
+import { StatusBadge } from '@/components/steps/shared/StatusBadge';
+import { Spinner } from '@/components/steps/shared/Spinner';
+import { ReassessConfirmation } from '@/components/steps/shared/ReassessConfirmation';
+import { ReturnToOutputButton } from '@/components/steps/shared/ReturnToOutputButton';
 
 export function TriageStep() {
   const { state, updateState, handlers } = useBriefState();
