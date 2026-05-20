@@ -6,29 +6,10 @@ import { useState, useEffect, useRef } from 'react';
 import {
   SessionState,
   Section,
-  Truth,
-  Status,
   Step,
   createInitialState,
-  EnhancedTriageResponse,
-  SectionResponse,
-  TruthsResponse,
-  OutputResponse,
-  AudienceSegment,
-  AudienceSegmentMenu,
-  AudiencePrioritisation,
-  PersonificationResponse,
-  OptionLevel,
-  SectionOptionsResponse,
-  SECTION_CONFIG,
-  SECTION_KEYS,
   GATE1_SECTION_KEYS,
-  CreativeTenetsResponse,
-  CreativeTenet,
-  CoherenceAnalysis,
-  CoherenceTension,
   HistoryEntry,
-  AudienceBranch,
 } from '@/lib/types';
 import {
   saveSession,
@@ -37,15 +18,6 @@ import {
   getSessionSavedAt,
   getSessionTimeRemaining,
 } from '@/lib/session-storage';
-import { SectionOptions } from '@/components/SectionOptions';
-import { AudienceMenu } from '@/components/AudienceMenu';
-import { PersonificationReview } from '@/components/PersonificationReview';
-import { FileUpload } from '@/components/FileUpload';
-import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
-import { logAnalytics, captureBriefScore } from '@/lib/analytics';
-import { LoadingProgress } from '@/components/LoadingProgress';
-import { TRIAGE_STAGES, AUDIENCE_STAGES, INSIGHTS_STAGES } from '@/lib/loading-config';
-import { useLoadingProgress } from '@/hooks/useLoadingProgress';
 import { BriefStateProvider, BriefStateContextValue } from '@/lib/state/BriefStateContext';
 import { useHandlers } from '@/lib/state/useHandlers';
 import { useProgressHooks } from '@/lib/state/useProgressHooks';
@@ -60,107 +32,10 @@ import { InsightsStep } from '@/components/steps/InsightsStep';
 import { CreativeTenetsStep } from '@/components/steps/CreativeTenetsStep';
 import { MediaContextStep } from '@/components/steps/MediaContextStep';
 import { OutputStep } from '@/components/steps/OutputStep';
-import { Spinner } from '@/components/steps/shared/Spinner';
-import { ReassessConfirmation } from '@/components/steps/shared/ReassessConfirmation';
-import { ReturnToOutputButton } from '@/components/steps/shared/ReturnToOutputButton';
-
-// ============================================
-// Constants
-// ============================================
 
 // ============================================
 // Helper Components
 // ============================================
-
-function EditButton({ onClick, children = 'Edit', className = '' }: { onClick: () => void; children?: React.ReactNode; className?: string }) {
-  return (
-    <button onClick={onClick} className={`btn-edit ${className}`}>
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>
-      {children}
-    </button>
-  );
-}
-
-function LoadingOverlay({ message, subMessage }: { message: string; subMessage?: string }) {
-  return (
-    <div
-      className="flex flex-col items-center justify-center py-16 px-8"
-      style={{ animation: 'fadeIn 0.3s ease-out' }}
-    >
-      {/* Animated dots */}
-      <div className="flex gap-2 mb-6">
-        <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
-          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '0ms' }}
-        />
-        <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
-          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '160ms' }}
-        />
-        <div
-          className="w-3 h-3 rounded-full bg-[var(--expedia-navy)]"
-          style={{ animation: 'dotBounce 1.4s ease-in-out infinite', animationDelay: '320ms' }}
-        />
-      </div>
-
-      {/* Main message */}
-      <p className="text-lg font-medium text-[var(--text-primary)] text-center">{message}</p>
-
-      {/* Sub message */}
-      {subMessage && (
-        <p className="text-sm text-[var(--text-muted)] mt-2 text-center">{subMessage}</p>
-      )}
-
-      {/* Gradient progress bar */}
-      <div className="w-48 h-1.5 bg-[var(--bg-tertiary)] rounded-full mt-6 overflow-hidden">
-        <div
-          className="h-full rounded-full"
-          style={{
-            background: 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))',
-            backgroundSize: '200% 100%',
-            animation: 'gradientSlide 2s ease-in-out infinite',
-          }}
-        />
-      </div>
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes dotBounce {
-          0%, 80%, 100% {
-            transform: scale(1);
-            opacity: 0.6;
-          }
-          40% {
-            transform: scale(1.2);
-            opacity: 1;
-          }
-        }
-        @keyframes gradientSlide {
-          0% {
-            background-position: 100% 0;
-          }
-          50% {
-            background-position: 0% 0;
-          }
-          100% {
-            background-position: 100% 0;
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
 
 function ErrorBanner({
   message,
@@ -312,127 +187,6 @@ function RestoreSessionPrompt({
   );
 }
 
-function ProgressBar({ current, total }: { current: number; total: number }) {
-  return (
-    <div className="mt-8">
-      <div className="flex justify-between text-sm text-[var(--text-muted)] mb-2">
-        <span>Progress</span>
-        <span>
-          {current + 1} of {total}
-        </span>
-      </div>
-      <div className="flex gap-1.5">
-        {Array.from({ length: total }, (_, i) => (
-          <div
-            key={i}
-            className="h-1.5 flex-1 rounded-full overflow-hidden bg-[var(--border-color)]"
-          >
-            <div
-              className="h-full rounded-full"
-              style={{
-                width: i < current ? '100%' : i === current ? '100%' : '0%',
-                background: i <= current
-                  ? 'linear-gradient(90deg, var(--expedia-navy), var(--expedia-yellow), var(--expedia-navy))'
-                  : 'transparent',
-                opacity: i < current ? 0.6 : i === current ? 1 : 0,
-                transition: 'width 0.5s ease-out, opacity 0.3s ease-out',
-              }}
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function BranchProgress({ branches, currentIndex }: { branches: AudienceBranch[]; currentIndex: number }) {
-  if (branches.length <= 1) return null;
-
-  return (
-    <div className="flex items-center gap-2 mb-4">
-      {branches.map((branch, i) => (
-        <div
-          key={i}
-          className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-            i === currentIndex
-              ? 'bg-[var(--expedia-navy)] text-white'
-              : i < currentIndex
-              ? 'bg-[var(--status-green)]/20 text-[var(--status-green)]'
-              : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)]'
-          }`}
-        >
-          {i < currentIndex && <span className="mr-1">✓</span>}
-          {branch.segment.name}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ResearchSuggestions({ gaps }: { gaps: string[] }) {
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [copied, setCopied] = useState<string | null>(null);
-
-  const prompts = getSuggestedPrompts(gaps);
-
-  if (prompts.length === 0) return null;
-
-  const handleCopy = async (prompt: ResearchPrompt) => {
-    try {
-      await navigator.clipboard.writeText(prompt.prompt);
-      setCopied(prompt.id);
-      setTimeout(() => setCopied(null), 2000);
-    } catch {
-      // Clipboard API failed silently
-    }
-  };
-
-  return (
-    <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-lg">💡</span>
-        <span className="font-medium text-[var(--text-primary)]">Try asking an LLM</span>
-      </div>
-      <p className="text-sm text-[var(--text-muted)] mb-4">
-        These prompts can help you research gaps in your brief. Copy and paste into ChatGPT, Claude, or your preferred AI assistant.
-      </p>
-      <div className="space-y-2">
-        {prompts.map((prompt) => (
-          <div
-            key={prompt.id}
-            className="border border-[var(--border-color)] rounded-lg overflow-hidden"
-          >
-            <button
-              onClick={() => setExpanded(expanded === prompt.id ? null : prompt.id)}
-              className="w-full flex items-center justify-between p-3 text-left hover:bg-[var(--bg-tertiary)] transition-colors"
-            >
-              <span className="font-medium text-sm text-[var(--text-primary)]">
-                {prompt.title}
-              </span>
-              <span className="text-[var(--text-muted)]">
-                {expanded === prompt.id ? '▼' : '▶'}
-              </span>
-            </button>
-            {expanded === prompt.id && (
-              <div className="p-3 pt-0 border-t border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                <pre className="whitespace-pre-wrap text-sm text-[var(--text-secondary)] font-mono mb-3 leading-relaxed">
-                  {prompt.prompt}
-                </pre>
-                <button
-                  onClick={() => handleCopy(prompt)}
-                  className="text-xs text-[var(--expedia-navy)] hover:underline"
-                >
-                  {copied === prompt.id ? '✓ Copied!' : 'Copy prompt'}
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // Global progress indicator with sliding focus design
 // Current step is prominent with scale animation, completed steps show green checkmarks,
 // future steps are muted dots, gradient lines connect steps
@@ -441,7 +195,6 @@ function GlobalProgressBar({
   sectionIndex,
   totalSections,
   sections,
-  currentGate,
   onNavigate,
 }: {
   step: string;
@@ -627,9 +380,6 @@ export default function Home() {
   const [sessionSavedAt, setSessionSavedAt] = useState<string | null>(null);
   const [sessionTimeRemaining, setSessionTimeRemaining] = useState<string | null>(null);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const triageProgress = useLoadingProgress(TRIAGE_STAGES);
-  const audienceProgress = useLoadingProgress(AUDIENCE_STAGES);
-  const insightsProgress = useLoadingProgress(INSIGHTS_STAGES);
 
   // State update helper
   const updateState = (updates: Partial<SessionState>) => {
@@ -716,10 +466,8 @@ export default function Home() {
   };
 
   // ============================================
-  // New context bag (Task 5)
-  // Runs in parallel with the inline closures below until Tasks 6-16
-  // progressively delete the inline closures. Placed after pushHistory
-  // is declared so useHandlers' dep is in scope.
+  // Context bag wiring — progress hooks + handler bag flow through
+  // BriefStateProvider to the extracted step components.
   // ============================================
   const progress = useProgressHooks();
   const handlers = useHandlers({
@@ -759,6 +507,30 @@ export default function Home() {
         ...nextEntry.state,
         historyIndex: prev.historyIndex + 1,
       }));
+    }
+  };
+
+  // Navigation helpers for two-gate flow (used by FloatingNavButtons and ErrorBanner Skip)
+  const goToNextGate1Section = () => {
+    // Get only Gate 1 sections
+    const gate1Sections = state.sections.filter((s) =>
+      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
+    );
+    const nextIndex = state.currentSectionIndex + 1;
+
+    if (nextIndex < gate1Sections.length) {
+      updateState({ currentSectionIndex: nextIndex });
+    } else {
+      // Finished Gate 1, go to transition
+      updateState({ step: 'gate_transition' });
+    }
+  };
+
+  const goToPreviousGate1Section = () => {
+    if (state.currentSectionIndex > 0) {
+      updateState({ currentSectionIndex: state.currentSectionIndex - 1 });
+    } else {
+      updateState({ step: 'triage' });
     }
   };
 
@@ -838,519 +610,6 @@ export default function Home() {
       updateState({ currentSectionIndex: 0 });
     }
   };
-
-  // ============================================
-  // API Handlers
-  // ============================================
-
-  const handleTriage = async () => {
-    if (!state.brief.trim()) {
-      updateState({ error: 'Please paste your brief first' });
-      return;
-    }
-
-    updateState({ loading: true, error: null });
-    setLastAction(() => handleTriage);
-    triageProgress.runSimulatedProgress();
-
-    try {
-      const response = await fetch('/api/triage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brief: state.brief }),
-      });
-
-      if (!response.ok) throw new Error('Failed to assess brief');
-
-      const data: EnhancedTriageResponse = await response.json();
-
-      // Defensive: ensure triageAssessment is an array
-      const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
-
-      // Transform EnhancedTriageResponse into Section[] for UI
-      const sections: Section[] = triageAssessment.map((result) => ({
-        key: result.key,
-        name: SECTION_CONFIG[result.key]?.name || result.key,
-        status: result.status || 'red',
-        // Prefer verbatimQuotes (actual brief content) over synthesizedContent (AI interpretation)
-        content: result.verbatimQuotes?.length
-          ? result.verbatimQuotes.join('\n\n')
-          : result.synthesizedContent || '',
-        feedback: (result.whyThisRating || '') + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
-        questions: result.questions || [],
-        gaps: [...(result.contradictions || []), ...(result.vagueness || [])],
-      }));
-
-      // If no sections came back, something went wrong
-      if (sections.length === 0) {
-        throw new Error('No sections returned from triage');
-      }
-
-      triageProgress.complete();
-      updateState({
-        sections,
-        triageResult: data,
-        step: 'triage',
-        loading: false,
-      });
-    } catch (err) {
-      triageProgress.reset();
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleTriageReassess = async () => {
-    if (!state.brief.trim()) {
-      updateState({ error: 'Please paste your brief first' });
-      return;
-    }
-
-    updateState({ loading: true, error: null });
-    setLastAction(() => handleTriageReassess);
-    triageProgress.runSimulatedProgress();
-
-    try {
-      const response = await fetch('/api/triage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief: state.brief,
-          additionalContext: state.additionalContext,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to reassess brief');
-
-      const data: EnhancedTriageResponse = await response.json();
-
-      // Defensive: ensure triageAssessment is an array
-      const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
-
-      // Transform EnhancedTriageResponse into Section[] for UI
-      const sections: Section[] = triageAssessment.map((result) => ({
-        key: result.key,
-        name: SECTION_CONFIG[result.key]?.name || result.key,
-        status: result.status || 'red',
-        content: result.verbatimQuotes?.length
-          ? result.verbatimQuotes.join('\n\n')
-          : result.synthesizedContent || '',
-        feedback: (result.whyThisRating || '') + (result.whatNeeded ? `\n\nNeeded: ${result.whatNeeded}` : ''),
-        questions: result.questions || [],
-        gaps: [...(result.contradictions || []), ...(result.vagueness || [])],
-      }));
-
-      if (sections.length === 0) {
-        throw new Error('No sections returned from triage');
-      }
-
-      triageProgress.complete();
-      updateState({
-        sections,
-        triageResult: data,
-        reassessCount: state.reassessCount + 1,
-        lastReassessedAt: new Date().toISOString(),
-        loading: false,
-      });
-    } catch (err) {
-      triageProgress.reset();
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleSectionReassess = async (additionalInfo: string) => {
-    const section = state.sections[state.currentSectionIndex];
-
-    // Push current state to history before reassessing
-    pushHistory(`Reassess ${section.name}`, { sections: [...state.sections] });
-
-    updateState({ loading: true, error: null });
-    setLastAction(() => () => handleSectionReassess(additionalInfo));
-
-    try {
-      const response = await fetch('/api/section', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sectionKey: section.key,
-          brief: state.brief,
-          currentContent: section.content,
-          additionalContext: state.additionalContext + '\n' + additionalInfo,
-          action: 'reassess',
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to reassess section');
-
-      const data: SectionResponse = await response.json();
-
-      const updatedSections = [...state.sections];
-      updatedSections[state.currentSectionIndex] = {
-        ...section,
-        status: data.status,
-        // content stays as-is until user accepts suggestion
-        feedback: data.feedback,
-        suggestion: data.suggestion,  // This shows in the suggestion box
-        questions: data.questions,
-      };
-
-      updateState({
-        sections: updatedSections,
-        additionalContext: state.additionalContext + '\n' + additionalInfo,
-        loading: false,
-      });
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleSectionGenerate = async () => {
-    const section = state.sections[state.currentSectionIndex];
-    updateState({ loading: true, error: null });
-    setLastAction(() => handleSectionGenerate);
-
-    try {
-      const response = await fetch('/api/section', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sectionKey: section.key,
-          brief: state.brief,
-          currentContent: section.content,
-          additionalContext: state.additionalContext,
-          action: 'generate',
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to generate suggestion');
-
-      const data: SectionResponse = await response.json();
-
-      const updatedSections = [...state.sections];
-      updatedSections[state.currentSectionIndex] = {
-        ...section,
-        suggestion: data.suggestion,
-      };
-
-      updateState({ sections: updatedSections, loading: false });
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleGenerateAudience = async (feedback?: string) => {
-    // Update step immediately so progress bar shows Audience during loading
-    updateState({ loading: true, error: null, step: 'gate2_audience' });
-    setLastAction(() => () => handleGenerateAudience(feedback));
-    audienceProgress.runSimulatedProgress();
-
-    try {
-      const response = await fetch('/api/generate/audience', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief: state.brief,
-          additionalContext: state.additionalContext,
-          feedback,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to generate audience options');
-
-      const data: AudienceSegmentMenu = await response.json();
-      audienceProgress.complete();
-      updateState({
-        audienceMenu: data,
-        loading: false,
-      });
-    } catch (err) {
-      audienceProgress.reset();
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleSelectAudience = async (segments: AudienceSegment[], prioritisation: AudiencePrioritisation) => {
-    // Create branches for all selected segments (primary + secondary)
-    // Primary is always first, secondary segments follow
-    const allSegments = [prioritisation.primary, ...prioritisation.secondary];
-    const branches: AudienceBranch[] = allSegments.map(segment => ({
-      segment,
-      personification: null,
-      insights: [],
-    }));
-
-    // Start with the first branch (primary segment)
-    const primarySegment = prioritisation.primary;
-
-    updateState({
-      loading: true,
-      error: null,
-      selectedAudienceSegment: primarySegment,
-      audiencePrioritisation: prioritisation,
-      audienceBranches: branches,
-      currentBranchIndex: 0,
-    });
-    setLastAction(() => () => handleSelectAudience(segments, prioritisation));
-
-    try {
-      const response = await fetch('/api/generate/audience', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief: state.brief,
-          additionalContext: state.additionalContext,
-          selectedSegment: primarySegment,
-          secondarySegments: prioritisation.secondary.map(s => s.name),
-          isMerged: false,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to personify audience');
-
-      const data: PersonificationResponse = await response.json();
-
-      // Update the first branch with the personification
-      const updatedBranches = [...branches];
-      updatedBranches[0] = { ...updatedBranches[0], personification: data };
-
-      updateState({
-        personification: data,
-        audienceBranches: updatedBranches,
-        loading: false,
-      });
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  // Generate personification for a specific branch segment (used when processing multiple audiences)
-  const handleGeneratePersonificationForBranch = async (segment: AudienceSegment) => {
-    updateState({ loading: true, error: null });
-    setLastAction(() => () => handleGeneratePersonificationForBranch(segment));
-
-    try {
-      const response = await fetch('/api/generate/audience', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief: state.brief,
-          additionalContext: state.additionalContext,
-          selectedSegment: segment,
-          isMerged: false,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to personify audience');
-
-      const data: PersonificationResponse = await response.json();
-
-      // Update the current branch with the personification
-      const updatedBranches = [...state.audienceBranches];
-      if (updatedBranches[state.currentBranchIndex]) {
-        updatedBranches[state.currentBranchIndex] = {
-          ...updatedBranches[state.currentBranchIndex],
-          personification: data,
-        };
-      }
-
-      updateState({
-        personification: data,
-        audienceBranches: updatedBranches,
-        loading: false,
-      });
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  const handleGenerateInsights = async () => {
-    if (!state.selectedAudienceSegment || !state.personification) return;
-
-    // Update step immediately so progress bar shows Insights during loading
-    updateState({ loading: true, error: null, step: 'gate2_insights' });
-    setLastAction(() => handleGenerateInsights);
-    insightsProgress.runSimulatedProgress();
-
-    try {
-      const response = await fetch('/api/generate/truths', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          audience: state.selectedAudienceSegment,
-          personification: state.personification.narrative,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to generate insights');
-
-      const data: TruthsResponse = await response.json();
-      insightsProgress.complete();
-      updateState({
-        insightOptions: data.truths,
-        loading: false,
-      });
-    } catch (err) {
-      insightsProgress.reset();
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  // Generate Creative Tenets (Gate 2)
-  const handleGenerateTenets = async (): Promise<CreativeTenetsResponse> => {
-    if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
-      throw new Error('Audience and insights required');
-    }
-
-    updateState({ loading: true, error: null });
-    setLastAction(() => () => handleGenerateTenets());
-
-    try {
-      // Get objective from sections
-      const objectiveSection = state.sections.find((s) => s.key === 'objective');
-      const objective = objectiveSection?.content || '';
-
-      const response = await fetch('/api/generate/tenets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brief: state.brief,
-          objective,
-          audience: state.selectedAudienceSegment,
-          insights: state.selectedInsights,
-          additionalContext: state.additionalContext,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to generate tenets');
-
-      const data: CreativeTenetsResponse = await response.json();
-      updateState({ loading: false });
-      return data;
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-      throw err;
-    }
-  };
-
-  // Confirm tenets and continue to media step
-  const handleConfirmTenets = (tenets: CreativeTenet[]) => {
-    pushHistory('Confirm creative tenets', { sections: [...state.sections] });
-    const updatedSections = [...state.sections];
-    const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
-    if (tenetsIndex >= 0) {
-      const content = tenets.map((t) => {
-        const dots = t.explanation.map((e) => `- ${e}`).join('\n');
-        return `**${t.headline}**\n${dots}\nDifferentiator: ${t.differentiator}`;
-      }).join('\n\n');
-      updatedSections[tenetsIndex] = {
-        ...updatedSections[tenetsIndex],
-        status: 'green',
-        content,
-      };
-    }
-    updateState({
-      sections: updatedSections,
-      step: 'gate2_media',
-    });
-  };
-
-  const handleCompileOutput = async () => {
-    updateState({ loading: true, error: null });
-    setLastAction(() => handleCompileOutput);
-
-    try {
-      const response = await fetch('/api/output', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sections: state.sections,
-          audience: state.selectedAudienceSegment,
-          personification: state.personification?.narrative || '',
-          selectedInsights: state.selectedInsights,
-          includeResearchStimuli: state.includeResearchStimuli,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to compile output');
-
-      const data: OutputResponse = await response.json();
-
-      // Log analytics when output is generated
-      logAnalytics(captureBriefScore(state));
-
-      // Store markdown for inline display
-      updateState({
-        step: 'output',
-        loading: false,
-        outputMarkdown: data.markdown,
-      });
-    } catch (err) {
-      updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
-        loading: false,
-      });
-    }
-  };
-
-  // Navigation helpers for two-gate flow
-  const goToNextGate1Section = () => {
-    // Get only Gate 1 sections
-    const gate1Sections = state.sections.filter((s) =>
-      GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
-    );
-    const nextIndex = state.currentSectionIndex + 1;
-
-    if (nextIndex < gate1Sections.length) {
-      updateState({ currentSectionIndex: nextIndex });
-    } else {
-      // Finished Gate 1, go to transition
-      updateState({ step: 'gate_transition' });
-    }
-  };
-
-  const goToPreviousGate1Section = () => {
-    if (state.currentSectionIndex > 0) {
-      updateState({ currentSectionIndex: state.currentSectionIndex - 1 });
-    } else {
-      updateState({ step: 'triage' });
-    }
-  };
-
-  // ============================================
-  // Step Renderers
-  // ============================================
-
-
-  // Gate Transition step renderer
-  // Brand Alignment step renderer (Gate 2)
-  // Creative Tenets step renderer (Gate 2)
-  // Media Context step renderer (Gate 2)
 
   // ============================================
   // Main Render
