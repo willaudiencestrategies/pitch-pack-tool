@@ -42,7 +42,6 @@ import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
 import { FileUpload } from '@/components/FileUpload';
-import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
 import { exportToWord } from '@/lib/word-export';
@@ -61,6 +60,7 @@ import { GateTransitionStep } from '@/components/steps/GateTransitionStep';
 import { BrandAlignmentStep } from '@/components/steps/BrandAlignmentStep';
 import { Gate2AudienceStep } from '@/components/steps/Gate2AudienceStep';
 import { InsightsStep } from '@/components/steps/InsightsStep';
+import { CreativeTenetsStep } from '@/components/steps/CreativeTenetsStep';
 import { BackButton } from '@/components/steps/shared/BackButton';
 import { StatusBadge } from '@/components/steps/shared/StatusBadge';
 import { Spinner } from '@/components/steps/shared/Spinner';
@@ -1353,25 +1353,6 @@ export default function Home() {
   // Gate Transition step renderer
   // Brand Alignment step renderer (Gate 2)
   // Creative Tenets step renderer (Gate 2)
-  const renderCreativeTenetsStep = () => {
-    if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
-      // Redirect back to insights if missing required data
-      updateState({ step: 'gate2_insights' });
-      return null;
-    }
-
-    return (
-      <CreativeTenets
-        audience={state.selectedAudienceSegment}
-        insights={state.selectedInsights}
-        onConfirm={handleConfirmTenets}
-        onBack={() => updateState({ step: 'gate2_insights' })}
-        onGenerate={handleGenerateTenets}
-        loading={state.loading}
-      />
-    );
-  };
-
   // Media Context step renderer (Gate 2)
   const renderMediaContextStep = () => {
     // Get the media_context section
@@ -1826,7 +1807,7 @@ export default function Home() {
       case 'gate2_insights':
         return <InsightsStep />;
       case 'gate2_tenets':
-        return renderCreativeTenetsStep();
+        return <CreativeTenetsStep />;
       case 'gate2_media':
         return renderMediaContextStep();
       case 'output':
