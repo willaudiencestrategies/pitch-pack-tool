@@ -44,7 +44,6 @@ import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
 import { FileUpload } from '@/components/FileUpload';
 import { BrandAlignment } from '@/components/BrandAlignment';
-import { GateTransition } from '@/components/GateTransition';
 import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
@@ -60,6 +59,7 @@ import { UploadStep } from '@/components/steps/UploadStep';
 import { TellMeMoreStep } from '@/components/steps/TellMeMoreStep';
 import { TriageStep } from '@/components/steps/TriageStep';
 import { Gate1SectionsStep } from '@/components/steps/Gate1SectionsStep';
+import { GateTransitionStep } from '@/components/steps/GateTransitionStep';
 import { BackButton } from '@/components/steps/shared/BackButton';
 import { StatusBadge } from '@/components/steps/shared/StatusBadge';
 import { Spinner } from '@/components/steps/shared/Spinner';
@@ -1358,25 +1358,6 @@ export default function Home() {
 
 
   // Gate Transition step renderer
-  const renderGateTransitionStep = () => {
-    return (
-      <GateTransition
-        sections={state.sections}
-        onContinue={() => updateState({ step: 'gate2_brand', currentGate: 'gate2' })}
-        onBack={() => {
-          // Go back to last Gate 1 section
-          const gate1Sections = state.sections.filter((s) =>
-            GATE1_SECTION_KEYS.includes(s.key as typeof GATE1_SECTION_KEYS[number])
-          );
-          updateState({
-            step: 'gate1_sections',
-            currentSectionIndex: gate1Sections.length - 1,
-          });
-        }}
-      />
-    );
-  };
-
   // Brand Alignment step renderer (Gate 2)
   const renderBrandAlignmentStep = () => {
     return (
@@ -2265,7 +2246,7 @@ export default function Home() {
       case 'gate1_sections':
         return <Gate1SectionsStep />;
       case 'gate_transition':
-        return renderGateTransitionStep();
+        return <GateTransitionStep />;
       case 'gate2_brand':
         return renderBrandAlignmentStep();
       case 'gate2_audience':
