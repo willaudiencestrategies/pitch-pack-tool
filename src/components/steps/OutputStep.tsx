@@ -90,7 +90,9 @@ export function OutputStep() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     // Clear session after successful download
-    clearSession();
+    if (state.briefId) {
+      clearSession(state.briefId);
+    }
   };
 
   // Show inline output if we have it

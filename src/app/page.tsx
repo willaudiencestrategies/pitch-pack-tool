@@ -433,7 +433,9 @@ export default function Home() {
 
   // Start fresh (clear stored session)
   const startFresh = () => {
-    clearSession();
+    if (state.briefId) {
+      clearSession(state.briefId);
+    }
     setShowRestorePrompt(false);
   };
 

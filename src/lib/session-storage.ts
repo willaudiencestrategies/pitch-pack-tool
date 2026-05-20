@@ -1,10 +1,12 @@
 // src/lib/session-storage.ts
-// Session persistence with localStorage
+// Per-briefId session persistence with localStorage, 30-day expiry.
 
-import { SessionState, createInitialState } from './types';
+import { SessionState } from './types';
 
-const STORAGE_KEY = 'pitch-pack-session';
-const EXPIRY_HOURS = 24;
+const STORAGE_PREFIX = 'pitch-pack-session:';
+const LEGACY_KEY = 'pitch-pack-session';
+export const MIGRATED_FROM_LEGACY_KEY = 'pitch-pack-legacy-migrated-at';
+const EXPIRY_DAYS = 30;
 
 export interface StoredSession {
   state: SessionState;
@@ -12,79 +14,132 @@ export interface StoredSession {
   expiresAt: string;
 }
 
-/**
- * Save session state to localStorage with 24-hour expiry
- */
+function isBrowser(): boolean {
+  return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+}
+
+function expiry(): Date {
+  return new Date(Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+}
+
+function keyFor(briefId: string): string {
+  return `${STORAGE_PREFIX}${briefId}`;
+}
+
 export function saveSession(state: SessionState): void {
-  if (typeof window === 'undefined') return;
-
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + EXPIRY_HOURS * 60 * 60 * 1000);
-
-  const storedSession: StoredSession = {
+  if (!isBrowser()) return;
+  if (!state.briefId) {
+    state.briefId = crypto.randomUUID();
+  }
+  const stored: StoredSession = {
     state,
-    savedAt: now.toISOString(),
-    expiresAt: expiresAt.toISOString(),
+    savedAt: new Date().toISOString(),
+    expiresAt: expiry().toISOString(),
   };
-
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedSession));
-  } catch (error) {
-    // localStorage might be full or disabled
-    console.warn('Failed to save session:', error);
+    localStorage.setItem(keyFor(state.briefId), JSON.stringify(stored));
+  } catch (err) {
+    console.warn('Failed to save session:', err);
   }
 }
 
-/**
- * Load session from localStorage if not expired
- * Returns null if no valid session exists
- */
-export function loadSession(): StoredSession | null {
-  if (typeof window === 'undefined') return null;
-
+export function getSessionByBriefId(briefId: string): StoredSession | null {
+  if (!isBrowser()) return null;
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
-
-    const session: StoredSession = JSON.parse(stored);
-
-    // Check expiry
-    if (new Date(session.expiresAt) <= new Date()) {
-      clearSession();
+    const raw = localStorage.getItem(keyFor(briefId));
+    if (!raw) return null;
+    const stored: StoredSession = JSON.parse(raw);
+    if (new Date(stored.expiresAt) <= new Date()) {
+      clearSession(briefId);
       return null;
     }
+    return stored;
+  } catch (err) {
+    console.warn('Failed to load session:', err);
+    clearSession(briefId);
+    return null;
+  }
+}
 
-    return session;
-  } catch (error) {
-    // Corrupted data
-    console.warn('Failed to load session:', error);
-    clearSession();
+export function listSessions(): { briefId: string; savedAt: string; expiresAt: string }[] {
+  if (!isBrowser()) return [];
+  const out: { briefId: string; savedAt: string; expiresAt: string }[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith(STORAGE_PREFIX)) continue;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) continue;
+      const stored: StoredSession = JSON.parse(raw);
+      if (new Date(stored.expiresAt) <= new Date()) continue;
+      out.push({
+        briefId: key.slice(STORAGE_PREFIX.length),
+        savedAt: stored.savedAt,
+        expiresAt: stored.expiresAt,
+      });
+    } catch { /* skip corrupted */ }
+  }
+  return out;
+}
+
+export function clearSession(briefId: string): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.removeItem(keyFor(briefId));
+  } catch { /* no-op */ }
+}
+
+/**
+ * Migrates the legacy single-key session (pitch-pack-session) to a per-briefId entry.
+ * Idempotent: only runs once, tracks completion with MIGRATED_FROM_LEGACY_KEY.
+ * Returns the migrated session if found, null if no legacy data.
+ */
+export function migrateLegacySession(): StoredSession | null {
+  if (!isBrowser()) return null;
+  if (localStorage.getItem(MIGRATED_FROM_LEGACY_KEY)) return null;
+  const raw = localStorage.getItem(LEGACY_KEY);
+  if (!raw) {
+    localStorage.setItem(MIGRATED_FROM_LEGACY_KEY, new Date().toISOString());
+    return null;
+  }
+  try {
+    const legacy: StoredSession = JSON.parse(raw);
+    if (!legacy.state.briefId) {
+      legacy.state.briefId = crypto.randomUUID();
+    }
+    saveSession(legacy.state);
+    localStorage.removeItem(LEGACY_KEY);
+    localStorage.setItem(MIGRATED_FROM_LEGACY_KEY, new Date().toISOString());
+    return getSessionByBriefId(legacy.state.briefId);
+  } catch {
+    localStorage.removeItem(LEGACY_KEY);
+    localStorage.setItem(MIGRATED_FROM_LEGACY_KEY, new Date().toISOString());
     return null;
   }
 }
 
 /**
- * Remove session from localStorage
+ * Loads the most recently saved session, performing one-shot legacy migration if needed.
+ * Used by the page on first mount to restore in-progress work.
  */
-export function clearSession(): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    console.warn('Failed to clear session:', error);
-  }
+export function loadSession(): StoredSession | null {
+  if (!isBrowser()) return null;
+  // First-time migration
+  const migrated = migrateLegacySession();
+  if (migrated) return migrated;
+  // Find the most recently saved valid session
+  const sessions = listSessions();
+  if (!sessions.length) return null;
+  sessions.sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime());
+  return getSessionByBriefId(sessions[0].briefId);
 }
 
-/**
- * Check if a valid (non-expired) session exists
- */
 export function hasStoredSession(): boolean {
   return loadSession() !== null;
 }
 
 /**
- * Get time remaining on session in a human-readable format
+ * Get time remaining on the most-recently-saved session in a human-readable format.
  */
 export function getSessionTimeRemaining(): string | null {
   const session = loadSession();
@@ -96,9 +151,13 @@ export function getSessionTimeRemaining(): string | null {
 
   if (diffMs <= 0) return null;
 
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
+  if (days > 0) {
+    return `${days}d ${hours}h`;
+  }
   if (hours > 0) {
     return `${hours}h ${minutes}m`;
   }
@@ -106,7 +165,7 @@ export function getSessionTimeRemaining(): string | null {
 }
 
 /**
- * Get a display-friendly timestamp for when session was saved
+ * Get a display-friendly timestamp for when the most-recently-saved session was saved.
  */
 export function getSessionSavedAt(): string | null {
   const session = loadSession();
