@@ -33,6 +33,7 @@ import { CreativeTenetsStep } from '@/components/steps/CreativeTenetsStep';
 import { VaultDecisionStep } from '@/components/steps/VaultDecisionStep';
 import { VaultAudiencePickerStep } from '@/components/steps/VaultAudiencePickerStep';
 import { VaultProductionBudgetStep } from '@/components/steps/VaultProductionBudgetStep';
+import { VaultMatchListStep } from '@/components/steps/VaultMatchListStep';
 import { MediaContextStep } from '@/components/steps/MediaContextStep';
 import { OutputStep } from '@/components/steps/OutputStep';
 
@@ -644,6 +645,8 @@ export default function Home() {
         return <VaultAudiencePickerStep />;
       case 'vault_production_budget':
         return <VaultProductionBudgetStep />;
+      case 'vault_matches':
+        return <VaultMatchListStep />;
       case 'gate2_tenets':
         return <CreativeTenetsStep />;
       case 'gate2_media':

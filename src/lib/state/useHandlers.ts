@@ -60,6 +60,7 @@ export interface UseHandlersReturn {
   handleVaultAudiencePick: (branchIndex: number | 'all') => void;
   handleVaultProductionBudgetConfirm: (budget: number) => void;
   handleVaultSelectConcept: (conceptId: string) => void;
+  handleVaultProceedToDraft: () => void;
   handleVaultGenerateNarrative: () => Promise<void>;
   handleVaultExport: () => Promise<void>;
 }
@@ -830,9 +831,23 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       0
     );
   };
-  const handleVaultSelectConcept = (_conceptId: string) => {
-    throw new Error('handleVaultSelectConcept: not implemented until Phase 2');
+  const handleVaultSelectConcept = (conceptId: string) => {
+    const current = state.vaultResult?.selectedConceptIds || [];
+    const next = current.includes(conceptId)
+      ? current.filter(id => id !== conceptId)
+      : [...current, conceptId];
+    updateState({
+      vaultResult: state.vaultResult ? { ...state.vaultResult, selectedConceptIds: next } : null,
+    });
   };
+
+  const handleVaultProceedToDraft = () => {
+    // Advance from the match list to the narrative draft step
+    if (!state.vaultResult?.selectedConceptIds.length) return;
+    updateState({ step: 'vault_narrative_draft' });
+    setTimeout(() => handleVaultGenerateNarrative(), 0);
+  };
+
   const handleVaultGenerateNarrative = async () => {
     throw new Error('handleVaultGenerateNarrative: not implemented until Phase 2');
   };
@@ -862,6 +877,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     handleVaultAudiencePick,
     handleVaultProductionBudgetConfirm,
     handleVaultSelectConcept,
+    handleVaultProceedToDraft,
     handleVaultGenerateNarrative,
     handleVaultExport,
   };
