@@ -24,7 +24,6 @@ import {
   SECTION_KEYS,
   GATE1_SECTION_KEYS,
   GATE2_SECTION_KEYS,
-  BrandAlignment as BrandAlignmentType,
   CreativeTenetsResponse,
   CreativeTenet,
   CoherenceAnalysis,
@@ -43,7 +42,6 @@ import { SectionOptions } from '@/components/SectionOptions';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
 import { FileUpload } from '@/components/FileUpload';
-import { BrandAlignment } from '@/components/BrandAlignment';
 import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
@@ -60,6 +58,7 @@ import { TellMeMoreStep } from '@/components/steps/TellMeMoreStep';
 import { TriageStep } from '@/components/steps/TriageStep';
 import { Gate1SectionsStep } from '@/components/steps/Gate1SectionsStep';
 import { GateTransitionStep } from '@/components/steps/GateTransitionStep';
+import { BrandAlignmentStep } from '@/components/steps/BrandAlignmentStep';
 import { BackButton } from '@/components/steps/shared/BackButton';
 import { StatusBadge } from '@/components/steps/shared/StatusBadge';
 import { Spinner } from '@/components/steps/shared/Spinner';
@@ -1220,14 +1219,6 @@ export default function Home() {
     }
   };
 
-  // Brand Alignment handler (Gate 2)
-  const handleBrandAlignment = (alignment: BrandAlignmentType) => {
-    updateState({
-      brandAlignment: alignment,
-      step: 'gate2_audience',
-    });
-  };
-
   // Generate Creative Tenets (Gate 2)
   const handleGenerateTenets = async (): Promise<CreativeTenetsResponse> => {
     if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
@@ -1359,41 +1350,6 @@ export default function Home() {
 
   // Gate Transition step renderer
   // Brand Alignment step renderer (Gate 2)
-  const renderBrandAlignmentStep = () => {
-    return (
-      <div className="space-y-4">
-        {state.hasReachedOutput && (
-          <div className="flex justify-end">
-            <ReturnToOutputButton />
-          </div>
-        )}
-      <BrandAlignment
-        onConfirm={handleBrandAlignment}
-        onBrandContent={(content) => {
-          const updatedSections = [...state.sections];
-          const brandIdx = updatedSections.findIndex(s => s.key === 'brand_alignment');
-          if (brandIdx >= 0) {
-            updatedSections[brandIdx] = {
-              ...updatedSections[brandIdx],
-              content,
-              status: 'green',
-            };
-            updateState({ sections: updatedSections });
-          }
-        }}
-        onBack={() => updateState({ step: 'gate_transition' })}
-        initialValue={state.brandAlignment}
-        briefAudienceContent={
-          state.triageResult?.triageAssessment.find((s) => s.key === 'audience')?.synthesizedContent || ''
-        }
-        briefObjectiveContent={
-          state.triageResult?.triageAssessment.find((s) => s.key === 'objective')?.synthesizedContent || ''
-        }
-      />
-      </div>
-    );
-  };
-
   // Creative Tenets step renderer (Gate 2)
   const renderCreativeTenetsStep = () => {
     if (!state.selectedAudienceSegment || state.selectedInsights.length === 0) {
@@ -2248,7 +2204,7 @@ export default function Home() {
       case 'gate_transition':
         return <GateTransitionStep />;
       case 'gate2_brand':
-        return renderBrandAlignmentStep();
+        return <BrandAlignmentStep />;
       case 'gate2_audience':
         return renderGate2AudienceStep();
       case 'gate2_insights':
