@@ -812,8 +812,23 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       0
     );
   };
-  const handleVaultProductionBudgetConfirm = (_budget: number) => {
-    throw new Error('handleVaultProductionBudgetConfirm: not implemented until Phase 2');
+  const handleVaultProductionBudgetConfirm = (budget: number) => {
+    updateState({
+      productionBudgetUsd: budget,
+      step: 'vault_matches',
+    });
+    // Re-fire matcher with explicit overrides (no closure staleness)
+    const partnerType = state.partnerType ?? derivePartnerType(state);
+    const branchInsights =
+      state.vaultAudienceBranchIndex === 'all'
+        ? state.audienceBranches.flatMap(b => b.insights)
+        : typeof state.vaultAudienceBranchIndex === 'number'
+          ? state.audienceBranches[state.vaultAudienceBranchIndex]?.insights || state.selectedInsights
+          : state.selectedInsights;
+    setTimeout(
+      () => fireBackgroundMatcher({ partnerType, productionBudgetUsd: budget, branchInsights }),
+      0
+    );
   };
   const handleVaultSelectConcept = (_conceptId: string) => {
     throw new Error('handleVaultSelectConcept: not implemented until Phase 2');
