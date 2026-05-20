@@ -59,6 +59,7 @@ import { TriageStep } from '@/components/steps/TriageStep';
 import { Gate1SectionsStep } from '@/components/steps/Gate1SectionsStep';
 import { GateTransitionStep } from '@/components/steps/GateTransitionStep';
 import { BrandAlignmentStep } from '@/components/steps/BrandAlignmentStep';
+import { Gate2AudienceStep } from '@/components/steps/Gate2AudienceStep';
 import { BackButton } from '@/components/steps/shared/BackButton';
 import { StatusBadge } from '@/components/steps/shared/StatusBadge';
 import { Spinner } from '@/components/steps/shared/Spinner';
@@ -1479,126 +1480,6 @@ export default function Home() {
     );
   };
 
-  const renderGate2AudienceStep = () => {
-    const currentBranch = state.audienceBranches[state.currentBranchIndex];
-    const isSubsequentBranch = state.currentBranchIndex > 0 && state.audienceBranches.length > 1;
-
-    // Loading state for audience generation
-    if (state.loading && !state.audienceMenu && audienceProgress.isActive) {
-      return (
-        <LoadingProgress
-          stages={AUDIENCE_STAGES}
-          currentStageIndex={audienceProgress.currentStageIndex}
-          showTips={true}
-        />
-      );
-    }
-
-    // Loading state for personification
-    if (state.loading && state.selectedAudienceSegment && !state.personification) {
-      return (
-        <LoadingOverlay
-          message={`Developing ${state.selectedAudienceSegment.name}...`}
-          subMessage="Creating a rich personification of this audience segment"
-        />
-      );
-    }
-
-    // Loading state for insights generation
-    if (state.loading && state.personification && insightsProgress.isActive) {
-      return (
-        <LoadingProgress
-          stages={INSIGHTS_STAGES}
-          currentStageIndex={insightsProgress.currentStageIndex}
-          showTips={true}
-        />
-      );
-    }
-
-    // For subsequent branches, auto-trigger personification if not already done
-    if (isSubsequentBranch && state.selectedAudienceSegment && !state.personification && !state.loading) {
-      // Trigger personification for this branch's segment
-      handleGeneratePersonificationForBranch(currentBranch.segment);
-      return (
-        <LoadingOverlay
-          message={`Developing ${currentBranch.segment.name}...`}
-          subMessage="Creating a rich personification of this audience segment"
-        />
-      );
-    }
-
-    // Personification review using new component
-    if (state.selectedAudienceSegment && state.personification) {
-      return (
-        <>
-          {/* Branch Progress - show when multiple segments selected */}
-          <BranchProgress branches={state.audienceBranches} currentIndex={state.currentBranchIndex} />
-          <PersonificationReview
-            segment={state.selectedAudienceSegment}
-            personification={state.personification}
-            onConfirm={(editedNarrative) => {
-              // Update personification with edited narrative and save to branch
-              const updatedBranches = [...state.audienceBranches];
-              if (updatedBranches[state.currentBranchIndex]) {
-                updatedBranches[state.currentBranchIndex] = {
-                  ...updatedBranches[state.currentBranchIndex],
-                  personification: { ...state.personification!, narrative: editedNarrative },
-                };
-              }
-              updateState({
-                personification: { ...state.personification!, narrative: editedNarrative },
-                audienceBranches: updatedBranches,
-              });
-              handleGenerateInsights();
-            }}
-            onBack={() => {
-              if (isSubsequentBranch) {
-                // Go back to previous branch's insights
-                const prevIndex = state.currentBranchIndex - 1;
-                const prevBranch = state.audienceBranches[prevIndex];
-                updateState({
-                  currentBranchIndex: prevIndex,
-                  selectedAudienceSegment: prevBranch.segment,
-                  personification: prevBranch.personification,
-                  selectedInsights: prevBranch.insights,
-                  step: 'gate2_insights',
-                });
-              } else {
-                updateState({ selectedAudienceSegment: null, personification: null });
-              }
-            }}
-            loading={state.loading}
-          />
-        </>
-      );
-    }
-
-    // Segment selection using new component
-    if (state.audienceMenu) {
-      return (
-        <AudienceMenu
-          menu={state.audienceMenu}
-          onSelect={handleSelectAudience}
-          onRegenerate={handleGenerateAudience}
-          onBack={() => updateState({ step: 'gate2_brand' })}
-          loading={state.loading}
-        />
-      );
-    }
-
-    // Auto-trigger audience generation if no menu yet
-    if (!state.loading && !state.audienceMenu) {
-      handleGenerateAudience();
-    }
-
-    // Fallback - shouldn't reach here
-    return (
-      <LoadingOverlay
-        message="Preparing audience step..."
-        subMessage="Loading audience generation"
-      />
-    );
-  };
 
   const renderInsightsStep = () => {
     if (state.loading && state.insightOptions.length === 0 && insightsProgress.isActive) {
@@ -2206,7 +2087,7 @@ export default function Home() {
       case 'gate2_brand':
         return <BrandAlignmentStep />;
       case 'gate2_audience':
-        return renderGate2AudienceStep();
+        return <Gate2AudienceStep />;
       case 'gate2_insights':
         return renderInsightsStep();
       case 'gate2_tenets':
