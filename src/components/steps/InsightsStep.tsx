@@ -10,7 +10,7 @@ import { INSIGHTS_STAGES } from '@/lib/loading-config';
 
 export function InsightsStep() {
   const { state, updateState, handlers, progress, pushHistory } = useBriefState();
-  const { handleGenerateInsights } = handlers;
+  const { handleGenerateInsights, handleConfirmInsights } = handlers;
 
   if (state.loading && state.insightOptions.length === 0 && progress.insights.isActive) {
     return (
@@ -258,8 +258,11 @@ export function InsightsStep() {
                   sections: updatedSections,
                   audienceBranches: updatedBranches,
                   selectedInsights: allInsights, // Keep all for tenets generation
-                  step: 'gate2_tenets',
                 });
+                // Route through the handler: persists insights to the current
+                // branch, derives partnerType/productionBudgetUsd, advances to
+                // vault_decision, and fires the background matcher.
+                handleConfirmInsights();
               }
             }}
             disabled={state.selectedInsights.length === 0}

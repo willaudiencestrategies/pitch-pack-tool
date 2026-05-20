@@ -19,6 +19,7 @@ import {
   CreativeTenet,
   AudienceBranch,
   BudgetDetails,
+  VaultCategory,
   createInitialState,
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
@@ -45,6 +46,7 @@ export interface UseHandlersReturn {
     segment: AudienceSegment
   ) => Promise<void>;
   handleGenerateInsights: () => Promise<void>;
+  handleConfirmInsights: () => void;
   // Gate 2 tenets / output
   handleGenerateTenets: () => Promise<CreativeTenetsResponse>;
   handleConfirmTenets: (tenets: CreativeTenet[]) => void;
@@ -67,6 +69,33 @@ export interface UseHandlersDeps {
   progress: UseProgressHooksReturn;
   pushHistory: (action: string, snapshot: Partial<SessionState>) => void;
   setLastAction: (action: (() => void) | null) => void;
+}
+
+// ============================================
+// Vault helpers (top-level, pure)
+// ============================================
+
+export function derivePartnerType(state: SessionState): VaultCategory | null {
+  // v1 heuristic: scan objective + creative_task for category signals.
+  // Default to 'destination' (most common case) when nothing matches.
+  const objective = state.sections.find(s => s.key === 'objective')?.content?.toLowerCase() || '';
+  const creativeTask = state.sections.find(s => s.key === 'creative_task')?.content?.toLowerCase() || '';
+  const text = `${objective} ${creativeTask}`;
+  if (!text.trim()) return null;
+  if (/airline|aviation|flight/.test(text)) return 'airline';
+  if (/rental car|car hire|automotive/.test(text)) return 'car';
+  if (/hotel|lodging|resort|property|vrbo|short-term rental/.test(text)) return 'lodging';
+  return 'destination';
+}
+
+export function deriveProductionBudgetUsd(state: SessionState): number | null {
+  if (state.productionBudgetUsd) return state.productionBudgetUsd;
+  const raw = state.budgetDetails?.productionBudget;
+  if (!raw) return null;
+  const match = raw.match(/[\d,]+/);
+  if (!match) return null;
+  const parsed = parseInt(match[0].replace(/,/g, ''), 10);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
@@ -621,12 +650,126 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   }
 
   // ============================================
-  // Vault handler stubs (implemented in Phase 2)
+  // Vault handlers (Phase 2)
   // ============================================
 
-  const handleVaultDecision = (_decision: 'vault' | 'creative-lab') => {
-    throw new Error('handleVaultDecision: not implemented until Phase 2');
+  const fireBackgroundMatcher = async () => {
+    // Fires after insights confirm so the preview signal is ready BEFORE the
+    // decision screen renders. Never awaited by the caller.
+    try {
+      const partnerType = derivePartnerType(state);
+      const productionBudgetUsd = deriveProductionBudgetUsd(state);
+      if (!partnerType || !productionBudgetUsd) {
+        updateState({
+          vaultMatchPreview: {
+            signal: 'none',
+            rankedCount: 0,
+            topConceptName: null,
+            cachedAt: new Date().toISOString(),
+          },
+        });
+        return;
+      }
+
+      const branchInsights =
+        state.audienceBranches[state.currentBranchIndex]?.insights ||
+        state.selectedInsights;
+
+      const res = await fetch('/api/vault', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'match',
+          brief: state.brief,
+          briefSections: Object.fromEntries(state.sections.map(s => [s.key, s.content])),
+          insights: branchInsights,
+          partnerType,
+          productionBudgetUsd,
+          mustHaveChannels: [],
+        }),
+      });
+
+      if (!res.ok) throw new Error(`Vault matcher failed: ${res.status}`);
+
+      const data = await res.json();
+      const ranked = Array.isArray(data.rankedConcepts) ? data.rankedConcepts : [];
+      const signal: 'strong' | 'plausible' | 'stretch' | 'none' =
+        !ranked.length ? 'none'
+        : ranked.some((m: { confidence?: string }) => m.confidence === 'strong') ? 'strong'
+        : ranked.some((m: { confidence?: string }) => m.confidence === 'plausible') ? 'plausible'
+        : 'stretch';
+
+      updateState({
+        vaultMatchPreview: {
+          signal,
+          rankedCount: ranked.length,
+          topConceptName: ranked[0]?.conceptName || null,
+          cachedAt: new Date().toISOString(),
+        },
+        vaultResult: {
+          rankedConcepts: ranked,
+          selectedConceptIds: [],
+          narrativeDrafts: {},
+          customEdits: {},
+          exportedAt: null,
+          resumeToken: null,
+          topLineNote: data.topLineNote ?? null,
+        },
+      });
+    } catch (err) {
+      console.error('Background matcher failed:', err);
+      updateState({
+        vaultMatchPreview: {
+          signal: 'none',
+          rankedCount: 0,
+          topConceptName: null,
+          cachedAt: new Date().toISOString(),
+        },
+      });
+    }
   };
+
+  const handleConfirmInsights = () => {
+    // Persist insights to the current branch (preserves branching invariant)
+    const updatedBranches = [...state.audienceBranches];
+    if (updatedBranches[state.currentBranchIndex]) {
+      updatedBranches[state.currentBranchIndex] = {
+        ...updatedBranches[state.currentBranchIndex],
+        insights: [...state.selectedInsights],
+      };
+    }
+
+    const partnerType = derivePartnerType(state);
+    const productionBudgetUsd = deriveProductionBudgetUsd(state);
+
+    updateState({
+      audienceBranches: updatedBranches,
+      partnerType,
+      productionBudgetUsd,
+      step: 'vault_decision',
+    });
+
+    // Fire background matcher AFTER UI advances. Not awaited.
+    setTimeout(() => { fireBackgroundMatcher(); }, 0);
+  };
+
+  const handleVaultDecision = (decision: 'vault' | 'creative-lab') => {
+    if (decision === 'creative-lab') {
+      updateState({ step: 'gate2_tenets' });
+      return;
+    }
+    // Vault path: route to picker if multi-branch, else to production budget gate
+    if (state.audienceBranches.length > 1) {
+      updateState({ step: 'vault_audience_picker' });
+    } else {
+      const branchIdx = state.currentBranchIndex || 0;
+      updateState({
+        step: 'vault_production_budget',
+        vaultAudienceBranchIndex: branchIdx,
+      });
+    }
+  };
+
   const handleVaultAudiencePick = (_branchIndex: number | 'all') => {
     throw new Error('handleVaultAudiencePick: not implemented until Phase 2');
   };
@@ -655,6 +798,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     handleSelectAudience,
     handleGeneratePersonificationForBranch,
     handleGenerateInsights,
+    handleConfirmInsights,
     handleGenerateTenets,
     handleConfirmTenets,
     handleCompileOutput,

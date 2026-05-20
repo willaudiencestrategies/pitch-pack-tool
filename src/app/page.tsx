@@ -30,6 +30,7 @@ import { BrandAlignmentStep } from '@/components/steps/BrandAlignmentStep';
 import { Gate2AudienceStep } from '@/components/steps/Gate2AudienceStep';
 import { InsightsStep } from '@/components/steps/InsightsStep';
 import { CreativeTenetsStep } from '@/components/steps/CreativeTenetsStep';
+import { VaultDecisionStep } from '@/components/steps/VaultDecisionStep';
 import { MediaContextStep } from '@/components/steps/MediaContextStep';
 import { OutputStep } from '@/components/steps/OutputStep';
 
@@ -635,6 +636,8 @@ export default function Home() {
         return <Gate2AudienceStep />;
       case 'gate2_insights':
         return <InsightsStep />;
+      case 'vault_decision':
+        return <VaultDecisionStep />;
       case 'gate2_tenets':
         return <CreativeTenetsStep />;
       case 'gate2_media':
