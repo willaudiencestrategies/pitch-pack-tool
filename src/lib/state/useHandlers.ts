@@ -21,6 +21,7 @@ import {
   BudgetDetails,
   VaultCategory,
   Truth,
+  NarrativeDraft,
   createInitialState,
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
@@ -849,7 +850,43 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   };
 
   const handleVaultGenerateNarrative = async () => {
-    throw new Error('handleVaultGenerateNarrative: not implemented until Phase 2');
+    if (!state.vaultResult?.selectedConceptIds.length) return;
+    updateState({ loading: true });
+    try {
+      const drafts: Record<string, NarrativeDraft> = {
+        ...(state.vaultResult.narrativeDrafts || {}),
+      };
+      for (const conceptId of state.vaultResult.selectedConceptIds) {
+        if (drafts[conceptId]) continue; // already generated
+        const res = await fetch('/api/vault', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'narrative-draft',
+            brief: state.brief,
+            briefSections: Object.fromEntries(state.sections.map(s => [s.key, s.content])),
+            insights:
+              state.audienceBranches[state.currentBranchIndex]?.insights ||
+              state.selectedInsights,
+            partnerType: state.partnerType,
+            productionBudgetUsd: state.productionBudgetUsd,
+            selectedConceptId: conceptId,
+            partnerName: state.brandAlignment?.brand || 'the partner',
+          }),
+        });
+        const data = await res.json();
+        drafts[conceptId] = data.draft;
+      }
+      updateState({
+        loading: false,
+        vaultResult: state.vaultResult
+          ? { ...state.vaultResult, narrativeDrafts: drafts }
+          : null,
+      });
+    } catch (err) {
+      console.error('Narrative draft failed:', err);
+      updateState({ loading: false, error: 'Failed to generate narrative draft' });
+    }
   };
   const handleVaultExport = async () => {
     throw new Error('handleVaultExport: not implemented until Phase 2');
