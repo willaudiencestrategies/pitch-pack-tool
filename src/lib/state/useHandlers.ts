@@ -20,6 +20,7 @@ import {
   AudienceBranch,
   BudgetDetails,
   VaultCategory,
+  Truth,
   createInitialState,
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
@@ -653,12 +654,23 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   // Vault handlers (Phase 2)
   // ============================================
 
-  const fireBackgroundMatcher = async () => {
+  interface MatcherArgs {
+    partnerType?: VaultCategory | null;
+    productionBudgetUsd?: number | null;
+    branchInsights?: Truth[];
+  }
+
+  const fireBackgroundMatcher = async (overrides?: MatcherArgs) => {
     // Fires after insights confirm so the preview signal is ready BEFORE the
     // decision screen renders. Never awaited by the caller.
+    //
+    // Accepts explicit overrides so callers that fire-and-forget via setTimeout
+    // don't depend on the closure's view of `state` (which may be stale by the
+    // time the macrotask runs).
     try {
-      const partnerType = derivePartnerType(state);
-      const productionBudgetUsd = deriveProductionBudgetUsd(state);
+      const partnerType = overrides?.partnerType ?? derivePartnerType(state);
+      const productionBudgetUsd =
+        overrides?.productionBudgetUsd ?? deriveProductionBudgetUsd(state);
       if (!partnerType || !productionBudgetUsd) {
         updateState({
           vaultMatchPreview: {
@@ -672,7 +684,8 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       }
 
       const branchInsights =
-        state.audienceBranches[state.currentBranchIndex]?.insights ||
+        overrides?.branchInsights ??
+        state.audienceBranches[state.currentBranchIndex]?.insights ??
         state.selectedInsights;
 
       const res = await fetch('/api/vault', {
@@ -750,7 +763,12 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     });
 
     // Fire background matcher AFTER UI advances. Not awaited.
-    setTimeout(() => { fireBackgroundMatcher(); }, 0);
+    // Pass derived values explicitly so the setTimeout callback doesn't depend
+    // on a stale closure view of `state`.
+    setTimeout(
+      () => { fireBackgroundMatcher({ partnerType, productionBudgetUsd }); },
+      0
+    );
   };
 
   const handleVaultDecision = (decision: 'vault' | 'creative-lab') => {
@@ -770,8 +788,29 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     }
   };
 
-  const handleVaultAudiencePick = (_branchIndex: number | 'all') => {
-    throw new Error('handleVaultAudiencePick: not implemented until Phase 2');
+  const handleVaultAudiencePick = (branchIndex: number | 'all') => {
+    // Resolve which insights the matcher should weight, based on the CP's
+    // explicit pick. 'all' merges every branch's insights into one call.
+    const branchInsights =
+      branchIndex === 'all'
+        ? state.audienceBranches.flatMap(b => b.insights)
+        : state.audienceBranches[branchIndex]?.insights || [];
+
+    updateState({
+      vaultAudienceBranchIndex: branchIndex,
+      step: state.productionBudgetUsd ? 'vault_matches' : 'vault_production_budget',
+    });
+
+    // Re-fire matcher with the chosen branch's insights. Explicit args avoid
+    // any closure-staleness on state.vaultAudienceBranchIndex.
+    const partnerType = state.partnerType ?? derivePartnerType(state);
+    const productionBudgetUsd =
+      state.productionBudgetUsd ?? deriveProductionBudgetUsd(state);
+    setTimeout(
+      () =>
+        fireBackgroundMatcher({ partnerType, productionBudgetUsd, branchInsights }),
+      0
+    );
   };
   const handleVaultProductionBudgetConfirm = (_budget: number) => {
     throw new Error('handleVaultProductionBudgetConfirm: not implemented until Phase 2');

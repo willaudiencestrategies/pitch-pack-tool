@@ -31,6 +31,7 @@ import { Gate2AudienceStep } from '@/components/steps/Gate2AudienceStep';
 import { InsightsStep } from '@/components/steps/InsightsStep';
 import { CreativeTenetsStep } from '@/components/steps/CreativeTenetsStep';
 import { VaultDecisionStep } from '@/components/steps/VaultDecisionStep';
+import { VaultAudiencePickerStep } from '@/components/steps/VaultAudiencePickerStep';
 import { MediaContextStep } from '@/components/steps/MediaContextStep';
 import { OutputStep } from '@/components/steps/OutputStep';
 
@@ -638,6 +639,8 @@ export default function Home() {
         return <InsightsStep />;
       case 'vault_decision':
         return <VaultDecisionStep />;
+      case 'vault_audience_picker':
+        return <VaultAudiencePickerStep />;
       case 'gate2_tenets':
         return <CreativeTenetsStep />;
       case 'gate2_media':
