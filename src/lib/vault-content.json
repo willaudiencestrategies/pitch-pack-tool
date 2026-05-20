@@ -1,0 +1,1591 @@
+{
+  "sourceFile": "THE VAULT_November 2025_Kat.docx",
+  "parsedAt": "2026-05-20T13:11:11.514Z",
+  "concepts": [
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Next Stop” is a dynamic, emotion-driven travel series that explores a region through the craft, creativity, and everyday rhythms of the people who shape its cultural pulse. Each stop—whether a major city or a lesser-known town—reveals a new vibe, showcasing how architecture, mood, and local energy shift from place to place while still feeling connected through the spirit of the region.",
+      "creativeMechanism": "Shot in a first-person, confident, and vibrant style, the film moves fluidly from one stop to the next—each transition revealing a distinct atmosphere. We spotlight local makers, artists, food cultures, and lived moments to create a sense of motion and discovery. The journey builds organically: different places, different feelings, one continuous narrative. The result is a modern travel portrait that inspires people to go deeper, explore further, and stay longer.",
+      "coreMessage": "Every stop has a story. Keep moving.",
+      "whatItsGoodFor": [
+        "Showcasing both anchor cities and lesser-known locations within a region.",
+        "Positioning a destination as layered, diverse, and worth extending a trip for.",
+        "Inspiring travelers who seek culture, people-centric stories, and authentic discovery."
+      ],
+      "audienceFit": [
+        "Explorers who value culture, creativity, and discovering unexpected places.",
+        "Social-first audiences who enjoy energetic, cinematic, movement-led storytelling.",
+        "Less effective for travelers focused solely on all-inclusive or stationary vacations."
+      ],
+      "channelsFormats": [
+        "Hero video for YouTube, paid social, and destination landing pages.",
+        "Short-form cutdowns focusing on individual stops (Reels/TikTok/Shorts).",
+        "Display and native placements highlighting key experiences or personalities.",
+        "Modular assets that can be replicated across multiple regions or markets."
+      ],
+      "watchouts": [
+        "Ensure each stop feels meaningfully different—avoid repetition in tone or visuals.",
+        "Maintain authenticity; avoid presenting cultural elements as stereotypes or surface-level tropes.",
+        "Keep transitions clean and purposeful so the “motion” of the idea stays strong."
+      ],
+      "previouslyPitchedTo": [
+        "Germany"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "3x films",
+          "minUsd": 300000,
+          "maxUsd": 300000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$300k (3x films)",
+      "name": "Next Stop",
+      "id": "next-stop"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Q&A to B” is a photography-led, social-first series that explores a destination through the eyes of the people who live there. Each local recommendation leads to the next, creating a daisy-chain journey that uncovers hidden gems, iconic spots, and everyday experiences that travelers would never find on their own.",
+      "creativeMechanism": "The series zigzags across a city or region in real time: our photographer meets a local, asks for a personal recommendation (“Where should I go next?”), and follows their lead. Each new stop introduces a different local voice—an artisan, a chef, a barista, a guide, a shop owner—who passes us on to the next must-see place. The chain continues organically, blending spontaneity with curated discovery, all captured through striking photography and social storytelling.",
+      "coreMessage": "Let the locals show you where to go next.",
+      "whatItsGoodFor": [
+        "Showcasing a destination’s diversity through authentic local perspectives.",
+        "Highlighting a mix of culture, food, nature, nightlife, and hidden gems.",
+        "Driving social engagement through episodic, recommendation-driven content."
+      ],
+      "audienceFit": [
+        "Curious travelers who trust local insights over traditional guides.",
+        "Social audiences who enjoy fast, visual, exploratory storytelling.",
+        "Less effective for travelers who seek structured itineraries or luxury-only narratives."
+      ],
+      "channelsFormats": [
+        "Instagram and TikTok photo sequences, carousel posts, and Reels/Shorts.",
+        "Photography-led social galleries for use across Expedia channels.",
+        "Blog or landing page recap mapping the daisy-chain route and spotlighting the locals.",
+        "Modular episodes that can easily scale across multiple destinations."
+      ],
+      "watchouts": [
+        "Ensure locals feel genuine, not casted or scripted.",
+        "Balance spontaneity with production planning so the journey remains practical and safe.",
+        "Avoid over-representing one type of local or experience to maintain diversity and credibility."
+      ],
+      "previouslyPitchedTo": [
+        "Ras Al Khaimah"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "1x creator",
+          "minUsd": 80000,
+          "maxUsd": 100000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80-$100k (1x creator)",
+      "name": "Q&A to B",
+      "id": "q-a-to-b"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Come For, Stay For” is a travel film that taps into a universal truth: many travelers visit a destination for one specific purpose—work, an event, a family obligation—only to realize it offers so much more. The campaign inspires audiences to extend their stay by showcasing the unexpected beauty, culture, and experiences they can enjoy once their original reason for visiting is over.",
+      "creativeMechanism": "We follow a traveler who arrives for a single purpose (a work trip, a conference, a wedding, a workshop) and ends up staying to explore the destination on their own terms. Through cinematic storytelling, we reveal the surprising moments, landscapes, flavors, and cultural experiences that transform a functional trip into a meaningful getaway.",
+      "coreMessage": "Come for one thing. Stay for everything else.",
+      "whatItsGoodFor": [
+        "Encouraging business or purpose-led travelers to extend their trip.",
+        "Highlighting a destination’s unexpected experiences beyond the obvious.",
+        "Driving consideration among audiences who rarely take extra time for leisure."
+      ],
+      "audienceFit": [
+        "Business travelers, event travelers, and anyone already planning a purposeful visit.",
+        "Audiences who enjoy aspirational, story-led travel content.",
+        "Less impactful for travelers looking exclusively for all-inclusive or single-location vacations."
+      ],
+      "channelsFormats": [
+        "Hero video for YouTube, paid social, and destination landing pages.",
+        "Short-form social edits aligned to the traveler’s “reason for coming” (work, event, family) and “reason for staying” (culture, food, nature, relaxation).",
+        "Display and native cutdowns showcasing key experiences and moments of discovery.",
+        "Onsite or blog feature: “Top reasons to extend your stay.”"
+      ],
+      "watchouts": [
+        "The “reason for coming” must be relatable but not overshadow the destination’s appeal.",
+        "Tone must feel authentic—never imply people should extend trips irresponsibly or without consideration.",
+        "Ensure the experiences shown are accessible and not overly niche."
+      ],
+      "previouslyPitchedTo": [
+        "Switzerland",
+        "World Cup (digital)"
+      ],
+      "productionTimelineRaw": "12 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "1x creator",
+          "minUsd": 60000,
+          "maxUsd": 80000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$60-$80k (1x creator)",
+      "name": "Come For, Stay For",
+      "id": "come-for-stay-for"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Out of Office-ish” captures the reality of remote work in a world where people can work from anywhere. The campaign explores the blurred line between work and play, showing how travelers can be productive while still enjoying the beauty, culture, and experiences of a destination. The series highlights the freedom and flexibility of modern travel — a place where professional responsibilities coexist with spontaneous adventure.",
+      "creativeMechanism": "Each short episode follows a professional “working” remotely or traveling for work, but whose stay naturally evolves into exploration and discovery. We see moments like checking emails from a lakeside bench before joining a locals’ evening event, or taking a meeting in a gondola and staying afterward to hike or capture photography. Episodes conclude with playful captions such as: “Still working. Just a little better.” “Technically on the clock. Spiritually exploring.” This approach combines first-person storytelling with cinematic visuals, showing audiences that productivity and adventure can coexist.",
+      "coreMessage": "Work anywhere. Play everywhere.",
+      "whatItsGoodFor": [
+        "Inspiring remote and hybrid workers to travel and explore destinations beyond typical business trips.",
+        "Highlighting the unique experiences and leisure opportunities a destination offers, even during short stays.",
+        "Engaging social-first audiences with aspirational, relatable, and playful content."
+      ],
+      "audienceFit": [
+        "Remote workers, digital nomads, and business travelers looking for balance between work and play.",
+        "Audiences who enjoy cinematic short-form travel content with humour and relatability.",
+        "Less effective for travelers solely seeking traditional vacations or all-inclusive stays."
+      ],
+      "channelsFormats": [
+        "YouTube series as the hero content.",
+        "Short-form edits for Instagram Reels, TikTok, and YouTube Shorts.",
+        "Display, native, and social amplification highlighting key “work + play” moments.",
+        "Modular episodes for repeatable storytelling in multiple destinations."
+      ],
+      "watchouts": [
+        "Balance must be authentic — avoid over-glamorizing working in scenic locations.",
+        "Ensure the adventure doesn’t overshadow the “work” element, so the concept remains relatable.",
+        "Keep tone playful, aspirational, but grounded in reality."
+      ],
+      "previouslyPitchedTo": [
+        "Switzerland"
+      ],
+      "productionTimelineRaw": "14-16 weeks",
+      "productionTimeline": {
+        "minWeeks": 14,
+        "maxWeeks": 16
+      },
+      "productionBudget": [
+        {
+          "label": "1-3x films",
+          "minUsd": 100000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$100-$200k (1-3x films)",
+      "name": "Out of Office-ish",
+      "id": "out-of-office-ish"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“More Than a Pretty Place” highlights that a destination’s beauty is just the beginning. While stunning landscapes and iconic sights attract travelers, the true appeal lies in the unexpected experiences, local culture, and memorable moments that make them stay longer. The campaign encourages audiences to go beyond the postcard-perfect images and immerse themselves in what makes the place genuinely remarkable.",
+      "creativeMechanism": "Each short video starts with a classic, glossy view of the destination — the “pretty place.” Then the camera pushes past it to showcase experiences beyond the surface. Episodes follow travelers engaging with the destination through immersive experiences, cultural encounters, gastronomy, and active exploration. Each film concludes with a tagline: “[Destination]. More than a pretty place.” Example film: We open on a glistening lake — just the beginning. The camera then follows someone waking up in a lakeside hotel, hiking through scenic mountains adorned with fall foliage, freediving in alpine waters, and ending the day relaxing in a floating sauna. Text/VO: “[Destination]. More than a pretty place.”",
+      "coreMessage": "Pretty gets you here. More makes you stay.",
+      "whatItsGoodFor": [
+        "Encouraging longer stays and deeper engagement with the destination.",
+        "Highlighting cultural, culinary, and experiential richness beyond natural beauty.",
+        "Inspiring audiences who value meaningful, immersive travel over purely visual appeal."
+      ],
+      "audienceFit": [
+        "Experience-driven travelers seeking authenticity and discovery.",
+        "Social-first audiences who enjoy visually striking, immersive storytelling.",
+        "Less effective for travelers focused solely on relaxation or surface-level sightseeing."
+      ],
+      "channelsFormats": [
+        "YouTube series as the hero content.",
+        "Short-form edits for Instagram Reels, TikTok, and YouTube Shorts highlighting unique experiences.",
+        "Display and native content showcasing “behind the scenes” of the destination.",
+        "Modular episodes to adapt across multiple destinations or regions."
+      ],
+      "watchouts": [
+        "Ensure experiences feel authentic, not staged.",
+        "Avoid over-emphasizing natural beauty at the expense of cultural or experiential storytelling.",
+        "Keep the narrative aspirational yet grounded, so audiences understand why the destination is “more than pretty.”"
+      ],
+      "previouslyPitchedTo": [
+        "Switzerland"
+      ],
+      "productionTimelineRaw": "14-16 weeks",
+      "productionTimeline": {
+        "minWeeks": 14,
+        "maxWeeks": 16
+      },
+      "productionBudget": [
+        {
+          "label": "2-3x films",
+          "minUsd": 100000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$100-$200k (2-3x films)",
+      "name": "More Than a Pretty Place",
+      "id": "more-than-a-pretty-place"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“LFC Players and Their Hometowns” brings Liverpool FC players’ personal stories and travel experiences to life, highlighting destinations in an authentic and engaging way. Fans get an insider look at players’ cultural roots while being inspired to explore new places themselves.",
+      "creativeMechanism": "Exclusive interviews at LFC’s training ground, where a presenter chats with players about their hometowns, cultural backgrounds, and travel experiences. These conversations are captured in mid-form videos, with short-form cutdowns for social amplification.",
+      "coreMessage": "Travel is personal, cultural, and inspiring—just like the journeys of Liverpool FC players. Explore destinations that matter to people you admire.",
+      "whatItsGoodFor": [
+        "Positioning destinations as must-visit travel experiences.",
+        "Showcasing cultural diversity through the lens of global football talent.",
+        "Driving engagement with fans via authentic storytelling."
+      ],
+      "audienceFit": [
+        "Liverpool FC’s global fanbase of football enthusiasts who are also likely to engage with travel content. Appeals to fans across multiple regions with a personal, human interest angle."
+      ],
+      "channelsFormats": [
+        "Social media: Instagram, TikTok, YouTube (mid-form interviews + short-form cutdowns)",
+        "Programmatic video advertising",
+        "Connected TV (CTV)"
+      ],
+      "watchouts": [
+        "Ensure players’ hometowns and stories are represented accurately and respectfully.",
+        "Avoid over-commercialization—maintain authenticity to keep fans engaged.",
+        "Sponsorship tie-ins must feel natural to the destination being promoted."
+      ],
+      "previouslyPitchedTo": [
+        "Georgia",
+        "Tokyo"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "2-3x films",
+          "minUsd": 100000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$100-$200k (2-3x films)",
+      "name": "LFC Players and Their Hometowns",
+      "id": "lfc-players-and-their-hometowns"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Sustainable Specs” highlights destinations’ restored heritage buildings, blending history and modernity to inspire travelers. Through visually stunning social content, the campaign showcases preservation efforts while sparking curiosity about the stories and futures behind these iconic structures.",
+      "creativeMechanism": "Partnering with Beautiful Destinations to capture social videos and photography that showcase restored buildings—from striking exteriors to thoughtfully modern interiors. Content connects viewers to the destination’s heritage, sustainability efforts, and evolving cultural narrative.",
+      "coreMessage": "Experience the past and future together—discover how heritage and modernity coexist in sustainably restored destinations.",
+      "whatItsGoodFor": [
+        "Showcasing destinations’ commitment to preservation and sustainability.",
+        "Driving engagement with travelers interested in history, architecture, and cultural experiences.",
+        "Generating curiosity that leads audiences to editorial content for deeper storytelling."
+      ],
+      "audienceFit": [
+        "Travelers with an interest in sustainability, history, architecture, and cultural exploration. Appeals to socially conscious, experience-driven audiences across demographics."
+      ],
+      "channelsFormats": [
+        "Social media: Instagram, TikTok, YouTube (short-form and mid-form videos + photography stills)",
+        "Programmatic video advertising"
+      ],
+      "watchouts": [
+        "Maintain authenticity in portraying restored sites; avoid over-commercialization.",
+        "Ensure storytelling respects the heritage and cultural significance of each building.",
+        "Balance modern visuals with historical context to highlight the sustainability message."
+      ],
+      "previouslyPitchedTo": [
+        "Malaysia"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "standard",
+          "minUsd": 80000,
+          "maxUsd": 150000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80-$150k",
+      "name": "Sustainable Specs",
+      "id": "sustainable-specs"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Rooted in [Destination]” highlights a region’s diversity, culture, and warm hospitality to non-local audiences. Through a four-part travel series, viewers explore the destination’s cities, small towns, landscapes, and culinary treasures, inspiring them to plan their own visits.",
+      "creativeMechanism": "Five-minute episodes feature a host exploring the destination alongside local contributors, uncovering unique experiences and authentic moments. Each mini-adventure celebrates the region’s culture and hidden gems, giving viewers an immersive and relatable look at what makes it special.",
+      "coreMessage": "Discover the diverse experiences, culture, and welcoming spirit that make this destination unforgettable.",
+      "whatItsGoodFor": [
+        "Showcasing the destination’s breadth of experiences and authentic local culture.",
+        "Inspiring travel planning among prospective visitors.",
+        "Engaging audiences through episodic storytelling that blends exploration with local expertise."
+      ],
+      "audienceFit": [
+        "Non-local travelers interested in immersive experiences, local culture, culinary exploration, and scenic travel.",
+        "Social-first audiences who enjoy episodic travel content and authentic stories.",
+        "Less effective for travelers seeking only luxury resorts or all-inclusive experiences."
+      ],
+      "channelsFormats": [
+        "Owned content platform: Four-part video series.",
+        "Amplification via digital and social channels: Display, YouTube, social media, and streaming platforms."
+      ],
+      "watchouts": [
+        "Maintain authenticity in representing local contributors and experiences.",
+        "Balance regional pride with broad appeal for non-local audiences.",
+        "Ensure consistent pacing and storytelling across episodes to retain engagement."
+      ],
+      "previouslyPitchedTo": [
+        "Texas"
+      ],
+      "productionTimelineRaw": "14-16 weeks",
+      "productionTimeline": {
+        "minWeeks": 14,
+        "maxWeeks": 16
+      },
+      "productionBudget": [
+        {
+          "label": "standard",
+          "minUsd": 200000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$200k per ep",
+      "name": "Rooted in [Destination]",
+      "id": "rooted-in-destination"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Off-Season Escape” showcases a destination as a serene winter or off-season getaway, highlighting intimate wildlife encounters, stunning landscapes, cozy local culture, and gourmet experiences. The campaign inspires travelers to experience the region’s authentic charm during quieter months.",
+      "creativeMechanism": "Editorial and visually compelling storytelling highlight off-season experiences — from wildlife and landscapes to cultural and culinary moments — showing travelers how to craft personalized, immersive winter or shoulder-season journeys.",
+      "coreMessage": "Discover the cool side of [Destination] — authentic winter experiences blending nature, culture, and cuisine.",
+      "whatItsGoodFor": [
+        "Driving off-season or winter visitor arrivals and spend.",
+        "Encouraging longer stays and high-value experiences.",
+        "Positioning the destination as intimate, culturally rich, and uniquely appealing outside peak travel periods."
+      ],
+      "audienceFit": [
+        "Travelers seeking immersive, slow-paced, and authentic off-season experiences.",
+        "Experience-driven visitors interested in nature, culture, and culinary highlights.",
+        "Less effective for visitors seeking high-energy summer or peak-season activities."
+      ],
+      "channelsFormats": [
+        "Editorial content (online and print).",
+        "Out-of-Home (OOH) advertising.",
+        "Social media campaigns and storytelling.",
+        "Static or modular assets for broader promotion."
+      ],
+      "watchouts": [
+        "Ensure accurate representation of local wildlife, culture, and seasonal conditions.",
+        "Balance intimate, authentic experiences with aspirational visuals.",
+        "Maintain credibility while highlighting premium offerings."
+      ],
+      "previouslyPitchedTo": [
+        "Victoria (Australia)"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "multiple social assets",
+          "minUsd": 100000,
+          "maxUsd": 150000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$100-$150k (multiple social assets)",
+      "name": "Off-Season Escape",
+      "id": "off-season-escape"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“The Way Back” is a three-part heritage travel series that follows a protagonist returning to a destination, exploring how its landscapes, traditions, and stories have shaped their identity. The campaign highlights cultural heritage and emotional connection, inspiring shoulder-season travel through storytelling.",
+      "creativeMechanism": "A multi-part video series featuring a compelling protagonist whose personal journey embodies the destination’s cultural influence. Content spans trailers, reels, short-form edits, and stills to create an immersive, emotional travel experience.",
+      "coreMessage": "Heritage shapes us—discover how the past inspires the present and experience a destination that continues to leave its mark.",
+      "whatItsGoodFor": [
+        "Driving shoulder-season visitation.",
+        "Showcasing cultural heritage, traditions, and local stories.",
+        "Engaging audiences emotionally through personal and immersive storytelling."
+      ],
+      "audienceFit": [
+        "Travelers interested in heritage, culture, and meaningful, off-peak travel experiences. Appeals to both new and repeat visitors seeking depth, authenticity, and emotional connection."
+      ],
+      "channelsFormats": [
+        "Video series on Expedia Content Platform",
+        "Editorial content",
+        "Social media (trailers, reels, short-form edits)",
+        "Programmatic video channels"
+      ],
+      "watchouts": [
+        "Ensure authentic representation of local heritage and culture.",
+        "Balance emotional storytelling with clear travel messaging.",
+        "Protagonist’s story must resonate broadly while remaining specific to the destination."
+      ],
+      "previouslyPitchedTo": [
+        "Scotland",
+        "Turkiye"
+      ],
+      "productionTimelineRaw": "14-16 weeks",
+      "productionTimeline": {
+        "minWeeks": 14,
+        "maxWeeks": 16
+      },
+      "productionBudget": [
+        {
+          "label": "per episode",
+          "minUsd": 200000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$200k (per episode)",
+      "name": "The Way Back",
+      "id": "the-way-back"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "‘’A Better Way to Listen’’ is a sensory storytelling experience that contrasts everyday noise with moments of natural quiet, culture, and discovery—inviting audiences to “experience a better way” through sound and narrative. Listeners follow ambassadors as they explore distinctive environments, capturing the textures, rhythms, and atmosphere of a place. These immersive audio diaries bring the feeling of travel directly into daily life.",
+      "creativeMechanism": "Listeners are transported through rich, immersive field recordings captured by brand ambassadors as they journey through unique landscapes, neighbourhoods, or cultural spaces. Each episode highlights authentic sounds, stories, and perspectives—creating a sensory bridge between the listener’s current routine and the destination’s essence. Users can listen while commuting, working, or unwinding, forming an emotional connection purely through sound. Complementary digital content—images, short stories, fun facts, interactive maps, and relevant links—enhances the experience and encourages exploration. Curated playlists or episode bundles allow users to personalize their journey.",
+      "coreMessage": "Swap everyday noise for quiet moments that reconnect you to something real.",
+      "whatItsGoodFor": [
+        "Destinations or brands seeking to create emotional, sensory-led connections.",
+        "Campaigns that aim to inspire through storytelling rather than direct sales messaging.",
+        "Highlighting unique, authentic experiences that differentiate a place or brand."
+      ],
+      "audienceFit": [
+        "Urban professionals, podcast listeners, and experience-driven travelers.",
+        "Individuals looking for enrichment, inspiration, and micro-escapes in their daily routines.",
+        "Less ideal for purely transactional travel booking campaigns without narrative or emotional framing."
+      ],
+      "channelsFormats": [
+        "Podcast series on major platforms (Apple Podcasts, Spotify, etc.) supported by a custom microsite hosting:",
+        "Episodes",
+        "Fun facts or behind-the-scenes content",
+        "Photo galleries or ambassador imagery",
+        "Light digital CTAs (e.g., learn more, explore)",
+        "Social integration showcasing ambassador content and sound snippets.",
+        "Saveable playlists and themed listening journeys.",
+        "Interactive map showing where recordings were captured (if relevant).",
+        "Supplementary video, editorial, and programmatic assets to extend reach."
+      ],
+      "watchouts": [
+        "Requires genuinely engaging ambassador voices and rich field recordings to maintain immersion.",
+        "Sound design must be high-quality—poor audio undermines the entire concept.",
+        "Inspirational tone should be balanced with subtle, not heavy-handed, calls-to-action."
+      ],
+      "previouslyPitchedTo": [
+        "Tourism Tasmania (proposed)"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "depending on volume of content and supporting visuals",
+          "minUsd": 80000,
+          "maxUsd": 150000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80-$150k (depending on volume of content and supporting visuals)",
+      "name": "A Better Way to Listen",
+      "id": "a-better-way-to-listen"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "destination",
+      "archetype": [],
+      "ideaSummary": "“Choose Your Own Adventure” invites travelers to design their own journey through an interactive, multi-format storytelling experience. The content serves as a dynamic travel guide—letting users explore diverse landscapes, cultures, and local experiences at their own pace. Whether listening, watching, or scrolling, audiences can chart a personalized path through destinations, activities, and insider insights.",
+      "creativeMechanism": "Interactive video and audio episodes allow users to pause at any moment to unlock contextual information—tips, behind-the-scenes stories, cultural notes, and bookable experiences. Ambassadors or local storytellers create episodes that highlight different regions or themes (nature, food, culture, adventure, wellness, etc.). Social content from ambassadors seamlessly feeds into episode pages to enrich the experience. Users can: Save favorite episodes, moments, and locations Build personalized “travel playlists” View everything on an interactive map charting their customized itinerary This format blends exploration with guided discovery, giving users control while keeping the storytelling rich and immersive.",
+      "coreMessage": "You control the journey—explore the world’s beauty, culture, and experiences on your own terms.",
+      "whatItsGoodFor": [
+        "Educating and inspiring travelers about the breadth of experiences a destination offers",
+        "Driving meaningful engagement through interactivity and personalized exploration",
+        "Supporting consideration and planning phases through immersive storytelling",
+        "Showcasing authentic local voices, hidden gems, and diverse travel styles",
+        "Blending entertainment, discovery, and practical travel guidance in one cohesive format"
+      ],
+      "audienceFit": [
+        "Experience-driven travelers seeking immersion and personalization",
+        "Digital-savvy audiences who enjoy interactive or choose-your-own-path content",
+        "Users who engage across multiple modalities: viewing, listening, reading, scrolling",
+        "Younger audiences, commuters, planners, and discovery-phase travelers"
+      ],
+      "channelsFormats": [
+        "Interactive video (POV or guided experiences)",
+        "Podcasts (Spotify, iTunes, custom microsite)",
+        "Integrated social content (ambassador feeds, short-form video, stories)",
+        "Editorial content (tips, cultural insights, guides)",
+        "Maps + playlist functionality",
+        "Programmatic video + display to extend reach"
+      ],
+      "watchouts": [
+        "Interactivity must be seamless and accessible across devices",
+        "Requires accurate, high-quality destination info (activities, opening times, bookings)",
+        "Balance inspiration with practical utility—neither can overshadow the other",
+        "Ambassador selection must feel credible and aligned with the experience type"
+      ],
+      "previouslyPitchedTo": [
+        "Queensland",
+        "Visit Denmark"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "per film",
+          "minUsd": 250000,
+          "maxUsd": 250000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$250k (per film)",
+      "name": "Choose Your Own Adventure",
+      "id": "choose-your-own-adventure"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "airline",
+      "archetype": [],
+      "ideaSummary": "“One Hop to Anywhere” celebrates the airline’s vast hub-and-spoke network by showing that every journey from the U.S. is “just one hop away” from the destinations travelers dream about. The campaign uses evocative visuals of iconic global locations paired with warm, personal, human moments to emphasize how the airline effortlessly connects people to where they want to go.",
+      "creativeMechanism": "Each execution contrasts everyday life with the effortless ease of travel: a traveler’s longing glance at a map or photo transforms into a vibrant, immersive scene at the destination. Minimalist, heartfelt copy reinforces that with this airline, the world is always “one hop away.” Visual storytelling and simple messaging create an emotional connection while subtly communicating the airline’s network strength.",
+      "coreMessage": "Anywhere you dream of, you’re just one hop away.",
+      "whatItsGoodFor": [
+        "Showcasing a global airline’s network reach and convenience.",
+        "Emotional storytelling that inspires travel and positions the airline as a bridge to meaningful destinations.",
+        "Campaigns seeking to combine lifestyle, aspirational imagery, and service utility."
+      ],
+      "audienceFit": [
+        "Urban professionals, frequent flyers, and aspirational travelers seeking convenience and global access.",
+        "Social media users inspired by travel experiences and personal storytelling.",
+        "Less effective for audiences looking only for transactional messaging or fare promotions."
+      ],
+      "channelsFormats": [
+        "Social media campaigns (Instagram, TikTok, YouTube) with immersive short-form visuals.",
+        "Out-of-home (billboards, transit hubs) emphasizing iconic destinations.",
+        "Connected TV (CTV) for emotive storytelling with a broader reach.",
+        "Onsite/airport activations to reinforce the network message and inspire bookings."
+      ],
+      "watchouts": [
+        "Visuals must authentically represent destinations to avoid feeling generic.",
+        "Minimalist copy requires strong creative execution to deliver emotional resonance.",
+        "Overuse of stock imagery could dilute brand credibility; real-life traveler moments enhance relatability."
+      ],
+      "previouslyPitchedTo": [
+        "Turkish Airlines"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "per film",
+          "minUsd": 80000,
+          "maxUsd": 100000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80k - $100k (per film)",
+      "name": "One Hop to Anywhere",
+      "id": "one-hop-to-anywhere"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "airline",
+      "archetype": [],
+      "ideaSummary": "This campaign promotes Copenhagen as a must-visit destination while highlighting Icelandair’s seamless travel from Iceland. By leveraging an Expedia Group influencer, the campaign showcases both Denmark’s natural beauty and Copenhagen’s vibrant local culture, appealing to Gen Z and younger Millennials. Authentic storytelling inspires audiences to book trips that explore two distinct cultures in one journey.",
+      "creativeMechanism": "An influencer documents their journey from Iceland to Copenhagen, capturing the contrast between Iceland’s natural landscapes and Copenhagen’s lively neighborhoods. Through authentic, relatable moments—food, local experiences, hidden gems—the influencer demonstrates the ease of travel and the richness of experiencing two destinations in one trip. Short-form videos, behind-the-scenes snippets, and social posts invite audiences to visualize themselves on the journey and feel inspired to book.",
+      "coreMessage": "Two cultures, one seamless journey with Icelandair.",
+      "whatItsGoodFor": [
+        "Raising awareness of Copenhagen as a unique travel destination.",
+        "Driving bookings for Icelandair flights with a focus on experiential travel.",
+        "Engaging younger travelers through influencer-led storytelling and social amplification."
+      ],
+      "audienceFit": [
+        "Gen Z and younger Millennials seeking authentic travel experiences.",
+        "Social-first travelers who trust influencer recommendations and enjoy discovery-driven content.",
+        "Less effective for older demographics or audiences less active on social media and influencer platforms."
+      ],
+      "channelsFormats": [
+        "Influencer’s own social platforms for authentic reach and storytelling.",
+        "Custom social content for Instagram, TikTok, and YouTube.",
+        "Expedia and partner channels to amplify reach and booking pathways.",
+        "Onsite activations and content hubs for further engagement and travel planning inspiration."
+      ],
+      "watchouts": [
+        "Influencer content must feel genuine, not scripted or overly commercial.",
+        "Visual storytelling must balance both Iceland and Copenhagen without overshadowing one destination.",
+        "Ensure all social content aligns with Icelandair branding while allowing influencer authenticity."
+      ],
+      "previouslyPitchedTo": [
+        "Icelandair x Visit Denmark"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "2x ambassadors",
+          "minUsd": 80000,
+          "maxUsd": 100000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80k - $100k (2x ambassadors)",
+      "name": "Two Cultures, One Journey",
+      "id": "two-cultures-one-journey"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“The Luxury Portfolio Experience” is an immersive digital campaign that elevates world-class hotels and resorts as essential destinations for discerning luxury travelers. Through a visually rich, interactive platform, the experience showcases the full spectrum of a brand’s offerings—from refined design and signature dining to wellness rituals, exclusive activities, and curated local culture. This content-driven destination hub inspires high-value travelers and drives premium bookings through an elegant, aspirational journey.",
+      "creativeMechanism": "Using high-end photography, cinematic video, and refined storytelling, the campaign builds a dynamic, parallax-scrolling digital “Portfolio” site. Each section immerses users in a different dimension of luxury—architecture, gastronomy, wellness, experiences, culture, and more. Interactive narratives guide users through the brand’s world, highlighting craftsmanship, exclusivity, and the unique sense of place each property offers. The platform seamlessly integrates booking pathways, creating a bridge between inspiration and action.",
+      "coreMessage": "Experience a world where luxury is crafted, curated, and entirely yours.",
+      "whatItsGoodFor": [
+        "Elevating brand visibility among premium travel audiences",
+        "Showcasing a collection of high-end properties or experiences within one unified, elegant digital environment",
+        "Driving high-value conversions by pairing inspiration with seamless booking paths",
+        "Communicating sophistication, uniqueness, and the breadth of offerings across a luxury portfolio"
+      ],
+      "audienceFit": [
+        "Affluent, experience-driven travelers seeking exclusivity, authenticity, and sophistication",
+        "Digital-native luxury consumers who value immersive, visually rich storytelling",
+        "Ideal for audiences who book based on brand trust, design, and premium experiences—not price"
+      ],
+      "channelsFormats": [
+        "Immersive Portfolio Site featuring parallax motion, rich visual storytelling, curated itineraries, and bookable paths",
+        "Social amplification using short-form content, teaser clips, and ambassador/creator highlights",
+        "Programmatic display + native advertising to extend reach among high-intent luxury travelers",
+        "Optional: Editorial features, interactive maps, signature stories, and behind-the-scenes craftsmanship content"
+      ],
+      "watchouts": [
+        "Luxury positioning requires impeccable production quality—imagery, video, and design must feel elevated",
+        "Interactive/parallax elements must perform flawlessly across devices to match premium expectations",
+        "Tone should remain aspirational yet informative, with booking paths integrated subtly but clearly"
+      ],
+      "previouslyPitchedTo": [
+        "Jumeirah Hotels"
+      ],
+      "productionTimelineRaw": "12 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "Digital production + stock/existing imagery",
+          "minUsd": 50000,
+          "maxUsd": 50000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$50k (Digital production + stock/existing imagery)",
+      "name": "The Luxury Portfolio Experience",
+      "id": "the-luxury-portfolio-experience"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Reset. Reimagine. Repeat.” celebrates the world of all-inclusive luxury by highlighting the freedom, variety, and effortless indulgence available at high-end, all-ages resorts. Through dynamic, elevated storytelling, the campaign demonstrates how every stay can unfold in countless ways—inviting families, couples, and groups to design completely different experiences within the same property. The concept reinforces the idea that true luxury is not just included—it’s endlessly customizable.",
+      "creativeMechanism": "Short, energetic yet refined videos follow parallel guest journeys—such as a couple, a family, and/or a group of friends—spotlighting the full spectrum of premium amenities: world-class dining, wellness rituals, entertainment, curated activities, relaxation zones, and exclusive services. Thoughtful edits, tasteful animations, and sophisticated transitions reveal how a single luxury all-inclusive property can deliver limitless adventure, serenity, and delight from morning to night. Each story underscores that every day can be completely reimagined.",
+      "coreMessage": "Every day is a new adventure—reset, reimagine, repeat.",
+      "whatItsGoodFor": [
+        "Showcasing the breadth and depth of experiences within a luxury all-inclusive resort",
+        "Communicating ease, freedom, and variety in a premium, aspirational way",
+        "Driving brand awareness and engagement through visually dynamic storytelling",
+        "Reinforcing that luxury all-inclusive can be both effortless and endlessly customizable"
+      ],
+      "audienceFit": [
+        "Families, couples, and groups seeking elevated, stress-free, all-inclusive luxury getaways",
+        "Travelers who value variety, convenience, and curated high-end experiences",
+        "Socially active audiences who engage with premium short-form content",
+        "Less effective for travelers looking for à-la-carte or highly transactional vacation planning"
+      ],
+      "channelsFormats": [
+        "Short-form social content: Instagram Reels, TikTok, YouTube Shorts",
+        "Programmatic display + native placements to amplify reach",
+        "Motion graphics & subtle animations to highlight luxury and variety",
+        "Optional: longer hero films, property walkthroughs, and creator-led narratives"
+      ],
+      "watchouts": [
+        "Creative must balance energy with sophistication to reinforce luxury positioning",
+        "Parallel storytelling should be curated and clear, not overwhelming",
+        "Posting cadence should build intrigue and desire without fatigue"
+      ],
+      "previouslyPitchedTo": [
+        "Moon Palace Resorts"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "multiple social assets",
+          "minUsd": 100000,
+          "maxUsd": 150000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$100-$150k (multiple social assets)",
+      "name": "Reset. Reimagine. Repeat.",
+      "id": "reset-reimagine-repeat"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Beyond the Service” offers a rare look behind the curtain of luxury hospitality, spotlighting the personalization, craftsmanship, and meticulous care that define high-end all-inclusive and luxury resorts. By following a dedicated service expert—such as a butler, concierge, or guest experience lead—the campaign reveals how unforgettable stays are intentionally designed, elevating travelers’ understanding of what true luxury feels like.",
+      "creativeMechanism": "An ambassador shadows a service professional, capturing authentic moments, unexpected details, and behind-the-scenes glimpses of how the team anticipates needs and creates bespoke experiences. The content blends: candid conversations with staff immersive storytelling moments playful hands-on attempts as the ambassador tries some of the duties curated showcases of signature amenities and surprise-and-delight touches The narrative reveals the passion, precision, and heart that turn a luxury property into a world-class experience.",
+      "coreMessage": "True luxury is crafted in the details—experience service beyond expectations.",
+      "whatItsGoodFor": [
+        "Elevating perception of luxury resorts by showcasing their service philosophy",
+        "Highlighting the human side of premium hospitality in an aspirational yet relatable way",
+        "Differentiating high-end all-inclusive or boutique luxury properties through storytelling rather than price",
+        "Educating travelers on the unseen work that enables effortless, elevated experiences"
+      ],
+      "audienceFit": [
+        "Affluent travelers seeking ultra-personalized, ultra-comfortable luxury stays",
+        "Travelers who enjoy behind-the-scenes, human-centered lifestyle and travel content",
+        "Lifestyle- and service-focused audiences who value premium craftsmanship and care",
+        "Less effective for highly transactional or budget-focused audiences"
+      ],
+      "channelsFormats": [
+        "Short-form video (IG Reels, TikTok, YT Shorts) with behind-the-scenes access",
+        "Hero content or episodic mini-series",
+        "Programmatic and native placements",
+        "Optional long-form editorial or “meet the team” companion content"
+      ],
+      "watchouts": [
+        "Authenticity is essential—overly staged scenes reduce credibility",
+        "Ambassador should maintain a balance between curiosity and aspirational tone",
+        "Messaging must emphasize differentiation without overwhelming audiences with logistics",
+        "Service professionals should be portrayed respectfully and accurately"
+      ],
+      "previouslyPitchedTo": [
+        "Le Blanc Resorts"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "1x ambassador, 1x property",
+          "minUsd": 50000,
+          "maxUsd": 80000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$50-$80k (1x ambassador, 1x property)",
+      "name": "Beyond the Service",
+      "id": "beyond-the-service"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“The Luxury of Connection” explores how luxury properties can create meaningful, transformative travel experiences by giving guests the space—and the inspiration—to reconnect. Through dual storytelling that follows both a couple and a solo traveler, the campaign highlights how serene settings, thoughtful amenities, and elevated service allow travelers to restore themselves, deepen relationships, and rediscover what truly matters.",
+      "creativeMechanism": "Two ambassadors anchor the narrative: The Couple experiencing shared rituals, new discoveries, and quiet moments together. The Solo Traveler embracing self-renewal, reflection, and personal exploration. Short-form videos capture aspirational yet intimate moments: a morning wellness ritual, a slow shared breakfast, a solitary walk along a quiet path, a candlelit dinner, a sunset swim. Visual storytelling emphasizes tranquility, sensory richness, and emotional resonance—showcasing how luxury hospitality creates an atmosphere where connection naturally happens.",
+      "coreMessage": "Reconnect with what matters—yourself, your people, your world.",
+      "whatItsGoodFor": [
+        "Elevating luxury properties through emotional, meaning-driven storytelling",
+        "Positioning a brand as a place for deep rest, renewal, and connection",
+        "Inspiring aspirational travel through visually immersive, wellness-forward narratives",
+        "Differentiating luxury stays through purpose, emotion, and atmosphere—not just amenities"
+      ],
+      "audienceFit": [
+        "Couples and solo travelers seeking restorative, wellness-centric luxury",
+        "Affluent, experience-driven travelers prioritizing meaning over material excess",
+        "Social-first audiences who engage with emotive, cinematic storytelling",
+        "Less effective for heavily transactional or price-sensitive audiences"
+      ],
+      "channelsFormats": [
+        "Social storytelling (IG Reels, TikTok, YouTube Shorts)",
+        "Programmatic display and native placements",
+        "Dual-narrative videos showing both togetherness and individual discovery",
+        "Optional long-form editorial or wellness-focused feature content"
+      ],
+      "watchouts": [
+        "Emotional tone must remain authentic and grounded—not overly scripted",
+        "Balance the storylines clearly to avoid audience confusion",
+        "Maintain consistent luxury production values across all visuals",
+        "Ensure the emotional narrative enhances, rather than overshadows, the property’s offerings"
+      ],
+      "previouslyPitchedTo": [
+        "Le Blanc Resorts"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "2x ambassadors",
+          "minUsd": 80000,
+          "maxUsd": 100000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80-$100k (2x ambassadors)",
+      "name": "The Luxury of Connection",
+      "id": "the-luxury-of-connection"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Unplugged 9-to-5” reimagines the traditional workday as one spent entirely in luxury, wellness, and effortless indulgence. By following lifestyle ambassadors known for their busy professional routines, the campaign shows how a luxury property can transform daily stress into a restorative, immersive escape. Hour by hour, we contrast the pressures of office life with the calm, richness, and ease of a full day in paradise—spotlighting the property’s premium amenities and curated experiences.",
+      "creativeMechanism": "Across short-form videos and social content, ambassadors move through a redefined “workday”—one where each hour offers a different expression of luxury: 9 AM: Trading morning emails for a slow breakfast overlooking the water 11 AM: Swapping meetings for a warm stone massage or guided yoga session 1 PM: Choosing a chef-prepared meal instead of desk lunch 3 PM: Replacing deadlines with sun-soaked pool time 5 PM: Ending the “workday” with a sunset cocktail, fine dining, or a twilight spa ritual Through immersive, aspirational storytelling, audiences can envision their own version of an indulgent escape—one where every hour enriches mind, body, and spirit.",
+      "coreMessage": "Turn your 9-to-5 into 24 hours of pure luxury.",
+      "whatItsGoodFor": [
+        "Elevating luxury properties through relatable, lifestyle-driven storytelling",
+        "Showcasing the breadth of wellness, dining, and leisure amenities",
+        "Inspiring busy professionals to prioritize restorative, high-end travel",
+        "Driving social engagement through high-impact, visual content"
+      ],
+      "audienceFit": [
+        "Time-poor professionals craving luxury, rest, and wellness",
+        "Lifestyle-driven travelers who enjoy aspirational content",
+        "Audiences who respond to visual storytelling on social platforms",
+        "Less suited for strictly family-focused or heavily transactional messaging"
+      ],
+      "channelsFormats": [
+        "Social-first content (IG Reels, TikTok, YouTube Shorts) using hour-by-hour transformations",
+        "Programmatic display and native placements to drive discovery and bookings",
+        "Multi-day sequences showcasing morning-to-evening luxury rituals",
+        "Optional long-form editorial or “A Day in the Life” hero films"
+      ],
+      "watchouts": [
+        "Maintain authenticity—luxury should feel effortless, not staged",
+        "Hour-by-hour structure must stay clear and dynamic without dragging",
+        "Visual execution must match the expectations of premium hospitality",
+        "Balance indulgence with a sense of calm and wellness"
+      ],
+      "previouslyPitchedTo": [
+        "Le Blanc Resorts"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "2x ambassadors",
+          "minUsd": 80000,
+          "maxUsd": 100000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$80-$100k (2x ambassadors)",
+      "name": "Unplugged 9-to-5",
+      "id": "unplugged-9-to-5"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Booking Story” helps travelers understand the unique strengths of different luxury properties within a hotel portfolio by following a creator through their real decision-making process. By showcasing the contrasts—such as all-inclusive vs. à la carte, wellness-focused vs. adventure-forward, boutique vs. resort-style—the campaign makes choosing the perfect stay simple, transparent, and engaging. Through candid storytelling, travelers see what each property offers and why one may fit their needs better than another.",
+      "creativeMechanism": "A lifestyle ambassador walks viewers through their booking journey, comparing resort experiences, amenities, room types, dining philosophies, wellness programs, and signature brand touches. Short-form content highlights: Room and suite tours Spa and wellness offerings Dining experiences (all-inclusive vs. specialty dining) Activities, vibe, and atmosphere Service style and brand personality The ambassador shares honest reflections and the “why” behind their choice, making the process feel human, relatable, and helpful—while subtly showcasing the diversity within the hotel portfolio.",
+      "coreMessage": "Find your perfect stay—see what each property offers before you book.",
+      "whatItsGoodFor": [
+        "Educating travelers on the differences within a hotel collection",
+        "Helping guests self-select the right luxury experience for their style",
+        "Increasing consideration and bookings across multiple properties",
+        "Driving engagement through relatable, influencer-led content",
+        "Reducing decision fatigue by breaking down options clearly"
+      ],
+      "audienceFit": [
+        "Social-first travelers who trust influencer recommendations",
+        "Experience-driven guests who want clarity before committing to a luxury stay",
+        "Travelers deciding between multiple resort types or travel styles",
+        "Less suited for loyalty-driven audiences already committed to one brand"
+      ],
+      "channelsFormats": [
+        "Social (IG Reels, TikTok, YouTube Shorts): fast-paced comparisons, mini-tours",
+        "Longer-form YouTube or editorial: deeper breakdowns of amenities",
+        "Programmatic display/native: driving users to booking pages",
+        "Creator-led stories: “Why I chose this one,” room walk-throughs, dining highlights"
+      ],
+      "watchouts": [
+        "Ambassador must feel authentic—overly staged comparisons reduce trust",
+        "Differences between properties should be simple, clear, and visually distinct",
+        "Keep content informative without overwhelming audiences with detail",
+        "Balance personal preference with objective, helpful insights"
+      ],
+      "previouslyPitchedTo": [
+        "Tafer Hotels"
+      ],
+      "productionTimelineRaw": "10-12 weeks",
+      "productionTimeline": {
+        "minWeeks": 10,
+        "maxWeeks": 12
+      },
+      "productionBudget": [
+        {
+          "label": "1x ambassador",
+          "minUsd": 50000,
+          "maxUsd": 80000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$50-$80k (1x ambassador)",
+      "name": "Booking Story",
+      "id": "booking-story"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Shape Your Stay” spotlights the unique strengths of three Excellence Collection properties in Playa Mujeres by inviting travelers to co-create the experience in real time. Leveraging a new library of premium footage captured by Beautiful Destinations, the campaign turns each property’s offerings into an interactive, choose-your-own-adventure journey. Through polls, questions, and either/or prompts on Instagram Stories, audiences guide the creators’ itinerary, revealing the amenities, atmospheres, and signature moments that define each resort.",
+      "creativeMechanism": "A nimble Beautiful Destinations creator team captures high-quality video and photography across Excellence Coral, Beloved, and Finest Playa Mujeres. Each 2–3 day stay becomes a branching narrative: The audience votes on which amenities, activities, or moments the creators experience next. These choices shape the storyline in near-real time. Instagram Stories on Beautiful Destinations serve as the primary storytelling vehicle, with the content later amplified across Expedia channels.",
+      "coreMessage": "Choose your path. Shape your stay.",
+      "whatItsGoodFor": [
+        "Clear property differentiation by showcasing each resort’s personality through audience-driven storytelling.",
+        "Higher likelihood of conversion by helping travelers visualize the exact type of stay they would choose.",
+        "Deep engagement through interactive social formats and creator-led content."
+      ],
+      "audienceFit": [
+        "Best for:",
+        "Social-first travelers who enjoy interactive, participatory formats.",
+        "Experience-driven travelers who value amenities, atmosphere, and personalization.",
+        "Less suited for:",
+        "Fast-scrolling audiences seeking quick, transactional content with no narrative."
+      ],
+      "channelsFormats": [
+        "Instagram Stories (polls, questions, decision points) hosted on Beautiful Destinations.",
+        "Short-form videos (Reels, TikTok, Shorts) summarizing story arcs shaped by audience choices.",
+        "Expedia social amplification across IG, TikTok, and digital display to drive awareness and site visits."
+      ],
+      "watchouts": [
+        "Authenticity matters. Interactive choices must feel meaningful rather than gimmicky.",
+        "Strong real-time coordination needed between BD, Expedia, and on-property teams for timely posting.",
+        "Consistent visual + narrative language across the three properties is essential to keep the experience cohesive."
+      ],
+      "previouslyPitchedTo": [
+        "Excellence",
+        "Posadas"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "standard",
+          "minUsd": 150000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$150k-$200k",
+      "name": "Shape Your Stay",
+      "id": "shape-your-stay"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Room for Everyone” spotlights the wide range of experiences across The Excellence Collection by showing how each property caters to completely different types of travelers. From honeymooners to families to culinary-focused guests, the film’s narrative celebrates the variety of vibes, room types, and atmospheres available across the portfolio—reinforcing that there truly is something for everyone.",
+      "creativeMechanism": "A hero film follows three different traveler types over the course of a single day. Their stories intercut through clever match cuts—each transition linking one moment to another through motion, sound, or visual cues. A popping champagne bottle becomes a splash down a waterslide; sunscreen squeezed poolside becomes hot sauce added to a dish at a boutique restaurant. This rhythmic collage showcases contrasting experiences in a seamless, energetic flow, demonstrating the breadth of offerings across the brand.",
+      "coreMessage": "One brand. Endless experiences.",
+      "whatItsGoodFor": [
+        "Demonstrating the range of traveler profiles The Excellence Collection can serve.",
+        "Elevating brand perception with premium, cinematic storytelling.",
+        "Inspiring bookings by helping travelers see themselves reflected in the narrative."
+      ],
+      "audienceFit": [
+        "Couples, families, solo travelers, and culinary/wellness-focused guests who want to understand which property fits their vibe.",
+        "Audiences who enjoy dynamic, cinematic storytelling with fast visual payoff.",
+        "Less suited for viewers seeking very detailed, informational content vs. high-level brand inspiration."
+      ],
+      "channelsFormats": [
+        "Hero brand film for YouTube, paid social, and website.",
+        "Short-form social edits highlighting each traveler type or specific experiences.",
+        "Cutdowns for display, paid media, and onsite modules promoting specific properties or traveler segments."
+      ],
+      "watchouts": [
+        "Must ensure each traveler storyline feels equally represented to support the “for everyone” message.",
+        "Transitions should feel intentional and premium, not gimmicky.",
+        "Needs careful production planning to capture diverse environments without losing cohesion in tone and pacing,"
+      ],
+      "previouslyPitchedTo": [
+        "Excellence",
+        "Posadas"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "standard",
+          "minUsd": 150000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$150k-$200k",
+      "name": "Room for Everyone",
+      "id": "room-for-everyone"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“At The End of the Day” highlights the comfort, luxury, and personalization The Excellence Collection provides when travelers return from their adventures. The campaign showcases how every type of guest—couples, families, and friend groups—winds down their day through distinct amenities and experiences offered across the portfolio. It reinforces that no matter how you spend your day, there’s a perfect way to end it at an Excellence property.",
+      "creativeMechanism": "A cinematic series of vignettes follows different traveler groups as they arrive back at their resort after a full day out. We see a couple returning from a romantic beach outing, a family tired from exploring, and a group of friends spilling out of a cab after a night in town. Each transitions into a personalized wind-down moment: a patio dinner for the couple, a spa treatment for mom while the kids fall asleep watching a movie, a hot tub hangout with room service for the friends. These warm, inviting scenes emphasize the restorative, end-of-day rituals that define The Excellence Collection.",
+      "coreMessage": "No matter your day, there’s an Excellence way to end it.",
+      "whatItsGoodFor": [
+        "Showcasing the breadth of amenities across the portfolio in an emotionally grounded way.",
+        "Demonstrating how multiple traveler types can find comfort, luxury, and ease at the end of their day.",
+        "Driving affinity through relatable, aspirational nighttime rituals."
+      ],
+      "audienceFit": [
+        "Couples, families, friend groups, and upscale travelers seeking relaxation after full, active itineraries.",
+        "Viewers who connect with emotional, lifestyle-driven storytelling.",
+        "Less suited for audiences looking for high-action or adventure-first narratives."
+      ],
+      "channelsFormats": [
+        "Hero film for YouTube, paid social, and onsite branding.",
+        "Short-form edits focusing on each traveler vignette or specific amenities.",
+        "Display, onsite modules, and paid placements promoting “wind-down” moments and signature offerings."
+      ],
+      "watchouts": [
+        "Must balance tone so the film feels warm and premium—not overly sentimental or slow.",
+        "Each vignette should have equal production value so no traveler type feels secondary.",
+        "Evening/low-light scenes require careful lighting and cinematography to maintain luxury aesthetic."
+      ],
+      "previouslyPitchedTo": [
+        "Excellence"
+      ],
+      "productionTimelineRaw": "12-13 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 13
+      },
+      "productionBudget": [
+        {
+          "label": "1x hero + promo assets",
+          "minUsd": 150000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$150k-$200k (1x hero + promo assets)",
+      "name": "At The End of the Day",
+      "id": "at-the-end-of-the-day"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“First Resort” taps into the truth that travelers are creatures of habit—often loyal to hotels, rentals, or boutique stays they know. This campaign follows a traveler who has never stayed at an all-inclusive, luxury resort before and invites them to experience their very first at a Posadas property. Through their discovery, we highlight the comfort, convenience, and elevated service that define a Posadas stay, reframing what a “resort vacation” can be.",
+      "creativeMechanism": "A 2–4-minute hero film follows our “first-timer” as they enter the vibrant culture of Mexico and settle into the luxury and amenities of a Posadas resort. We capture their genuine reactions to moments they’ve never experienced before—spa treatments, poolside service, curated dining, seamless hospitality. These “aha!” moments visually and emotionally anchor the story. Additional content on a landing page deepens the narrative with an interview reflecting on their first resort experience.",
+      "coreMessage": "Your first resort stay changes everything.",
+      "whatItsGoodFor": [
+        "Reaching travelers who haven’t traditionally considered all-inclusive or resort-style vacations.",
+        "Showing the breadth of Posadas amenities through authentic human reactions.",
+        "Driving reappraisal and shifting perceptions of what a resort stay can offer."
+      ],
+      "audienceFit": [
+        "Resort skeptics, boutique-hotel loyalists, and travelers who prioritize culture over convenience.",
+        "Audiences who connect with first-person, documentary-style storytelling.",
+        "Less effective for travelers who already strongly prefer all-inclusive packages."
+      ],
+      "channelsFormats": [
+        "Hero film for paid social, YouTube, and onsite placements.",
+        "Short-form cutdowns focusing on “first moments” or specific amenities.",
+        "Landing page featuring resort options plus an extended interview with the first-timer.",
+        "Re-engagement ads targeting travelers who typically book non-resort stays."
+      ],
+      "watchouts": [
+        "The talent casting must feel authentic; overly polished or influencer-like delivery weakens the premise.",
+        "Ensure the story balances cultural immersion with resort life to avoid feeling one-note.",
+        "Moments should be genuine—not exaggerated—to preserve credibility and relatability."
+      ],
+      "previouslyPitchedTo": [
+        "Posadas"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "1x hero + promo assets",
+          "minUsd": 150000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$150k-$200k (1x hero + promo assets)",
+      "name": "First Resort",
+      "id": "first-resort"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "lodging",
+      "archetype": [],
+      "ideaSummary": "“Check Into Authentic” positions Posadas city hotels as the gateway to the true Mexico—offering something international chains simply can’t replicate: genuine cultural immersion. Through poetic, detail-driven storytelling, the campaign highlights the textures, flavors, styles, and moments that make each Posadas property deeply connected to its surroundings, helping travelers choose a stay that feels unmistakably Mexican.",
+      "creativeMechanism": "A series of short, atmospheric vignettes—each beginning with “Check in to…”—captures the authentic experiences inside and around a Posadas hotel. We spotlight local design, culinary craft, neighborhood energy, and subtle cultural details. These films collectively build a narrative of hotels rooted in place, elevating Posadas as the superior choice for travelers seeking culture, comfort, and luxury with true local character.",
+      "coreMessage": "For the real Mexico, check into Posadas.",
+      "whatItsGoodFor": [
+        "Differentiating Posadas from foreign and U.S. hotel brands dominating urban markets.",
+        "Inspiring culturally curious travelers who value authenticity over standardization.",
+        "Reinforcing Posadas’ local heritage and elevating it as the go-to option for a rooted, meaningful city stay."
+      ],
+      "audienceFit": [
+        "Travelers who want genuine cultural immersion rather than generic city hotels.",
+        "Social-first audiences drawn to aesthetic, cinematic short-form content.",
+        "Less effective for purely budget-driven or utilitarian business travelers."
+      ],
+      "channelsFormats": [
+        "Short-form vignette films for Instagram Reels, TikTok, and YouTube Shorts.",
+        "Paid social and programmatic video to drive awareness of Posadas’ unique city offering.",
+        "Recut assets for display, onsite modules, and hotel detail pages to highlight authentic design and amenities.",
+        "Option to adapt into a multi-part city series (e.g., “Check Into Mexico City,” “Check Into Guadalajara.”)"
+      ],
+      "watchouts": [
+        "Authenticity must feel real: avoid clichés or overly romanticized tropes of Mexican culture.",
+        "Maintain consistency across vignettes while allowing each city/hotel its own personality.",
+        "Ensure the content clearly connects authenticity back to the Posadas property to avoid becoming just a city tourism film."
+      ],
+      "previouslyPitchedTo": [
+        "Posadas"
+      ],
+      "productionTimelineRaw": "12-14 weeks",
+      "productionTimeline": {
+        "minWeeks": 12,
+        "maxWeeks": 14
+      },
+      "productionBudget": [
+        {
+          "label": "3-4 vignettes + promo assets",
+          "minUsd": 150000,
+          "maxUsd": 200000
+        }
+      ],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "productionBudgetRaw": "$150k-$200k (3-4 vignettes + promo assets)",
+      "name": "Check Into Authentic",
+      "id": "check-into-authentic"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "car",
+      "archetype": [],
+      "ideaSummary": "“The Open Road” celebrates the journey as much as the destination, highlighting Volkswagen’s new models through an immersive road trip experience. Users virtually explore exciting destinations across the U.S., discovering how the cars enhance outdoor adventures and everyday travel while engaging with the brand in a multisensory, memorable way.",
+      "creativeMechanism": "Through a digital and multisensory activation, users participate in a test-drive experience that simulates exploring the U.S. in Volkswagen vehicles. PR activations at car dealerships allow drivers to choose a route and “drive” virtually, with the experiences captured on film. Short-form content from these journeys is shared across social and programmatic channels, bringing the adventure to a wider audience and emphasizing the car’s features in real-world, aspirational contexts.",
+      "coreMessage": "The journey matters—experience adventure in a Volkswagen.",
+      "whatItsGoodFor": [
+        "Raising awareness of new car models in a way that highlights lifestyle and adventure.",
+        "Creating memorable, experiential interactions that showcase vehicle capabilities.",
+        "Generating content that can be amplified across multiple channels for broader reach."
+      ],
+      "audienceFit": [
+        "Travel- and adventure-driven audiences who value experiential content.",
+        "Car enthusiasts interested in testing features in realistic, aspirational scenarios.",
+        "Less effective for purely transactional audiences seeking only pricing or specifications."
+      ],
+      "channelsFormats": [
+        "PR activations at U.S. car dealerships for hands-on experiences.",
+        "Social media for short-form video highlights from the experiences.",
+        "Programmatic display and native channels to amplify awareness."
+      ],
+      "watchouts": [
+        "Multisensory activations must be logistically smooth to ensure a high-quality user experience.",
+        "Filmed experiences need to authentically convey the adventure and lifestyle appeal.",
+        "Must balance showcasing the car with storytelling to avoid overly product-heavy content."
+      ],
+      "previouslyPitchedTo": [
+        "Volkswagen"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "The Open Road",
+      "id": "the-open-road"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“One Click to Mahi Mahi” positions Klarna as the ultimate tool for stress-free vacation planning, enabling travelers—especially parents—to enjoy every moment of their trip without compromise. Bold, playful DOOH visuals paired with concise messaging communicate the freedom and flexibility Klarna provides, turning everyday vacation decisions into seamless, joyful experiences.",
+      "creativeMechanism": "DOOH headlines such as “Make believe, massages, and mahi mahi” highlight how Klarna empowers travelers to budget for everything—from family fun and indulgent dining to resort relaxation—without stress. Eye-catching visuals reinforce the playful, aspirational tone, while subcopy emphasizes Klarna’s seamless payment solutions, creating an immediate and memorable impact. The campaign extends digitally to social and landing pages to provide more context and drive conversions.",
+      "coreMessage": "Budget for it all with Klarna.",
+      "whatItsGoodFor": [
+        "Driving awareness and conversions by showcasing Klarna’s flexible payment options.",
+        "Positioning Klarna as a practical and joyful solution for travel and vacation spending.",
+        "Engaging parents and family travelers by emphasizing freedom and choice."
+      ],
+      "audienceFit": [
+        "Parents and family travelers seeking flexible budgeting solutions for vacations.",
+        "Social- and DOOH-engaged audiences receptive to playful, aspirational messaging.",
+        "Less effective for audiences seeking purely transactional or price-focused messaging without lifestyle context."
+      ],
+      "channelsFormats": [
+        "DOOH for high-impact, attention-grabbing messaging in key locations.",
+        "Social media amplification with short-form visuals and playful copy.",
+        "Dedicated landing page to explain Klarna’s payment features and drive conversions."
+      ],
+      "watchouts": [
+        "Headlines must remain playful but clear to avoid confusion.",
+        "Visuals should convey both aspiration and practicality to resonate with parents.",
+        "DOOH execution must balance bold design with concise, legible messaging for quick consumption."
+      ],
+      "previouslyPitchedTo": [
+        "Klarna"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "One Click to Mahi Mahi",
+      "id": "one-click-to-mahi-mahi"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Point A to Yayyy” positions Klarna as the effortless way to plan and pay for travel, letting travelers focus on enjoying their experiences rather than worrying about logistics. Playful DOOH headlines paired with bold visuals communicate simplicity, joy, and freedom, reinforcing Klarna as the go-to solution for stress-free vacation planning.",
+      "creativeMechanism": "Headlines like “From point A to yayyy” paired with supportive subcopy “Booking with Klarna is that easy” emphasize the simplicity and joy of using Klarna for travel. Bold visuals depict adventure, relaxation, and memorable vacation moments, reinforcing the emotional appeal of carefree planning. The concept extends digitally via social media and landing pages to engage users, educate them on Klarna’s flexible payment options, and drive conversions.",
+      "coreMessage": "Booking your next getaway is effortless with Klarna.",
+      "whatItsGoodFor": [
+        "Increasing international awareness of Klarna as a travel-friendly payment solution.",
+        "Driving engagement and conversions by showcasing simplicity and flexibility.",
+        "Connecting with travelers through playful, aspirational visuals that highlight vacation experiences."
+      ],
+      "audienceFit": [
+        "Travelers, especially digitally savvy and experience-driven audiences, seeking easy and flexible payment solutions.",
+        "Social- and DOOH-engaged audiences receptive to playful, aspirational messaging.",
+        "Less effective for audiences who prefer transactional-only messaging without lifestyle context."
+      ],
+      "channelsFormats": [
+        "DOOH for high-impact, attention-grabbing messaging in key travel or urban locations.",
+        "Social media amplification using short-form content inspired by DOOH visuals.",
+        "Dedicated landing page explaining Klarna’s features and guiding conversions."
+      ],
+      "watchouts": [
+        "Headlines must be playful but immediately understandable for quick consumption.",
+        "Visuals must balance aspirational vacation imagery with the functional Klarna message.",
+        "DOOH placement requires legible design and concise messaging for maximum impact."
+      ],
+      "previouslyPitchedTo": [
+        "Klarna"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Point A to Yayyy",
+      "id": "point-a-to-yayyy"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Smoooth Recognition” positions Klarna as the effortless, seamless choice for travel bookings, highlighting how its flexible payment solutions simplify the traveler experience. Using playful analogies to iconic duos, the campaign conveys confidence, style, and ease, showing that Klarna and Expedia are a natural pairing for stress-free travel.",
+      "creativeMechanism": "DOOH visuals feature the headline “Smoooth recognizes smoooth” with subcopy “Seamless checkout with Klarna”, paired with striking imagery that illustrates iconic duos (e.g., butter on a baguette, marble in a sculptor’s hands). The messaging reinforces Klarna’s ability to make travel planning effortless, while bold, stylish visuals ensure immediate impact. The concept extends digitally via social media and a landing page to educate users on Klarna’s payment flexibility and drive conversions.",
+      "coreMessage": "Travel booking made effortlessly smooth with Klarna.",
+      "whatItsGoodFor": [
+        "Increasing international awareness of Klarna as a travel-friendly, seamless payment solution.",
+        "Positioning Klarna as stylish, confident, and easy-to-use for vacation planning.",
+        "Driving engagement and conversions through aspirational, playful messaging."
+      ],
+      "audienceFit": [
+        "Experience-driven, social-savvy travelers who value convenience and style.",
+        "Digital-first users who respond to visually striking, playful, and aspirational content.",
+        "Less effective for audiences seeking purely transactional messaging without lifestyle context."
+      ],
+      "channelsFormats": [
+        "DOOH for high-impact, attention-grabbing visual messaging.",
+        "Social media amplification using short-form, playful, and shareable content.",
+        "Dedicated landing page for deeper education on Klarna’s features and flexible checkout."
+      ],
+      "watchouts": [
+        "Analogies and playful messaging must be instantly understandable in high-traffic DOOH placements.",
+        "Visuals should balance aspirational style with clear communication of Klarna’s benefits.",
+        "Consistency in tone is key across DOOH, social, and landing page to reinforce brand positioning."
+      ],
+      "previouslyPitchedTo": [
+        "Klarna"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Smoooth Recognition",
+      "id": "smoooth-recognition"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Look Book” transforms travel inspiration into an interactive, visually-driven editorial experience that blends destination discovery with lifestyle and beauty content. Partnering with Expedia Magazine and non-endemic brands like Estee Lauder, the concept allows travelers to explore destinations through curated looks, beauty products, and immersive experiences, positioning Klarna as the seamless way to shop and pay for their ultimate getaway kit.",
+      "creativeMechanism": "Users engage with striking destination imagery on a dedicated editorial hub or social carousel units. With each click or swipe, the background and content change to reveal a destination-inspired “Look Book,” showcasing recommended experiences and complementary beauty products. Interactive elements include embedded shoppable links via Klarna, allowing users to seamlessly purchase items while exploring curated travel inspiration.",
+      "coreMessage": "Match your beauty with the beauty of the world—discover, style, and book effortlessly with Klarna.",
+      "whatItsGoodFor": [
+        "Driving awareness and conversions by linking travel inspiration with shoppable lifestyle and beauty content.",
+        "Engaging audiences through editorial storytelling and aspirational visual experiences.",
+        "Highlighting Klarna as a flexible, effortless payment solution within culturally rich, social-first campaigns."
+      ],
+      "audienceFit": [
+        "Fashion-, beauty-, and experience-driven travelers seeking aspirational editorial content.",
+        "Social-first users who engage with swipeable, visually immersive content and interactive shoppable features.",
+        "Less effective for audiences who prefer transactional booking without lifestyle or editorial context."
+      ],
+      "channelsFormats": [
+        "Editorial hub: Expedia Magazine digital platform featuring full Look Book experiences.",
+        "Social media: Instagram and TikTok carousels, Reels, and Stories for interactive destination-product journeys.",
+        "Interactive shoppable links integrated directly via Klarna, driving seamless conversions."
+      ],
+      "watchouts": [
+        "Content must feel aspirational yet accessible; overly commercial messaging could undermine editorial credibility.",
+        "Interactive elements must be intuitive, with smooth navigation across destination, product, and booking layers.",
+        "Balance between editorial storytelling and product promotion is key to maintain user engagement."
+      ],
+      "previouslyPitchedTo": [
+        "Estee Lauder"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Look Book",
+      "id": "look-book"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Spotlight Festivals” showcases iconic cultural festivals as must-see, immersive experiences while positioning Klarna as the seamless, flexible payment solution for travel. This social-first concept delivers quick, engaging content that highlights local culture, memorable experiences, and travel convenience, inspiring users to plan their next getaway with confidence.",
+      "creativeMechanism": "Short-form social content—Instagram Reels, TikTok clips, and Stories—brings the energy of festivals like El Dia de los Muertos to life through a mix of user-generated footage, stock clips, illustrations, and animated graphics. Dynamic edits spotlight vibrant costumes, parades, local food, and music, while overlay copy communicates Klarna’s flexible payment benefits. Microsites or social landing pages provide itineraries, maps, and booking links, allowing users to easily explore and purchase experiences.",
+      "coreMessage": "Immerse yourself in the world’s most vibrant festivals—Klarna makes it effortless.",
+      "whatItsGoodFor": [
+        "Driving awareness of Klarna among culturally curious travelers.",
+        "Engaging audiences with vibrant, shareable, socially-friendly festival content.",
+        "Quick-turnaround, lower-production social executions that complement hero mid-form campaigns."
+      ],
+      "audienceFit": [
+        "Younger, social-first travelers interested in culture, experiences, and events.",
+        "Users who respond to visually dynamic, fast-paced content optimized for feeds and Stories.",
+        "Less effective for audiences seeking deep editorial storytelling or traditional travel advertising."
+      ],
+      "channelsFormats": [
+        "Social: Instagram Reels, TikTok, Stories, and carousel posts for rapid engagement.",
+        "Microsite: Lightweight hub with itineraries, festival guides, maps, and Klarna-powered booking links.",
+        "Programmatic display: Retargeting social audiences with quick festival highlights."
+      ],
+      "watchouts": [
+        "Content must feel authentic and lively without over-relying on stock imagery.",
+        "Festival experiences should be accurately represented to avoid cultural missteps.",
+        "Messaging must balance excitement with Klarna’s value proposition without cluttering visuals."
+      ],
+      "previouslyPitchedTo": [
+        "Klarna x Expedia"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Spotlight Festivals",
+      "id": "spotlight-festivals"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Audible Travel Experiences” highlights how Audible’s audiobooks can transform the way travelers explore the world. By pairing immersive stories with real destinations, users discover curated trips enriched with audio content that enhances cultural context, inspires exploration, and deepens their travel experience. Klarna can be integrated as the flexible payment option for audio-book purchases or travel experiences, creating a seamless journey from inspiration to booking.",
+      "creativeMechanism": "Two tiered activations: Hear, There & Everywhere Concierge ($250k)Users input travel interests, bucket-list destinations, and preferred audiobook genres. The concierge generates a tailored travel itinerary with Audible audiobook recommendations for each location, highlighting how the audio content enriches the journey. Interactive emails, landing pages, or social experiences allow users to preview or download books instantly, with Klarna powering flexible purchases. The Audio Atlas ($500k)A visually rich digital map lets users “travel” across countries, with each destination linked to related Audible audiobooks. Leveraging purchase data and recommendation algorithms, users can jump between destinations via themed audio suggestions. Social extensions and interactive microsites encourage exploration, sharing, and instant access to audio content, paired with Klarna for seamless checkout.",
+      "coreMessage": "Hear the world come alive—let Audible and Klarna transform your journey.",
+      "whatItsGoodFor": [
+        "Raising awareness and consideration of Audible among travel- and culture-focused audiences.",
+        "Demonstrating the immersive power of audio content to enhance real-world travel experiences.",
+        "Driving engagement and conversions through tailored recommendations and interactive digital tools."
+      ],
+      "audienceFit": [
+        "Immersed Enthusiasts: culturally curious, digitally savvy, and travel-oriented users who enjoy experiential storytelling.",
+        "Social-first audiences who engage with visually rich, interactive content.",
+        "Less effective for audiences unfamiliar with audiobooks or digital content consumption."
+      ],
+      "channelsFormats": [
+        "Social: Instagram, TikTok, and Reels for destination/audio highlights.",
+        "Digital: Interactive microsites, map-based journeys, concierge tools.",
+        "Email/CRM: Personalized travel and audiobook recommendations.",
+        "Programmatic display and paid social to retarget users and drive conversions."
+      ],
+      "watchouts": [
+        "Recommendations must feel personalized and authentic to maintain trust.",
+        "Map and digital interfaces need intuitive navigation to avoid user frustration.",
+        "Balance storytelling and commerce—Klarna checkout should enhance, not disrupt, the immersive experience."
+      ],
+      "previouslyPitchedTo": [
+        "Audible"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Audible Travel Experiences",
+      "id": "audible-travel-experiences"
+    },
+    {
+      "conceptType": "one-off",
+      "category": "non-endemic",
+      "archetype": [],
+      "ideaSummary": "“Ready, Set, Visa” inspires travelers to turn world-class sporting events into fully immersive, local experiences while showcasing Visa as the seamless, cash-free payment solution. Through social-led mini-itineraries and interactive content, audiences discover how to enhance their Olympic (or major tournament) trips with curated food, activities, and cultural moments—making each visit unforgettable and effortless.",
+      "creativeMechanism": "A series of fast-paced, visually engaging mini-itineraries is delivered across social platforms (Reels, TikTok, Stories) and digital banners. Each itinerary centers on a single event or sport, pairing recommended local experiences with practical guidance on using Visa abroad. Users see how to fully live the moment: from pre-event meals, immersive local activities, to post-event recovery or sightseeing. Interactive hubs amplify the experience, featuring: Hover-activated GIF tiles showcasing curated experiences. Embedded tips and benefits of using Visa abroad. Easy sign-up CTA buttons to acquire a Visa card. This concept can flex across different global events—Olympics, World Cups, or other international tournaments—by swapping sports-specific itineraries and culturally relevant experiences, keeping content fresh and socially shareable.",
+      "coreMessage": "Turn every sporting event into an unforgettable, cash-free adventure with Visa.",
+      "whatItsGoodFor": [
+        "Driving awareness of Visa’s cashless benefits in a fun, culturally immersive context.",
+        "Engaging travelers through aspirational, interactive, social-first storytelling.",
+        "Encouraging sign-ups by tying practical value directly to memorable experiences."
+      ],
+      "audienceFit": [
+        "Sports enthusiasts, global travelers, and experience-driven audiences.",
+        "Social-first, digitally savvy users who enjoy fast, snackable, visually rich content.",
+        "Less effective for audiences who are uninterested in travel or sports events."
+      ],
+      "channelsFormats": [
+        "Social: Instagram Reels, TikTok, Stories, carousel posts for event-specific mini-itineraries.",
+        "Digital banners with GIFs and short animated sequences.",
+        "Custom hub on Hotels.com or Visa site with immersive itineraries, GIFs, and Visa benefits.",
+        "Paid social amplification to target travelers planning to attend major tournaments."
+      ],
+      "watchouts": [
+        "Content must remain culturally respectful and accurate when showcasing local experiences.",
+        "Fast-paced social content must communicate Visa’s benefits clearly without feeling heavy-handed.",
+        "Mini-itineraries need to balance aspiration and practicality to be genuinely useful and inspiring."
+      ],
+      "previouslyPitchedTo": [
+        "Visa"
+      ],
+      "productionTimelineRaw": "",
+      "productionTimeline": null,
+      "productionBudget": [],
+      "referenceLinks": [],
+      "lastValidated": null,
+      "eraTags": [],
+      "name": "Ready, Set, Visa",
+      "id": "ready-set-visa"
+    }
+  ]
+}
