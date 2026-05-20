@@ -55,6 +55,9 @@ import { LoadingProgress } from '@/components/LoadingProgress';
 import { TRIAGE_STAGES, AUDIENCE_STAGES, INSIGHTS_STAGES } from '@/lib/loading-config';
 import { useLoadingProgress } from '@/hooks/useLoadingProgress';
 import { ProductionBudget } from '@/components/ProductionBudget';
+import { BriefStateProvider, BriefStateContextValue } from '@/lib/state/BriefStateContext';
+import { useHandlers } from '@/lib/state/useHandlers';
+import { useProgressHooks } from '@/lib/state/useProgressHooks';
 
 // ============================================
 // Constants
@@ -1185,6 +1188,21 @@ export default function Home() {
       };
     });
   };
+
+  // ============================================
+  // New context bag (Task 5)
+  // Runs in parallel with the inline closures below until Tasks 6-16
+  // progressively delete the inline closures. Placed after pushHistory
+  // is declared so useHandlers' dep is in scope.
+  // ============================================
+  const progress = useProgressHooks();
+  const handlers = useHandlers({
+    state,
+    updateState,
+    progress,
+    pushHistory,
+    setLastAction,
+  });
 
   // Derived values for undo/redo availability
   const canUndo = state.historyIndex > 0;
@@ -3219,7 +3237,18 @@ export default function Home() {
     }
   };
 
+  const contextValue: BriefStateContextValue = {
+    state,
+    updateState,
+    handlers,
+    progress,
+    pushHistory,
+    lastAction,
+    setLastAction,
+  };
+
   return (
+    <BriefStateProvider value={contextValue}>
     <div className="min-h-screen bg-[var(--bg-secondary)]">
       {/* Header */}
       <header className="bg-[var(--expedia-navy)] text-white">
@@ -3287,5 +3316,6 @@ export default function Home() {
         />
       )}
     </div>
+    </BriefStateProvider>
   );
 }
