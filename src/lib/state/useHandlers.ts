@@ -63,7 +63,6 @@ export interface UseHandlersReturn {
 
 export interface UseHandlersDeps {
   state: SessionState;
-  setState: (updater: (prev: SessionState) => SessionState) => void;
   updateState: (partial: Partial<SessionState>) => void;
   progress: UseProgressHooksReturn;
   pushHistory: (action: string, snapshot: Partial<SessionState>) => void;
@@ -71,17 +70,13 @@ export interface UseHandlersDeps {
 }
 
 export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
-  const { state, setState, updateState, progress, pushHistory, setLastAction } =
-    deps;
+  const { state, updateState, progress, pushHistory, setLastAction } = deps;
 
   // NOTE: Each handler below is lifted verbatim from page.tsx, with the
   // following transformations applied:
   //   - `triageProgress.x`   → `progress.triage.x`
   //   - `audienceProgress.x` → `progress.audience.x`
   //   - `insightsProgress.x` → `progress.insights.x`
-  //   - `setState(createInitialState())` → `setState(() => createInitialState())`
-  //     (the deps interface only exposes the updater-form setState; this is the
-  //     functional-form equivalent of the original direct call)
   // All other reads (`state.x`), `updateState(...)`, `pushHistory(...)`, and
   // `setLastAction(...)` calls stay the same — they're closure references in
   // the original and now they're function deps in this hook, identical shape.
@@ -89,7 +84,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   // Navigation handler for progress bar
   const handleNavigateToStep = (step: Step) => {
     if (step === 'upload') {
-      setState(() => createInitialState());
+      updateState(createInitialState());
       return;
     }
     updateState({ step });
@@ -617,35 +612,35 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     }
   }
 
-  const goToPreviousGate1Section = () => {
+  function goToPreviousGate1Section() {
     if (state.currentSectionIndex > 0) {
       updateState({ currentSectionIndex: state.currentSectionIndex - 1 });
     } else {
       updateState({ step: 'triage' });
     }
-  };
+  }
 
   // ============================================
   // Vault handler stubs (implemented in Phase 2)
   // ============================================
 
   const handleVaultDecision = (_decision: 'vault' | 'creative-lab') => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultDecision: not implemented until Phase 2');
   };
   const handleVaultAudiencePick = (_branchIndex: number | 'all') => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultAudiencePick: not implemented until Phase 2');
   };
   const handleVaultProductionBudgetConfirm = (_budget: number) => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultProductionBudgetConfirm: not implemented until Phase 2');
   };
   const handleVaultSelectConcept = (_conceptId: string) => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultSelectConcept: not implemented until Phase 2');
   };
   const handleVaultGenerateNarrative = async () => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultGenerateNarrative: not implemented until Phase 2');
   };
   const handleVaultExport = async () => {
-    throw new Error('Not implemented until Phase 2');
+    throw new Error('handleVaultExport: not implemented until Phase 2');
   };
 
   return {
