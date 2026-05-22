@@ -27,6 +27,7 @@ import {
 import { logAnalytics, captureBriefScore } from '../analytics';
 import { encodeResumeToken, buildResumeUrl } from '../vault-resume-token';
 import { exportVaultPack } from '../word-export';
+import { getBrandDisplayName } from '../brand-criteria';
 import { UseProgressHooksReturn } from './useProgressHooks';
 
 export interface UseHandlersReturn {
@@ -60,8 +61,8 @@ export interface UseHandlersReturn {
   goToPreviousGate1Section: () => void;
   // Vault handlers added in Phase 2 (stubs):
   handleVaultDecision: (decision: 'vault' | 'creative-lab') => void;
-  handleVaultAudiencePick: (branchIndex: number | 'all') => void;
-  handleVaultProductionBudgetConfirm: (budget: number) => void;
+  handleVaultAudiencePick: (branchIndex: number | 'all') => Promise<void>;
+  handleVaultProductionBudgetConfirm: (budget: number) => Promise<void>;
   handleVaultSelectConcept: (conceptId: string) => void;
   handleVaultProceedToDraft: () => void;
   handleVaultGenerateNarrative: () => Promise<void>;
@@ -792,7 +793,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     }
   };
 
-  const handleVaultAudiencePick = (branchIndex: number | 'all') => {
+  const handleVaultAudiencePick = async (branchIndex: number | 'all') => {
     // Resolve which insights the matcher should weight, based on the CP's
     // explicit pick. 'all' merges every branch's insights into one call.
     const branchInsights =
@@ -800,9 +801,13 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
         ? state.audienceBranches.flatMap(b => b.insights)
         : state.audienceBranches[branchIndex]?.insights || [];
 
+    const nextStep = state.productionBudgetUsd ? 'vault_matches' : 'vault_production_budget';
+    const willShowMatches = nextStep === 'vault_matches';
+
     updateState({
       vaultAudienceBranchIndex: branchIndex,
-      step: state.productionBudgetUsd ? 'vault_matches' : 'vault_production_budget',
+      step: nextStep,
+      ...(willShowMatches ? { loading: true, vaultResult: null } : {}),
     });
 
     // Re-fire matcher with the chosen branch's insights. Explicit args avoid
@@ -810,16 +815,18 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     const partnerType = state.partnerType ?? derivePartnerType(state);
     const productionBudgetUsd =
       state.productionBudgetUsd ?? deriveProductionBudgetUsd(state);
-    setTimeout(
-      () =>
-        fireBackgroundMatcher({ partnerType, productionBudgetUsd, branchInsights }),
-      0
-    );
+    try {
+      await fireBackgroundMatcher({ partnerType, productionBudgetUsd, branchInsights });
+    } finally {
+      if (willShowMatches) updateState({ loading: false });
+    }
   };
-  const handleVaultProductionBudgetConfirm = (budget: number) => {
+  const handleVaultProductionBudgetConfirm = async (budget: number) => {
     updateState({
       productionBudgetUsd: budget,
       step: 'vault_matches',
+      vaultResult: null,
+      loading: true,
     });
     // Re-fire matcher with explicit overrides (no closure staleness)
     const partnerType = state.partnerType ?? derivePartnerType(state);
@@ -829,10 +836,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
         : typeof state.vaultAudienceBranchIndex === 'number'
           ? state.audienceBranches[state.vaultAudienceBranchIndex]?.insights || state.selectedInsights
           : state.selectedInsights;
-    setTimeout(
-      () => fireBackgroundMatcher({ partnerType, productionBudgetUsd: budget, branchInsights }),
-      0
-    );
+    try {
+      await fireBackgroundMatcher({ partnerType, productionBudgetUsd: budget, branchInsights });
+    } finally {
+      updateState({ loading: false });
+    }
   };
   const handleVaultSelectConcept = (conceptId: string) => {
     const current = state.vaultResult?.selectedConceptIds || [];
@@ -873,7 +881,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
             partnerType: state.partnerType,
             productionBudgetUsd: state.productionBudgetUsd,
             selectedConceptId: conceptId,
-            partnerName: state.brandAlignment?.brand || 'the partner',
+            partnerName: getBrandDisplayName(state.brandAlignment?.brand),
           }),
         });
         const data = await res.json();
@@ -901,7 +909,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
 
     await exportVaultPack({
       briefFilename: state.briefFilename || 'brief',
-      partnerName: state.brandAlignment?.brand || 'Partner',
+      partnerName: getBrandDisplayName(state.brandAlignment?.brand),
       vaultResult: state.vaultResult,
       resumeUrl,
     });

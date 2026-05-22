@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useBriefState } from '@/lib/state/BriefStateContext';
 import { AudienceMenu } from '@/components/AudienceMenu';
 import { PersonificationReview } from '@/components/PersonificationReview';
@@ -124,11 +125,14 @@ export function Gate2AudienceStep() {
   }
 
   // Auto-trigger audience generation if no menu yet
-  if (!state.loading && !state.audienceMenu) {
-    handleGenerateAudience();
-  }
+  useEffect(() => {
+    if (!state.loading && !state.audienceMenu) {
+      handleGenerateAudience();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.loading, state.audienceMenu]);
 
-  // Fallback - shouldn't reach here
+  // Fallback while the effect kicks in
   return (
     <LoadingOverlay
       message="Preparing audience step..."

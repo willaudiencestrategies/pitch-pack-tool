@@ -3,11 +3,26 @@
 import { useState } from 'react';
 import { useBriefState } from '@/lib/state/BriefStateContext';
 
+function parseBudgetString(raw: string): number | null {
+  if (!raw) return null;
+  // Match "$350K", "350,000", "1.5M", "2 billion", etc.
+  const match = raw.match(/([\d,]+(?:\.\d+)?)\s*(k|m|b|thousand|million|billion)?/i);
+  if (!match) return null;
+  const base = parseFloat(match[1].replace(/,/g, ''));
+  if (!isFinite(base)) return null;
+  const suffix = (match[2] || '').toLowerCase();
+  const multiplier =
+    suffix === 'k' || suffix === 'thousand' ? 1_000
+    : suffix === 'm' || suffix === 'million' ? 1_000_000
+    : suffix === 'b' || suffix === 'billion' ? 1_000_000_000
+    : 1;
+  return Math.round(base * multiplier);
+}
+
 export function VaultProductionBudgetStep() {
   const { state, handlers } = useBriefState();
   const totalBudgetRaw = state.budgetDetails?.totalBudget || '';
-  const totalBudgetMatch = totalBudgetRaw.match(/[\d,]+/);
-  const totalBudgetUsd = totalBudgetMatch ? parseInt(totalBudgetMatch[0].replace(/,/g, ''), 10) : null;
+  const totalBudgetUsd = parseBudgetString(totalBudgetRaw);
   const [value, setValue] = useState('');
 
   const quickPicks = totalBudgetUsd ? [
@@ -17,7 +32,9 @@ export function VaultProductionBudgetStep() {
   ] : [];
 
   const parsedValue = parseInt(value.replace(/[^\d]/g, ''), 10);
-  const isValid = parsedValue && parsedValue >= 1000;
+  const hasInput = !!parsedValue;
+  const isValid = hasInput && parsedValue >= 1000;
+  const showFloorError = hasInput && !isValid;
 
   const submit = () => {
     if (!isValid) return;
@@ -63,6 +80,11 @@ export function VaultProductionBudgetStep() {
             autoFocus
           />
         </div>
+        {showFloorError && (
+          <p className="text-sm text-[var(--status-red)] mt-1">
+            Minimum production budget is $1,000. Vault concepts have production costs that won&apos;t fit smaller budgets.
+          </p>
+        )}
       </div>
 
       {/* Quick picks */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useBriefState } from '@/lib/state/BriefStateContext';
+import { LoadingOverlay } from '@/components/steps/shared/LoadingOverlay';
 import { VaultConceptMatch } from '@/lib/types';
 
 const confidenceBadge: Record<string, { label: string; className: string }> = {
@@ -13,6 +14,15 @@ export function VaultMatchListStep() {
   const { state, handlers } = useBriefState();
   const result = state.vaultResult;
   const selected = result?.selectedConceptIds || [];
+
+  if (state.loading && (!result || !result.rankedConcepts.length)) {
+    return (
+      <LoadingOverlay
+        message="Searching the Vault..."
+        subMessage="Matching your brief against 33 pre-developed concepts"
+      />
+    );
+  }
 
   if (!result || !result.rankedConcepts.length) {
     return (

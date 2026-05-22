@@ -39,7 +39,7 @@ The Vault components were built mechanically from the plan without invoking the 
 | Card selection pattern (radio + tinted bg + shadow) | Plain border buttons | Cards in AudiencePicker + MatchList now use BrandAlignment/AudienceMenu pattern |
 | `pt-4 border-t` section dividers + action rows | Plain margins | All 6 fixed |
 | Hover/transition effects | Minimal | Added `transition-all`, `hover:shadow-sm`, `hover:border-[var(--expedia-navy)]/50` |
-| Text colour discipline (explicit vars) | Mostly defaults | All text now uses `text-[var(--text-...)]` |
+| Text colour discipline (explicit vars) | Mostly defaults | All text now uses `text-` with the CSS variables |
 | `LoadingSpinner` SVG in async buttons | Static buttons | Added to VaultDecisionStep's "Checking the Vault..." state |
 | `.textarea-field` / `.input-field` CSS classes | Inline border styles | NarrativeDraft and ProductionBudget now use them |
 

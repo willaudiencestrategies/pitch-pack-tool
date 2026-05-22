@@ -1,5 +1,11 @@
 import { ExpediaBrand } from './types';
 
+export function getBrandDisplayName(key: ExpediaBrand | string | null | undefined): string {
+  if (!key) return 'Partner';
+  if (key in BRAND_CRITERIA) return BRAND_CRITERIA[key as ExpediaBrand].name;
+  return key;
+}
+
 export interface BrandTargetAudience {
   name: string;
   description: string;
