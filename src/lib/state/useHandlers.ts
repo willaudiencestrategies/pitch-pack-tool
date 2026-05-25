@@ -866,8 +866,21 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       const drafts: Record<string, NarrativeDraft> = {
         ...(state.vaultResult.narrativeDrafts || {}),
       };
+
+      const gate1Keys = ['objective', 'budget', 'audience', 'creative_task'];
+      const triageTrafficLights = Object.fromEntries(
+        state.sections
+          .filter(s => gate1Keys.includes(s.key))
+          .map(s => {
+            const assessment = state.triageResult?.triageAssessment.find(t => t.key === s.key);
+            return [s.key, { status: s.status, rationale: assessment?.whyThisRating || '' }];
+          }),
+      );
+      const triageCoherenceTensions = state.triageResult?.coherenceAnalysis?.tensions || [];
+
       for (const conceptId of state.vaultResult.selectedConceptIds) {
         if (drafts[conceptId]) continue; // already generated
+        const match = state.vaultResult.rankedConcepts.find(c => c.conceptId === conceptId);
         const res = await fetch('/api/vault', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -882,6 +895,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
             productionBudgetUsd: state.productionBudgetUsd,
             selectedConceptId: conceptId,
             partnerName: getBrandDisplayName(state.brandAlignment?.brand),
+            triageTrafficLights,
+            triageCoherenceTensions,
+            matchConfidence: match?.confidence || 'plausible',
+            matchQualityFlags: match?.qualityFlags || [],
+            budgetFlag: match?.budgetFlag || 'within-range',
           }),
         });
         const data = await res.json();

@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import vaultContent from '@/lib/vault-content.json';
 import { filterVaultCandidates } from '@/lib/vault-filter';
-import { VaultConcept, VaultConceptMatch, VaultCategory, VaultContent, NarrativeDraft } from '@/lib/types';
+import { callClaudeJSON } from '@/lib/claude';
+import { VAULT_NARRATIVE_DRAFT_PROMPT } from '@/lib/prompts/vault-narrative-draft';
+import { VaultConcept, VaultConceptMatch, VaultCategory, VaultContent, NarrativeDraft, VaultConfidence } from '@/lib/types';
+
+interface TriageTrafficLight {
+  status: 'green' | 'amber' | 'red';
+  rationale: string;
+}
+
+interface CoherenceTensionInput {
+  title: string;
+  description: string;
+  severity: 'critical' | 'notable';
+}
 
 interface VaultMatchRequest {
   mode: 'match' | 'narrative-draft';
@@ -14,6 +27,11 @@ interface VaultMatchRequest {
   // For narrative-draft mode only:
   selectedConceptId?: string;
   partnerName?: string;
+  triageTrafficLights?: Record<string, TriageTrafficLight>;
+  triageCoherenceTensions?: CoherenceTensionInput[];
+  matchConfidence?: VaultConfidence;
+  matchQualityFlags?: ('too-destination-specific' | 'overly-generic')[];
+  budgetFlag?: 'within-range' | 'close-to-edge';
 }
 
 interface VaultMatchResponse {
@@ -87,20 +105,52 @@ function stubMatcher(candidates: ReturnType<typeof filterVaultCandidates>): Vaul
 }
 
 /**
- * Stub narrative draft generator. Replaced by the Claude call in Task 32.
+ * Generate narrative draft via Claude using Tim's v1.0 prompt.
+ * Injects conceptId server-side after the response.
  */
-function stubNarrativeDraft(conceptId: string, concept: VaultConcept, partnerName: string): NarrativeDraft {
+async function generateNarrativeDraft(
+  concept: VaultConcept,
+  partnerName: string,
+  brief: string,
+  briefSections: Record<string, string>,
+  insights: VaultMatchRequest['insights'],
+  triageTrafficLights: Record<string, TriageTrafficLight>,
+  triageCoherenceTensions: CoherenceTensionInput[],
+  matchConfidence: VaultConfidence,
+  matchQualityFlags: ('too-destination-specific' | 'overly-generic')[],
+  budgetFlag: 'within-range' | 'close-to-edge',
+): Promise<NarrativeDraft> {
+  const userPayload = {
+    brief,
+    briefSections,
+    triageTrafficLights,
+    triageCoherenceTensions,
+    insights,
+    concept,
+    partnerName,
+    matchConfidence,
+    matchQualityFlags,
+    budgetFlag,
+  };
+
+  const userMessage = `Generate the six-slide narrative draft for the selected Vault concept using the following inputs:\n\n${JSON.stringify(userPayload, null, 2)}`;
+
+  const response = await callClaudeJSON<{
+    slides?: Partial<NarrativeDraft['slides']>;
+    creativeLabFlag?: boolean;
+  }>(VAULT_NARRATIVE_DRAFT_PROMPT, userMessage, { endpoint: 'vault-narrative-draft' });
+
   return {
-    conceptId,
+    conceptId: concept.id,
     slides: {
-      keyBriefPoints: `[stub] Key brief points for ${partnerName}. Strategic inputs would restate here, plus triage traffic lights.`,
-      creativeProblemWeAreSolving: `[stub] Creative problem framing showing why ${concept.name} fits.`,
-      narrativePitch: `[stub] Narrative pitch for ${concept.name}. ${concept.ideaSummary}`,
-      conceptDescriptionFull: `[stub] ${concept.creativeMechanism}\n\nCore message: ${concept.coreMessage}\n\nDeployment examples to embed here.`,
-      tailoringTo: `[stub] Tailoring ${concept.name} to ${partnerName}. Allowed: destination, culture, atmosphere, local characters. Forbidden: speculative bespoke executions.`,
-      strategicFitAndBudget: `[stub] Strategic fit + ${concept.watchouts.join('; ')}. Production timeline: ${concept.productionTimelineRaw || 'TBD'}. Production budget: ${concept.productionBudget.map(b => b.label).join(', ') || 'TBD'}.`,
+      keyBriefPoints: response.slides?.keyBriefPoints || '',
+      creativeProblemWeAreSolving: response.slides?.creativeProblemWeAreSolving || '',
+      narrativePitch: response.slides?.narrativePitch || '',
+      conceptDescriptionFull: response.slides?.conceptDescriptionFull || '',
+      tailoringTo: response.slides?.tailoringTo || '',
+      strategicFitAndBudget: response.slides?.strategicFitAndBudget || '',
     },
-    creativeLabFlag: false,
+    creativeLabFlag: Boolean(response.creativeLabFlag),
   };
 }
 
@@ -156,7 +206,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Concept not found' }, { status: 404 });
   }
   try {
-    const draft = stubNarrativeDraft(body.selectedConceptId, concept, body.partnerName || 'the partner');
+    const draft = await generateNarrativeDraft(
+      concept,
+      body.partnerName || 'the partner',
+      body.brief || '',
+      body.briefSections || {},
+      body.insights || [],
+      body.triageTrafficLights || {},
+      body.triageCoherenceTensions || [],
+      body.matchConfidence || 'plausible',
+      body.matchQualityFlags || [],
+      body.budgetFlag || 'within-range',
+    );
     return NextResponse.json({ draft } as NarrativeDraftResponse);
   } catch (err) {
     console.error('Vault narrative-draft error:', err);
