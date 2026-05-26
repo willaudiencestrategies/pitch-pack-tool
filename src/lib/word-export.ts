@@ -201,7 +201,7 @@ export async function exportVaultPack(data: VaultExportData): Promise<void> {
 
   // Title page
   sections.push(new Paragraph({
-    text: `Vault Pitch Pack — ${partnerName}`,
+    text: `Vault Brief Pack — ${partnerName}`,
     heading: HeadingLevel.HEADING_1,
     spacing: { before: 200, after: 200 },
   }));
@@ -273,5 +273,5 @@ export async function exportVaultPack(data: VaultExportData): Promise<void> {
 
   const blob = await Packer.toBlob(doc);
   const safePartner = partnerName.toLowerCase().replace(/\s+/g, '-');
-  saveAs(blob, `vault-pitch-pack-${safePartner}.docx`);
+  saveAs(blob, `vault-brief-pack-${safePartner}.docx`);
 }

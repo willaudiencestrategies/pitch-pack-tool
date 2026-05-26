@@ -80,7 +80,7 @@ describe('exportVaultPack', () => {
     const [blob, filename] = saveAsMock.mock.calls[0];
     expect(blob).toBeInstanceOf(Blob);
     expect((blob as Blob).size).toBeGreaterThan(1000); // a real docx is at least 1KB
-    expect(filename).toBe('vault-pitch-pack-expedia.docx');
+    expect(filename).toBe('vault-brief-pack-expedia.docx');
   });
 
   it('produces a docx blob that decodes as a valid ZIP archive (PK header)', async () => {
@@ -128,7 +128,7 @@ describe('exportVaultPack', () => {
     });
 
     const [, filename] = saveAsMock.mock.calls[0];
-    expect(filename).toBe('vault-pitch-pack-hotels-com.docx');
+    expect(filename).toBe('vault-brief-pack-hotels-com.docx');
   });
 
   it('handles vault result with multiple selected concepts without error', async () => {
@@ -165,7 +165,7 @@ describe('exportVaultPack', () => {
     // Multi-concept packs are bigger than single-concept ones (more slide content)
     const [blob] = saveAsMock.mock.calls[0];
     expect((blob as Blob).size).toBeGreaterThan(1500);
-    expect(saveAsMock.mock.calls[0][1]).toBe('vault-pitch-pack-vrbo.docx');
+    expect(saveAsMock.mock.calls[0][1]).toBe('vault-brief-pack-vrbo.docx');
   });
 
   it('handles vault result with empty selectedConceptIds (matches summary only)', async () => {

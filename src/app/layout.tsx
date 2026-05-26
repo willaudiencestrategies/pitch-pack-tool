@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Pitch Pack Tool',
+  title: 'Creative Brief Builder',
   description: 'Brief improvement workflow for E Studio',
 };
 

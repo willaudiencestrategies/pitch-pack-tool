@@ -20,7 +20,7 @@ export function OutputStep() {
   if (state.loading) {
     return (
       <LoadingOverlay
-        message="Compiling your Pitch Pack..."
+        message="Compiling your Brief Pack..."
         subMessage="Formatting all sections into the final document"
       />
     );
@@ -83,7 +83,7 @@ export function OutputStep() {
     a.href = url;
     const baseName = state.briefFilename
       ? state.briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
-      : 'pitch-pack';
+      : 'brief-pack';
     a.download = `${baseName}.md`;
     document.body.appendChild(a);
     a.click();
@@ -117,10 +117,10 @@ export function OutputStep() {
             </svg>
           </div>
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Your Pitch Pack is Ready!
+            Your Brief Pack is Ready!
           </h2>
           <p className="text-[var(--text-secondary)]">
-            Review your completed Pitch Pack below. Copy or download when ready.
+            Review your completed Brief Pack below. Copy or download when ready.
           </p>
         </div>
 
@@ -232,10 +232,10 @@ export function OutputStep() {
 
       <div className="text-center pb-6 border-b border-[var(--border-color)]">
         <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-          Pitch Pack Complete
+          Brief Pack Complete
         </h2>
         <p className="text-[var(--text-secondary)]">
-          All sections reviewed. Ready to compile your final Pitch Pack.
+          All sections reviewed. Ready to compile your final Brief Pack.
         </p>
       </div>
 
@@ -320,7 +320,7 @@ export function OutputStep() {
 
       <div className="flex gap-3">
         <button onClick={handleCompileOutput} className="btn-secondary flex items-center gap-2">
-          Export Pitch Pack
+          Export Brief Pack
         </button>
         <button
           onClick={() => {

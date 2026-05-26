@@ -34,7 +34,7 @@ export function TriageStep() {
     }
   } else if (amberSections.length > 0) {
     recommendationPriority = 'amber';
-    recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map((s) => s.name).join(', ')}. Adding more detail will strengthen your Pitch Pack.`;
+    recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map((s) => s.name).join(', ')}. Adding more detail will strengthen your Brief Pack.`;
   } else {
     recommendationPriority = 'green';
     recommendation = `Your brief covers the core Gate 1 sections well. You can still refine each section as you go through.`;

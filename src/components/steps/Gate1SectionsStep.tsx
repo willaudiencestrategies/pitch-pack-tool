@@ -189,7 +189,7 @@ function SectionStepContent({
           <p className="text-[var(--text-secondary)]">
             Any URLs shown below were extracted from the brief. We haven't checked if they
             still work or verified their content. Please check any links before including
-            them in your final Pitch Pack.
+            them in your final Brief Pack.
           </p>
         </div>
       )}

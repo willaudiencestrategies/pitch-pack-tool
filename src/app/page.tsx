@@ -714,7 +714,7 @@ export default function Home() {
               <span className="text-[var(--expedia-navy)] font-bold text-sm">E</span>
             </div>
             <div>
-              <h1 className="font-semibold">Pitch Pack Tool</h1>
+              <h1 className="font-semibold">Creative Brief Builder</h1>
               <p className="text-xs text-white/70">E Studio Brief Improvement</p>
             </div>
           </div>
@@ -753,7 +753,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="text-center py-6 text-sm text-[var(--text-muted)]">
-        Pitch Pack Tool for E Studio
+        Creative Brief Builder for E Studio
       </footer>
 
       {/* Floating Navigation / Undo-Redo Buttons */}

@@ -27,7 +27,7 @@ export function VaultExportStep() {
           Vault: Export
         </div>
         <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-          Pitch Pack Ready
+          Brief Pack Ready
         </h2>
         <p className="text-[var(--text-secondary)]">
           Export your pitch-ready package for the seller to take into the client meeting.
