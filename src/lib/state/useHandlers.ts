@@ -902,7 +902,14 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
             budgetFlag: match?.budgetFlag || 'within-range',
           }),
         });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `Narrative draft request failed (${res.status})`);
+        }
         const data = await res.json();
+        if (!data?.draft) {
+          throw new Error('Narrative draft response missing draft payload');
+        }
         drafts[conceptId] = data.draft;
       }
       updateState({
