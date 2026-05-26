@@ -1,6 +1,7 @@
 // src/lib/claude.ts
 
 import Anthropic from '@anthropic-ai/sdk';
+import { extractBalancedJson } from './claude-json-extract';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -91,21 +92,22 @@ export async function callClaudeJSON<T>(
     context
   );
 
-  // Extract JSON from response (handle potential markdown code blocks)
-  let jsonStr = response.trim();
-  if (jsonStr.startsWith('```json')) {
-    jsonStr = jsonStr.slice(7);
-  }
-  if (jsonStr.startsWith('```')) {
-    jsonStr = jsonStr.slice(3);
-  }
-  if (jsonStr.endsWith('```')) {
-    jsonStr = jsonStr.slice(0, -3);
-  }
+  const extracted = extractBalancedJson(response);
+  const jsonStr = (extracted ?? response).trim();
 
   try {
-    return JSON.parse(jsonStr.trim()) as T;
-  } catch {
-    throw new Error(`Failed to parse Claude response as JSON: ${jsonStr.substring(0, 200)}...`);
+    return JSON.parse(jsonStr) as T;
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    const head = jsonStr.slice(0, 300);
+    const tail = jsonStr.length > 800 ? jsonStr.slice(-500) : '';
+    const message = [
+      'Failed to parse Claude response as JSON.',
+      `Reason: ${reason}.`,
+      `Total length: ${jsonStr.length}.`,
+      `Head: ${head}`,
+      tail ? `Tail: ${tail}` : '',
+    ].filter(Boolean).join(' ');
+    throw new Error(message);
   }
 }
