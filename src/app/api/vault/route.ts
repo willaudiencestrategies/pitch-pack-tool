@@ -3,6 +3,7 @@ import vaultContent from '@/lib/vault-content.json';
 import { filterVaultCandidates } from '@/lib/vault-filter';
 import { callClaudeJSON } from '@/lib/claude';
 import { VAULT_NARRATIVE_DRAFT_PROMPT } from '@/lib/prompts/vault-narrative-draft';
+import { VAULT_MATCH_PROMPT } from '@/lib/prompts/vault-match';
 import { VaultConcept, VaultConceptMatch, VaultCategory, VaultContent, NarrativeDraft, VaultConfidence } from '@/lib/types';
 
 interface TriageTrafficLight {
@@ -65,42 +66,89 @@ function validateMatchRequest(body: Partial<VaultMatchRequest>): string | null {
   return null;
 }
 
+const VALID_SLOTS = new Set(['A', 'B', 'C', 'D', 'E']);
+const VALID_CONFIDENCE = new Set<VaultConfidence>(['strong', 'plausible', 'stretch']);
+const VALID_QUALITY_FLAGS = new Set(['too-destination-specific', 'overly-generic']);
+
 /**
- * Stub matcher: ranks candidates deterministically based on simple heuristics
- * so the UI can be built and demoed before Tim's prompt lands. Replaced by the
- * Claude call in Task 31.
+ * Generate ranked Vault matches via Claude using Tim's v1.0 prompt.
+ * Normalises the response against the candidate set so downstream code
+ * always sees well-formed VaultConceptMatch[] (clamps slot/confidence/flags,
+ * recovers pass-through fields from the candidate when the model omits them).
  */
-function stubMatcher(candidates: ReturnType<typeof filterVaultCandidates>): VaultMatchResponse {
-  // Sort: same-category first, then by name
-  const sorted = [...candidates].sort((a, b) => {
-    if (a.partnerTypeMatch === b.partnerTypeMatch) return a.concept.name.localeCompare(b.concept.name);
-    return a.partnerTypeMatch === 'same-category' ? -1 : 1;
-  });
-  const top = sorted.slice(0, 5);
+async function generateMatcherRanking(
+  candidates: ReturnType<typeof filterVaultCandidates>,
+  brief: string,
+  briefSections: Record<string, string>,
+  insights: VaultMatchRequest['insights'],
+  partnerType: VaultCategory,
+  productionBudgetUsd: number,
+): Promise<VaultMatchResponse> {
+  if (candidates.length === 0) {
+    return {
+      rankedConcepts: [],
+      topLineNote:
+        'No Vault candidates survived the filter for this brief - budget, partner type, or must-have channels excluded the available concepts.',
+    };
+  }
 
-  const matches: VaultConceptMatch[] = top.map((c, idx) => ({
-    conceptId: c.concept.id,
-    conceptName: c.concept.name,
-    slot: SLOTS[idx],
-    confidence: idx === 0 ? 'strong' : idx <= 2 ? 'plausible' : 'stretch',
-    confidenceReason: `[stub] ${c.partnerTypeMatch === 'same-category' ? 'Same partner type.' : 'Cross-category reach.'} ${c.budgetFlag === 'close-to-edge' ? 'Close to budget edge.' : 'Comfortable budget headroom.'}`,
-    partnerTypeMatch: c.partnerTypeMatch,
-    budgetFlag: c.budgetFlag,
-    conceptDescription: c.concept.ideaSummary.slice(0, 240),
-    estimatedProductionTimeline: c.concept.productionTimelineRaw || 'Timeline TBC',
-    estimatedProductionBudget: c.concept.productionBudget.length
-      ? c.concept.productionBudget.map(b => `$${b.minUsd.toLocaleString()}-$${b.maxUsd.toLocaleString()} (${b.label})`).join(', ')
-      : 'Budget TBC',
-    qualityFlags: [],
-    referenceLinks: c.concept.referenceLinks,
-  }));
+  const userPayload = {
+    brief,
+    briefSections,
+    insights,
+    partnerType,
+    productionBudgetUsd,
+    candidates: candidates.map(c => ({
+      concept: c.concept,
+      partnerTypeMatch: c.partnerTypeMatch,
+      budgetFlag: c.budgetFlag,
+    })),
+  };
 
-  const allStretch = matches.length > 0 && matches.every(m => m.confidence === 'stretch');
+  const userMessage = `Rank the candidates against the brief using the following inputs:\n\n${JSON.stringify(userPayload, null, 2)}`;
+
+  const response = await callClaudeJSON<{
+    rankedConcepts?: Partial<VaultConceptMatch>[];
+    topLineNote?: string | null;
+  }>(VAULT_MATCH_PROMPT, userMessage, { endpoint: 'vault-match' });
+
+  const candidatesById = new Map(candidates.map(c => [c.concept.id, c]));
+  const rawRanked = Array.isArray(response.rankedConcepts) ? response.rankedConcepts : [];
+
+  const rankedConcepts: VaultConceptMatch[] = rawRanked
+    .map((m, idx): VaultConceptMatch | null => {
+      const conceptId = m.conceptId;
+      if (!conceptId || !candidatesById.has(conceptId)) return null;
+      const candidate = candidatesById.get(conceptId)!;
+      const fallbackSlot = SLOTS[idx] || 'E';
+      const slot = m.slot && VALID_SLOTS.has(m.slot) ? m.slot : fallbackSlot;
+      const confidence = m.confidence && VALID_CONFIDENCE.has(m.confidence) ? m.confidence : 'plausible';
+      const qualityFlags = Array.isArray(m.qualityFlags)
+        ? m.qualityFlags.filter(f => VALID_QUALITY_FLAGS.has(f))
+        : [];
+      return {
+        conceptId,
+        conceptName: m.conceptName || candidate.concept.name,
+        slot,
+        confidence,
+        confidenceReason: m.confidenceReason || '',
+        partnerTypeMatch: candidate.partnerTypeMatch,
+        budgetFlag: candidate.budgetFlag,
+        conceptDescription: m.conceptDescription || candidate.concept.ideaSummary.slice(0, 240),
+        estimatedProductionTimeline: m.estimatedProductionTimeline || candidate.concept.productionTimelineRaw || 'Timeline TBC',
+        estimatedProductionBudget: m.estimatedProductionBudget || (candidate.concept.productionBudget.length
+          ? candidate.concept.productionBudget.map(b => `$${b.minUsd.toLocaleString()}-$${b.maxUsd.toLocaleString()} (${b.label})`).join(', ')
+          : 'Budget TBC'),
+        qualityFlags: qualityFlags as ('too-destination-specific' | 'overly-generic')[],
+        referenceLinks: Array.isArray(m.referenceLinks) ? m.referenceLinks : candidate.concept.referenceLinks,
+      };
+    })
+    .filter((m): m is VaultConceptMatch => m !== null)
+    .slice(0, 5);
+
   return {
-    rankedConcepts: matches,
-    topLineNote: allStretch
-      ? 'The Vault found candidates worth a quick scan, but nothing is a strong fit for this brief. Consider Creative Lab for net-new ideation. The matches below show what\'s closest.'
-      : null,
+    rankedConcepts,
+    topLineNote: typeof response.topLineNote === 'string' ? response.topLineNote : null,
   };
 }
 
@@ -189,7 +237,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         partnerType: body.partnerType!,
         mustHaveChannels: body.mustHaveChannels || [],
       });
-      const response = stubMatcher(candidates);
+      const response = await generateMatcherRanking(
+        candidates,
+        body.brief || '',
+        body.briefSections || {},
+        body.insights || [],
+        body.partnerType!,
+        body.productionBudgetUsd!,
+      );
       return NextResponse.json(response);
     } catch (err) {
       console.error('Vault match error:', err);
