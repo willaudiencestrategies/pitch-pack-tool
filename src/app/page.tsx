@@ -881,7 +881,7 @@ function SectionStepContent({
           <p className="text-[var(--text-secondary)]">
             Any URLs shown below were extracted from the brief. We haven't checked if they
             still work or verified their content. Please check any links before including
-            them in your final Pitch Pack.
+            them in your final Brief Pack.
           </p>
         </div>
       )}
@@ -2038,7 +2038,7 @@ export default function Home() {
       }
     } else if (amberSections.length > 0) {
       recommendationPriority = 'amber';
-      recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map(s => s.name).join(', ')}. Adding more detail will strengthen your Pitch Pack.`;
+      recommendation = `${amberSections.length} section${amberSections.length > 1 ? 's need' : ' needs'} improvement: ${amberSections.map(s => s.name).join(', ')}. Adding more detail will strengthen your Brief Pack.`;
     } else {
       recommendationPriority = 'green';
       recommendation = `Your brief covers the core Gate 1 sections well. You can still refine each section as you go through.`;
@@ -2874,7 +2874,7 @@ export default function Home() {
     if (state.loading) {
       return (
         <LoadingOverlay
-          message="Compiling your Pitch Pack..."
+          message="Compiling your Brief Pack..."
           subMessage="Formatting all sections into the final document"
         />
       );
@@ -2937,7 +2937,7 @@ export default function Home() {
       a.href = url;
       const baseName = state.briefFilename
         ? state.briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
-        : 'pitch-pack';
+        : 'brief-pack';
       a.download = `${baseName}.md`;
       document.body.appendChild(a);
       a.click();
@@ -2969,10 +2969,10 @@ export default function Home() {
               </svg>
             </div>
             <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-              Your Pitch Pack is Ready!
+              Your Brief Pack is Ready!
             </h2>
             <p className="text-[var(--text-secondary)]">
-              Review your completed Pitch Pack below. Copy or download when ready.
+              Review your completed Brief Pack below. Copy or download when ready.
             </p>
           </div>
 
@@ -3081,10 +3081,10 @@ export default function Home() {
 
         <div className="text-center pb-6 border-b border-[var(--border-color)]">
           <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-            Pitch Pack Complete
+            Brief Pack Complete
           </h2>
           <p className="text-[var(--text-secondary)]">
-            All sections reviewed. Ready to compile your final Pitch Pack.
+            All sections reviewed. Ready to compile your final Brief Pack.
           </p>
         </div>
 
@@ -3169,7 +3169,7 @@ export default function Home() {
 
         <div className="flex gap-3">
           <button onClick={handleCompileOutput} className="btn-secondary flex items-center gap-2">
-            Export Pitch Pack
+            Export Brief Pack
           </button>
           <button
             onClick={() => {
@@ -3229,7 +3229,7 @@ export default function Home() {
               <span className="text-[var(--expedia-navy)] font-bold text-sm">E</span>
             </div>
             <div>
-              <h1 className="font-semibold">Pitch Pack Tool</h1>
+              <h1 className="font-semibold">Creative Brief Builder</h1>
               <p className="text-xs text-white/70">E Studio Brief Improvement</p>
             </div>
           </div>
@@ -3268,7 +3268,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="text-center py-6 text-sm text-[var(--text-muted)]">
-        Pitch Pack Tool for E Studio
+        Creative Brief Builder for E Studio
       </footer>
 
       {/* Floating Navigation / Undo-Redo Buttons */}

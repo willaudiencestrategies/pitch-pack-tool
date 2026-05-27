@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const promptConfig = loadPrompt('output');
     const systemPrompt = buildSystemPrompt(promptConfig.generate);
 
-    let userMessage = 'Compile the final Pitch Pack from these sections:\n\n';
+    let userMessage = 'Compile the final Brief Pack from these sections:\n\n';
 
     for (const section of filteredSections) {
       userMessage += `## ${section.name}\nStatus: ${section.status}\nContent: ${section.content || '(not provided)'}\n\n`;
