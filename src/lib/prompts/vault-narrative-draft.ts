@@ -1,8 +1,8 @@
 /**
  * Vault narrative-draft prompt - six-slide expansion.
  *
- * v1.0 drafted by Tim 25 May 2026 (see communications/expedia/inbox file
- * 2026-05-25-vault-narrative-draft-prompt-v1.md for design rationale).
+ * v1.0 drafted by Tim 25 May 2026. Design rationale lives in the walnut at:
+ *   reference-library/raw/plans/2026-05-25-vault-narrative-draft-prompt-v1.md
  */
 
 export const VAULT_NARRATIVE_DRAFT_PROMPT_VERSION = 'v1.0';

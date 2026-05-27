@@ -1,9 +1,9 @@
 /**
  * Vault matching prompt.
  *
- * v1.0 drafted by Tim 25 May 2026 (see inbox file
- * 2026-05-25-vault-match-prompt-v1.md for design rationale and the five
- * CEO calls Tim made).
+ * v1.0 drafted by Tim 25 May 2026. Design rationale and the five CEO calls
+ * Tim made live in the walnut at:
+ *   reference-library/raw/plans/2026-05-25-vault-match-prompt-v1.md
  */
 
 export const VAULT_MATCH_PROMPT_VERSION = 'v1.0';
