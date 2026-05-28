@@ -717,6 +717,11 @@ export default function Home() {
               <h1 className="font-semibold">Creative Brief Builder</h1>
               <p className="text-xs text-white/70">E Studio Brief Improvement</p>
             </div>
+            {process.env.NEXT_PUBLIC_DEPLOY_LABEL && (
+              <span className="ml-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[var(--expedia-yellow)] text-[var(--expedia-navy)] uppercase tracking-wider">
+                {process.env.NEXT_PUBLIC_DEPLOY_LABEL}
+              </span>
+            )}
           </div>
         </div>
       </header>
