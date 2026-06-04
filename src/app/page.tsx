@@ -49,6 +49,7 @@ import { GateTransition } from '@/components/GateTransition';
 import { CreativeTenets } from '@/components/CreativeTenets';
 import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
+import { fetchWithRetry, isNetworkError, CONNECTION_DROPPED_MESSAGE } from '@/lib/fetch-with-retry';
 import { exportToWord } from '@/lib/word-export';
 import { logAnalytics, captureBriefScore } from '@/lib/analytics';
 import { LoadingProgress } from '@/components/LoadingProgress';
@@ -1310,7 +1311,7 @@ export default function Home() {
     triageProgress.runSimulatedProgress();
 
     try {
-      const response = await fetch('/api/triage', {
+      const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ brief: state.brief }),
@@ -1352,7 +1353,11 @@ export default function Home() {
     } catch (err) {
       triageProgress.reset();
       updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
+        error: isNetworkError(err)
+          ? CONNECTION_DROPPED_MESSAGE
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong',
         loading: false,
       });
     }
@@ -1369,7 +1374,7 @@ export default function Home() {
     triageProgress.runSimulatedProgress();
 
     try {
-      const response = await fetch('/api/triage', {
+      const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1413,7 +1418,11 @@ export default function Home() {
     } catch (err) {
       triageProgress.reset();
       updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
+        error: isNetworkError(err)
+          ? CONNECTION_DROPPED_MESSAGE
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong',
         loading: false,
       });
     }
