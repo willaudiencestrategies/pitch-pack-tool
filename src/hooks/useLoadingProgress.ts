@@ -36,7 +36,13 @@ export function useLoadingProgress(stages: StageConfig[]) {
 
   const runSimulatedProgress = useCallback(async () => {
     start();
-    for (let i = 0; i < stages.length - 1; i++) {
+    // Deliberately stop one short of the final stage. The last stage is the 100%
+    // "complete" marker — reaching it on a timer would pin the bar at 100% while
+    // the real request is still running (briefs routinely take 1-4 min, far longer
+    // than the simulated walk). The bar holds at the last pre-complete stage and
+    // only complete() — called when the response actually arrives — advances to 100%.
+    const lastSimulatedIndex = Math.max(0, stages.length - 2);
+    for (let i = 0; i < lastSimulatedIndex; i++) {
       await new Promise((resolve) => setTimeout(resolve, stages[i].minDuration));
       setCurrentStageIndex(i + 1);
     }
