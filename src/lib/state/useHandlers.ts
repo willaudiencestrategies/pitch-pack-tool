@@ -28,6 +28,7 @@ import { logAnalytics, captureBriefScore } from '../analytics';
 import { encodeResumeToken, buildResumeUrl } from '../vault-resume-token';
 import { exportVaultPack } from '../word-export';
 import { getBrandDisplayName } from '../brand-criteria';
+import { fetchWithRetry, isNetworkError, CONNECTION_DROPPED_MESSAGE } from '../fetch-with-retry';
 import { UseProgressHooksReturn } from './useProgressHooks';
 
 export interface UseHandlersReturn {
@@ -152,7 +153,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     progress.triage.runSimulatedProgress();
 
     try {
-      const response = await fetch('/api/triage', {
+      const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ brief: state.brief }),
@@ -194,7 +195,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     } catch (err) {
       progress.triage.reset();
       updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
+        error: isNetworkError(err)
+          ? CONNECTION_DROPPED_MESSAGE
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong',
         loading: false,
       });
     }
@@ -211,7 +216,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     progress.triage.runSimulatedProgress();
 
     try {
-      const response = await fetch('/api/triage', {
+      const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -255,7 +260,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     } catch (err) {
       progress.triage.reset();
       updateState({
-        error: err instanceof Error ? err.message : 'Something went wrong',
+        error: isNetworkError(err)
+          ? CONNECTION_DROPPED_MESSAGE
+          : err instanceof Error
+            ? err.message
+            : 'Something went wrong',
         loading: false,
       });
     }
