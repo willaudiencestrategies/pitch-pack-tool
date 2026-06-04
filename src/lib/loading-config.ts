@@ -8,15 +8,19 @@ export interface StageConfig {
   minDuration: number;
 }
 
+// Durations are calibrated so the simulated walk reaches the final pre-complete
+// stage (95%) in ~100s, roughly matching a real /api/triage call. The bar holds
+// at 95% until the response arrives (see useLoadingProgress.runSimulatedProgress),
+// so a longer call reads as "still working" rather than pinning at 100%.
 export const TRIAGE_STAGES: StageConfig[] = [
-  { stage: 'uploading', message: 'Brief received', subMessage: 'Starting analysis...', percent: 5, minDuration: 2000 },
-  { stage: 'parsing', message: 'Parsing document', subMessage: 'Extracting text content...', percent: 15, minDuration: 4000 },
-  { stage: 'analysing', message: 'Analysing brief structure', subMessage: 'Identifying key sections...', percent: 30, minDuration: 6000 },
-  { stage: 'extracting_objectives', message: 'Extracting objectives', subMessage: 'Looking for campaign goals...', percent: 45, minDuration: 8000 },
-  { stage: 'assessing_audience', message: 'Assessing audience clarity', subMessage: 'Checking target definition...', percent: 60, minDuration: 6000 },
-  { stage: 'checking_budget', message: 'Checking budget alignment', subMessage: 'Evaluating constraints...', percent: 75, minDuration: 5000 },
-  { stage: 'evaluating_creative', message: 'Evaluating creative task', subMessage: 'Analysing deliverables...', percent: 85, minDuration: 5000 },
-  { stage: 'generating_assessment', message: 'Generating assessment', subMessage: 'Compiling traffic light scores...', percent: 95, minDuration: 6000 },
+  { stage: 'uploading', message: 'Brief received', subMessage: 'Starting analysis...', percent: 5, minDuration: 3000 },
+  { stage: 'parsing', message: 'Parsing document', subMessage: 'Extracting text content...', percent: 15, minDuration: 9000 },
+  { stage: 'analysing', message: 'Analysing brief structure', subMessage: 'Identifying key sections...', percent: 30, minDuration: 14000 },
+  { stage: 'extracting_objectives', message: 'Extracting objectives', subMessage: 'Looking for campaign goals...', percent: 45, minDuration: 20000 },
+  { stage: 'assessing_audience', message: 'Assessing audience clarity', subMessage: 'Checking target definition...', percent: 60, minDuration: 18000 },
+  { stage: 'checking_budget', message: 'Checking budget alignment', subMessage: 'Evaluating constraints...', percent: 75, minDuration: 16000 },
+  { stage: 'evaluating_creative', message: 'Evaluating creative task', subMessage: 'Analysing deliverables...', percent: 85, minDuration: 20000 },
+  { stage: 'generating_assessment', message: 'Generating assessment', subMessage: 'Compiling traffic light scores — larger briefs can take a couple of minutes...', percent: 95, minDuration: 6000 },
   { stage: 'complete', message: 'Assessment complete', percent: 100, minDuration: 500 },
 ];
 
