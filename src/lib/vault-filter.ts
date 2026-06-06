@@ -51,7 +51,9 @@ export function filterVaultCandidates(
   args: VaultFilterArgs,
 ): VaultCandidate[] {
   return concepts
-    .filter(c => c.category !== 'non-endemic')  // v1 hard exclusion
+    // Non-endemic is NOT hard-dropped — scoring ranks it low on partner/audience fit
+    // for an endemic brief. (If Tim confirms a commercial reason to hide it, gate it
+    // behind an explicit opt-in arg here rather than restoring a silent hard filter.)
     .filter(c => hasMustHaveChannels(c, args.mustHaveChannels))
     .map(c => ({
       concept: c,

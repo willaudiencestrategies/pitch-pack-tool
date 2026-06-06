@@ -73,12 +73,13 @@ describe('filterVaultCandidates', () => {
     expect(result[0].budgetFlag).toBe('within-range');
   });
 
-  it('excludes non-endemic in v1', () => {
+  it('no longer hard-excludes non-endemic; it flows through as adjacent', () => {
     const concepts: VaultConcept[] = [
       { ...baseConcept, id: 'klarna', category: 'non-endemic' },
     ];
     const result = filterVaultCandidates(concepts, { productionBudgetUsd: 300_000, partnerType: 'destination', mustHaveChannels: [] });
-    expect(result).toHaveLength(0);
+    expect(result).toHaveLength(1);
+    expect(result[0].partnerTypeMatch).toBe('adjacent');
   });
 
   it('filters out concepts missing must-have channels', () => {
