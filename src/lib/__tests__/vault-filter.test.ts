@@ -35,30 +35,42 @@ describe('filterVaultCandidates', () => {
     expect(result[0].budgetFlag).toBe('within-range');
   });
 
-  it('hard-excludes concepts more than 20% above the brief budget', () => {
+  it('never excludes on budget — keeps a concept well above the brief, flagged close-to-edge', () => {
     const concepts: VaultConcept[] = [
       { ...baseConcept, id: 'too-expensive', productionBudget: [{ label: 's', minUsd: 500_000, maxUsd: 600_000 }] },
     ];
     const result = filterVaultCandidates(concepts, { productionBudgetUsd: 300_000, partnerType: 'destination', mustHaveChannels: [] });
-    expect(result).toHaveLength(0);
+    expect(result).toHaveLength(1);
+    expect(result[0].budgetFlag).toBe('close-to-edge');
   });
 
-  it('hard-excludes concepts more than 20% below the brief budget', () => {
+  it('never excludes on budget — keeps a concept well below the brief, flagged close-to-edge', () => {
     const concepts: VaultConcept[] = [
       { ...baseConcept, id: 'too-cheap', productionBudget: [{ label: 's', minUsd: 50_000, maxUsd: 80_000 }] },
     ];
     const result = filterVaultCandidates(concepts, { productionBudgetUsd: 300_000, partnerType: 'destination', mustHaveChannels: [] });
-    expect(result).toHaveLength(0);
+    expect(result).toHaveLength(1);
+    expect(result[0].budgetFlag).toBe('close-to-edge');
   });
 
-  it('flags concepts within 10% of the cutoff edge as close-to-edge', () => {
+  it('flags concepts outside the ±50% comfort band as close-to-edge but keeps them', () => {
     const concepts: VaultConcept[] = [
-      // brief budget 300k. concept 350k (max) is at the edge. 360k (within 20% but >10% over max) is close-to-edge.
-      { ...baseConcept, id: 'edge', productionBudget: [{ label: 's', minUsd: 340_000, maxUsd: 360_000 }] },
+      // brief 300k. comfort band is 150k–450k. 480k–520k sits past it → close-to-edge.
+      { ...baseConcept, id: 'edge', productionBudget: [{ label: 's', minUsd: 480_000, maxUsd: 520_000 }] },
     ];
     const result = filterVaultCandidates(concepts, { productionBudgetUsd: 300_000, partnerType: 'destination', mustHaveChannels: [] });
     expect(result).toHaveLength(1);
     expect(result[0].budgetFlag).toBe('close-to-edge');
+  });
+
+  it('flags concepts inside the ±50% comfort band as within-range', () => {
+    const concepts: VaultConcept[] = [
+      // brief 300k. comfort band 150k–450k. 350k–400k overlaps → within-range.
+      { ...baseConcept, id: 'comfortable', productionBudget: [{ label: 's', minUsd: 350_000, maxUsd: 400_000 }] },
+    ];
+    const result = filterVaultCandidates(concepts, { productionBudgetUsd: 300_000, partnerType: 'destination', mustHaveChannels: [] });
+    expect(result).toHaveLength(1);
+    expect(result[0].budgetFlag).toBe('within-range');
   });
 
   it('excludes non-endemic in v1', () => {

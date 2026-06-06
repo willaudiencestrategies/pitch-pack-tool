@@ -26,6 +26,7 @@ import {
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
 import { encodeResumeToken, buildResumeUrl } from '../vault-resume-token';
+import { parseUsdBudget } from '../parse-budget';
 import { exportVaultPack } from '../word-export';
 import { getBrandDisplayName } from '../brand-criteria';
 import { fetchWithRetry, isNetworkError, CONNECTION_DROPPED_MESSAGE } from '../fetch-with-retry';
@@ -97,12 +98,7 @@ export function derivePartnerType(state: SessionState): VaultCategory | null {
 
 export function deriveProductionBudgetUsd(state: SessionState): number | null {
   if (state.productionBudgetUsd) return state.productionBudgetUsd;
-  const raw = state.budgetDetails?.productionBudget;
-  if (!raw) return null;
-  const match = raw.match(/[\d,]+/);
-  if (!match) return null;
-  const parsed = parseInt(match[0].replace(/,/g, ''), 10);
-  return Number.isFinite(parsed) ? parsed : null;
+  return parseUsdBudget(state.budgetDetails?.productionBudget);
 }
 
 export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
