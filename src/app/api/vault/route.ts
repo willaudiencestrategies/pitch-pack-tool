@@ -3,7 +3,10 @@ import vaultContent from '@/lib/vault-content.json';
 import { filterVaultCandidates } from '@/lib/vault-filter';
 import { callClaudeJSON } from '@/lib/claude';
 import { VAULT_NARRATIVE_DRAFT_PROMPT } from '@/lib/prompts/vault-narrative-draft';
-import { VAULT_MATCH_PROMPT } from '@/lib/prompts/vault-match';
+import { buildBriefFingerprint } from '@/lib/vault-match/fingerprint';
+import { scoreAllConcepts } from '@/lib/vault-match/score';
+import { rankAndLabel } from '@/lib/vault-match/rank';
+import type { ConceptFingerprint } from '@/lib/vault-match/types';
 import { VaultConcept, VaultConceptMatch, VaultCategory, VaultContent, NarrativeDraft, VaultConfidence } from '@/lib/types';
 
 interface TriageTrafficLight {
@@ -44,7 +47,6 @@ interface NarrativeDraftResponse {
   draft: NarrativeDraft;
 }
 
-const SLOTS: ('A' | 'B' | 'C' | 'D' | 'E')[] = ['A', 'B', 'C', 'D', 'E'];
 const VALID_CATEGORIES: VaultCategory[] = ['destination', 'lodging', 'airline', 'car', 'non-endemic'];
 
 /**
@@ -66,90 +68,33 @@ function validateMatchRequest(body: Partial<VaultMatchRequest>): string | null {
   return null;
 }
 
-const VALID_SLOTS = new Set(['A', 'B', 'C', 'D', 'E']);
-const VALID_CONFIDENCE = new Set<VaultConfidence>(['strong', 'plausible', 'stretch']);
-const VALID_QUALITY_FLAGS = new Set(['too-destination-specific', 'overly-generic']);
-
 /**
- * Generate ranked Vault matches via Claude using Tim's v1.0 prompt.
- * Normalises the response against the candidate set so downstream code
- * always sees well-formed VaultConceptMatch[] (clamps slot/confidence/flags,
- * recovers pass-through fields from the candidate when the model omits them).
+ * Generate ranked Vault matches via the scoring pipeline:
+ * filter → brief fingerprint → independent per-concept scoring → deterministic rank.
  */
 async function generateMatcherRanking(
   candidates: ReturnType<typeof filterVaultCandidates>,
   brief: string,
   briefSections: Record<string, string>,
   insights: VaultMatchRequest['insights'],
-  partnerType: VaultCategory,
-  productionBudgetUsd: number,
 ): Promise<VaultMatchResponse> {
   if (candidates.length === 0) {
     return {
       rankedConcepts: [],
       topLineNote:
-        'No Vault candidates survived the filter for this brief - budget, partner type, or must-have channels excluded the available concepts.',
+        'No Vault candidates survived the filter for this brief - must-have channels excluded the available concepts.',
     };
   }
 
-  const userPayload = {
-    brief,
-    briefSections,
-    insights,
-    partnerType,
-    productionBudgetUsd,
-    candidates: candidates.map(c => ({
-      concept: c.concept,
-      partnerTypeMatch: c.partnerTypeMatch,
-      budgetFlag: c.budgetFlag,
-    })),
-  };
+  const briefFingerprint = await buildBriefFingerprint(brief, briefSections, insights);
 
-  const userMessage = `Rank the candidates against the brief using the following inputs:\n\n${JSON.stringify(userPayload, null, 2)}`;
+  const scorable = candidates
+    .filter(c => c.concept.fingerprint)
+    .map(c => ({ conceptId: c.concept.id, fingerprint: c.concept.fingerprint as ConceptFingerprint }));
 
-  const response = await callClaudeJSON<{
-    rankedConcepts?: Partial<VaultConceptMatch>[];
-    topLineNote?: string | null;
-  }>(VAULT_MATCH_PROMPT, userMessage, { endpoint: 'vault-match' });
-
+  const scored = await scoreAllConcepts(briefFingerprint, scorable);
   const candidatesById = new Map(candidates.map(c => [c.concept.id, c]));
-  const rawRanked = Array.isArray(response.rankedConcepts) ? response.rankedConcepts : [];
-
-  const rankedConcepts: VaultConceptMatch[] = rawRanked
-    .map((m, idx): VaultConceptMatch | null => {
-      const conceptId = m.conceptId;
-      if (!conceptId || !candidatesById.has(conceptId)) return null;
-      const candidate = candidatesById.get(conceptId)!;
-      const fallbackSlot = SLOTS[idx] || 'E';
-      const slot = m.slot && VALID_SLOTS.has(m.slot) ? m.slot : fallbackSlot;
-      const confidence = m.confidence && VALID_CONFIDENCE.has(m.confidence) ? m.confidence : 'plausible';
-      const qualityFlags = Array.isArray(m.qualityFlags)
-        ? m.qualityFlags.filter(f => VALID_QUALITY_FLAGS.has(f))
-        : [];
-      return {
-        conceptId,
-        conceptName: m.conceptName || candidate.concept.name,
-        slot,
-        confidence,
-        confidenceReason: m.confidenceReason || '',
-        partnerTypeMatch: candidate.partnerTypeMatch,
-        budgetFlag: candidate.budgetFlag,
-        conceptDescription: m.conceptDescription || candidate.concept.ideaSummary.slice(0, 240),
-        estimatedProductionTimeline: m.estimatedProductionTimeline || candidate.concept.productionTimelineRaw || 'Timeline TBC',
-        estimatedProductionBudget: m.estimatedProductionBudget || (candidate.concept.productionBudget.length
-          ? candidate.concept.productionBudget.map(b => `$${b.minUsd.toLocaleString()}-$${b.maxUsd.toLocaleString()} (${b.label})`).join(', ')
-          : 'Budget TBC'),
-        qualityFlags: qualityFlags as ('too-destination-specific' | 'overly-generic')[],
-        referenceLinks: Array.isArray(m.referenceLinks) ? m.referenceLinks : candidate.concept.referenceLinks,
-      };
-    })
-    .filter((m): m is VaultConceptMatch => m !== null)
-    .slice(0, 5);
-
-  return {
-    rankedConcepts,
-    topLineNote: typeof response.topLineNote === 'string' ? response.topLineNote : null,
-  };
+  return rankAndLabel(scored, candidatesById);
 }
 
 /**
@@ -242,8 +187,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         body.brief || '',
         body.briefSections || {},
         body.insights || [],
-        body.partnerType!,
-        body.productionBudgetUsd!,
       );
       return NextResponse.json(response);
     } catch (err) {
