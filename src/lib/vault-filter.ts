@@ -16,8 +16,8 @@ export interface VaultCandidate {
 // concept whose budget fell outside ±20% of the brief, which starved the LLM
 // matcher of brief-relevant candidates before it ever read the brief — the
 // cause of "the Vault won't return anything relevant". Now every partner- and
-// channel-relevant concept reaches the matcher, and budget only sets a flag the
-// matcher surfaces as honest headroom/pressure (see VAULT_MATCH_PROMPT).
+// channel-relevant concept reaches the scoring pipeline, and budget only sets a
+// flag that downstream surfaces as honest headroom/pressure.
 const COMFORT_BAND_PCT = 0.50;
 
 function assessBudgetFlag(concept: VaultConcept, briefBudget: number): 'within-range' | 'close-to-edge' {
