@@ -1,5 +1,7 @@
 // src/lib/types.ts
 
+import type { ConceptFingerprint } from './vault-match/types';
+
 export type Status = 'green' | 'amber' | 'red';
 
 // Gate-based step flow
@@ -498,6 +500,7 @@ export interface VaultConcept {
   referenceLinks: string[];
   lastValidated: string | null;
   eraTags: string[];
+  fingerprint?: ConceptFingerprint;
 }
 
 export interface VaultContent {
