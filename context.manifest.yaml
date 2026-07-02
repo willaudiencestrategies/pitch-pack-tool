@@ -6,7 +6,7 @@ version: v0.1
 sensitivity: private
 pii: false
 created: 2026-03-31
-updated: 2026-03-31
+updated: 2026-05-21
 squirrels: []
 sources: []
 linked_bundles: ["[[reference-library]]", "[[communications]]", "[[docs]]", "[[v1.7-feedback-response]]", "[[v1.8-launch-sprint]]"]
@@ -17,3 +17,5 @@ context: |
   Supports Expedia, Hotels.com, and Vrbo brand alignment with demographic fit scoring. Features include session persistence, Word/PDF upload, .docx export, per-section AI research prompts, and editable JSON prompt configs. Tech stack includes Tailwind CSS 4, Vitest, mammoth.js for document parsing. Currently at v1.8+ with 47+ tests passing.
 
   This is a graduated codebase bundle — lives in place, not inside bundles/.
+
+  21 May manual-testing pass: four production bugs found and fixed (setState-in-render at Gate2AudienceStep:128, silent disabled budget confirm button at VaultProductionBudgetStep, missing loading state at VaultMatchListStep, K/M/B budget parser regex). Plus Expedia capitalisation polish via new getBrandDisplayName() helper in brand-criteria.ts wired into useHandlers.ts at both the exportVaultPack call and the /api/vault narrative-draft request. Tests still 94/94 passing. Branch vault-build now at commit ahead of 78bdc72 with all four fixes layered on top, still not pushed (deliberate: production untouched until prompts land and demo signs off).

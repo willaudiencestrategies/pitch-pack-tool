@@ -63,6 +63,16 @@ All section builders return 4 options:
 3. **Inspired Coherence** — Interpretation finding coherence
 4. **Ruthless Clarity** — Bold strategic reframe
 
+### Streamed Triage (NDJSON keep-alive)
+`/api/triage` does NOT return plain JSON. It streams newline-delimited JSON via
+`streamJsonResponse` (`src/lib/stream-response.ts`): an immediate heartbeat, then a
+heartbeat every 10s, then one terminal `{type:'result',data}` or `{type:'error',message}`.
+This keeps the connection alive through the ~60-90s Claude call so a proxy/edge can't
+idle-kill it (the old 502/504 → "fail to load, retry"), and it surfaces the REAL error.
+Consume it with `readJsonStream` (`src/lib/read-json-stream.ts`) — never `response.json()`.
+The underlying call streams from Claude (`src/lib/claude.ts`) and guards `stop_reason ===
+'max_tokens'`. If you add another long route, reuse the same two helpers.
+
 ### Two-Step Audience Flow
 1. Generate 5-segment menu (snappy names + brief descriptions)
 2. User picks/merges segments

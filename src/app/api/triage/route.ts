@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { callClaudeJSON } from '@/lib/claude';
 import { loadPrompt, buildSystemPrompt } from '@/lib/prompts';
+import { streamJsonResponse } from '@/lib/stream-response';
 import {
   EnhancedTriageResponse,
   TriageSectionResult,
@@ -15,14 +16,21 @@ import {
   CoherenceAnalysis,
 } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
-  try {
-    const { brief } = await request.json();
+  const { brief } = await request.json().catch(() => ({ brief: undefined }));
 
-    if (!brief || typeof brief !== 'string') {
-      return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
-    }
+  if (!brief || typeof brief !== 'string') {
+    return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
+  }
 
+  // Stream the assessment: a slow (~60-90s) call can't be idle-killed by the platform,
+  // and a genuine failure surfaces the REAL error to the browser instead of a generic
+  // "Failed to assess brief".
+  return streamJsonResponse(
+    async () => {
     const promptConfig = loadPrompt('triage');
     const systemPrompt = buildSystemPrompt(promptConfig.assess);
 
@@ -146,17 +154,16 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({
+    return {
       synthesizedReplay,
       triageAssessment,
       overallBriefHealth: response.overallBriefHealth || '',
       coherenceAnalysis,
-    } as EnhancedTriageResponse);
-  } catch (error) {
-    console.error('Triage error:', error);
-    return NextResponse.json(
-      { error: 'Failed to assess brief' },
-      { status: 500 }
-    );
-  }
+    } as EnhancedTriageResponse;
+    },
+    {
+      // Keep the log line Tim greps for in Deploy Logs ("Triage error" + the cause).
+      onError: (error) => console.error('Triage error:', error),
+    },
+  );
 }

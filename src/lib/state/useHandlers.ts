@@ -30,6 +30,7 @@ import { parseUsdBudget } from '../parse-budget';
 import { exportVaultPack } from '../word-export';
 import { getBrandDisplayName } from '../brand-criteria';
 import { fetchWithRetry, isNetworkError, CONNECTION_DROPPED_MESSAGE } from '../fetch-with-retry';
+import { readJsonStream } from '../read-json-stream';
 import { UseProgressHooksReturn } from './useProgressHooks';
 
 export interface UseHandlersReturn {
@@ -155,9 +156,15 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
         body: JSON.stringify({ brief: state.brief }),
       });
 
-      if (!response.ok) throw new Error('Failed to assess brief');
+      // A non-streamed error response (e.g. 400 bad request) carries { error }.
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || 'Failed to assess brief');
+      }
 
-      const data: EnhancedTriageResponse = await response.json();
+      // The route streams NDJSON; readJsonStream returns the payload or throws the
+      // real server-side error (truncation, API error, JSON parse failure, ...).
+      const data = await readJsonStream<EnhancedTriageResponse>(response);
 
       // Defensive: ensure triageAssessment is an array
       const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
@@ -221,9 +228,12 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to reassess brief');
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || 'Failed to reassess brief');
+      }
 
-      const data: EnhancedTriageResponse = await response.json();
+      const data = await readJsonStream<EnhancedTriageResponse>(response);
 
       // Defensive: ensure triageAssessment is an array
       const triageAssessment = Array.isArray(data.triageAssessment) ? data.triageAssessment : [];
