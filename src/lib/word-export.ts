@@ -63,6 +63,15 @@ function markdownToParagraphs(content: string): Paragraph[] {
 
     if (trimmed === '') continue;
 
+    if (trimmed.startsWith('#### ')) {
+      paragraphs.push(new Paragraph({
+        text: trimmed.replace(/^#### /, ''),
+        heading: HeadingLevel.HEADING_4,
+        spacing: { before: 200, after: 100 },
+      }));
+      continue;
+    }
+
     if (trimmed.startsWith('### ')) {
       paragraphs.push(new Paragraph({
         text: trimmed.replace(/^### /, ''),

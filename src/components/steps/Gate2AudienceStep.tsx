@@ -87,7 +87,20 @@ export function Gate2AudienceStep() {
               personification: { ...state.personification!, narrative: editedNarrative },
               audienceBranches: updatedBranches,
             });
-            handleGenerateInsights();
+            // Revisit: restore this branch's saved insight options rather than
+            // regenerating — selected ids are only meaningful against the
+            // options they were picked from. Regenerate stays available on
+            // the insights screen for a deliberate refresh.
+            const storedBranch = state.audienceBranches[state.currentBranchIndex];
+            if (storedBranch?.insightOptions?.length) {
+              updateState({
+                insightOptions: storedBranch.insightOptions,
+                selectedInsights: storedBranch.insights ?? [],
+                step: 'gate2_insights',
+              });
+            } else {
+              handleGenerateInsights();
+            }
           }}
           onBack={() => {
             if (isSubsequentBranch) {
