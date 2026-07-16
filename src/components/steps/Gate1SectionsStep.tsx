@@ -367,16 +367,20 @@ function SectionStepContent({
         )}
       </div>
 
-      {/* Continue Button */}
-      <div className="pt-4 border-t border-[var(--border-color)]">
-        <button
-          onClick={onNext}
-          className="btn-secondary flex items-center gap-2 hover:shadow-sm transition-shadow"
-        >
-          {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
-          <span>→</span>
-        </button>
-      </div>
+      {/* Continue Button — hidden on the budget section, where ProductionBudget's
+          own Confirm Budget is the only advance path. A second generic button here
+          skipped the budget capture, silently dropping typed figures. */}
+      {section.key !== 'budget' && (
+        <div className="pt-4 border-t border-[var(--border-color)]">
+          <button
+            onClick={onNext}
+            className="btn-secondary flex items-center gap-2 hover:shadow-sm transition-shadow"
+          >
+            {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
+            <span>→</span>
+          </button>
+        </div>
+      )}
 
       {/* Animation keyframes */}
       <style jsx>{`
