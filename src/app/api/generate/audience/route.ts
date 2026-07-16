@@ -7,7 +7,7 @@ import { AudienceSegmentMenu, PersonificationResponse, AudienceSegment } from '@
 
 export async function POST(request: NextRequest) {
   try {
-    const { brief, additionalContext, selectedSegment, feedback, isMerged } = await request.json();
+    const { brief, additionalContext, selectedSegment, secondarySegments, feedback, isMerged } = await request.json();
 
     if (!brief) {
       return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
@@ -30,6 +30,13 @@ export async function POST(request: NextRequest) {
 
       if (isMerged) {
         userMessage += `IMPORTANT: This is a UNIFIED profile created by merging multiple audience segments. The user has selected these segments because they see overlap or complementary aspects. Your task is to:\n1. Find the common threads that unite these segments\n2. Identify any interesting tensions between them that could fuel creative work\n3. Create a single, coherent personification that captures the essence of this combined audience\n4. Don't treat this as multiple people - synthesize into one rich, nuanced persona\n\n`;
+      }
+
+      if (Array.isArray(secondarySegments) && secondarySegments.length > 0) {
+        userMessage += `Secondary audiences also selected (this segment is the PRIMARY): ${secondarySegments.join(', ')}\n\n`;
+      }
+      if (additionalContext && typeof additionalContext === 'string' && additionalContext.trim()) {
+        userMessage += `Additional context from the CP:\n${additionalContext.trim()}\n\n`;
       }
 
       userMessage += `Please personify this segment.`;

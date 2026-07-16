@@ -20,7 +20,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
-  const { brief } = await request.json().catch(() => ({ brief: undefined }));
+  const { brief, additionalContext } = await request
+    .json()
+    .catch(() => ({ brief: undefined, additionalContext: undefined }));
 
   if (!brief || typeof brief !== 'string') {
     return NextResponse.json({ error: 'Brief is required' }, { status: 400 });
@@ -34,7 +36,10 @@ export async function POST(request: NextRequest) {
     const promptConfig = loadPrompt('triage');
     const systemPrompt = buildSystemPrompt(promptConfig.assess);
 
-    const userMessage = `Please assess this brief:\n\n${brief}`;
+    let userMessage = `Please assess this brief:\n\n${brief}`;
+    if (additionalContext && typeof additionalContext === 'string' && additionalContext.trim()) {
+      userMessage += `\n\nAdditional context from the CP (call notes, emails, clarifications — treat as part of the brief):\n${additionalContext.trim()}`;
+    }
 
     const response = await callClaudeJSON<{
       synthesizedReplay?: Record<string, {

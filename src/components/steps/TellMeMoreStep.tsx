@@ -21,15 +21,17 @@ export function TellMeMoreStep() {
   }
 
   const handleAssessBrief = () => {
-    // Merge preTellMeMoreContext into additionalContext before triage
+    // Merge preTellMeMoreContext into additionalContext before triage,
+    // and hand the merged string to handleTriage directly (updateState is
+    // async, so reading state inside handleTriage would see the old value)
+    let mergedContext = state.additionalContext;
     if (state.preTellMeMoreContext.trim()) {
-      updateState({
-        additionalContext: state.additionalContext
-          ? state.additionalContext + '\n\n' + state.preTellMeMoreContext
-          : state.preTellMeMoreContext,
-      });
+      mergedContext = state.additionalContext
+        ? state.additionalContext + '\n\n' + state.preTellMeMoreContext
+        : state.preTellMeMoreContext;
+      updateState({ additionalContext: mergedContext });
     }
-    handleTriage();
+    handleTriage(mergedContext);
   };
 
   return (

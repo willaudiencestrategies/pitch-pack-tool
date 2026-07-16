@@ -31,9 +31,13 @@ export function BrandAlignmentStep() {
         onBack={() => updateState({ step: 'gate_transition' })}
         initialValue={state.brandAlignment}
         briefAudienceContent={
+          // Prefer the user-confirmed Gate 1 content over the pre-confirmation
+          // triage synthesis; fall back to synthesis for unedited sections
+          state.sections.find((s) => s.key === 'audience')?.content ||
           state.triageResult?.triageAssessment.find((s) => s.key === 'audience')?.synthesizedContent || ''
         }
         briefObjectiveContent={
+          state.sections.find((s) => s.key === 'objective')?.content ||
           state.triageResult?.triageAssessment.find((s) => s.key === 'objective')?.synthesizedContent || ''
         }
       />

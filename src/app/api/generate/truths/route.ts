@@ -36,7 +36,7 @@ Demographics: ${audience.demographics}
 
 Personification:
 ${personification}
-
+${body.objective ? `\nCampaign objective (confirmed by the user):\n${body.objective}\n` : ''}
 Generate 12 audience insights.`;
 
     const response = await callClaudeJSON<{ insights: string[] }>(

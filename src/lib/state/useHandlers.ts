@@ -38,7 +38,7 @@ export interface UseHandlersReturn {
   // Navigation
   handleNavigateToStep: (step: Step) => void;
   // Gate 1 triage / sections
-  handleTriage: () => Promise<void>;
+  handleTriage: (contextOverride?: string) => Promise<void>;
   handleTriageReassess: () => Promise<void>;
   handleSectionReassess: (additionalInfo: string) => Promise<void>;
   handleSectionGenerate: () => Promise<void>;
@@ -140,21 +140,27 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   // API Handlers
   // ============================================
 
-  const handleTriage = async () => {
+  // contextOverride: the freshly merged additional context. Passed explicitly
+  // because the caller's updateState is async and state.additionalContext may
+  // still be stale when this runs.
+  const handleTriage = async (contextOverride?: string) => {
     if (!state.brief.trim()) {
       updateState({ error: 'Please paste your brief first' });
       return;
     }
 
     updateState({ loading: true, error: null });
-    setLastAction(() => handleTriage);
+    setLastAction(() => () => handleTriage(contextOverride));
     progress.triage.runSimulatedProgress();
 
     try {
       const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brief: state.brief }),
+        body: JSON.stringify({
+          brief: state.brief,
+          additionalContext: contextOverride ?? state.additionalContext,
+        }),
       });
 
       // A non-streamed error response (e.g. 400 bad request) carries { error }.
@@ -512,6 +518,8 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
         body: JSON.stringify({
           audience: state.selectedAudienceSegment,
           personification: state.personification.narrative,
+          objective: state.sections.find((s) => s.key === 'objective')?.content || undefined,
+          brandAlignment: state.brandAlignment || undefined,
         }),
       });
 
@@ -575,6 +583,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
           audience: state.selectedAudienceSegment,
           insights: state.selectedInsights,
           secondaryAudiences,
+          personification: state.personification?.narrative || undefined,
           brandAlignment: state.brandAlignment || undefined,
           additionalContext: state.additionalContext,
         }),
@@ -635,6 +644,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
           selectedInsights: state.selectedInsights,
           includeResearchStimuli: state.includeResearchStimuli,
           brandAlignment: state.brandAlignment || undefined,
+          budgetDetails: state.budgetDetails || undefined,
         }),
       });
 
@@ -781,12 +791,16 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
   };
 
   const handleConfirmInsights = () => {
-    // Persist insights to the current branch (preserves branching invariant)
+    // Persist insights AND their options to the current branch (preserves
+    // branching invariant). Options must travel with insights: this handler's
+    // setState lands after InsightsStep's own persist and would otherwise
+    // overwrite the branch record without insightOptions, losing them.
     const updatedBranches = [...state.audienceBranches];
     if (updatedBranches[state.currentBranchIndex]) {
       updatedBranches[state.currentBranchIndex] = {
         ...updatedBranches[state.currentBranchIndex],
         insights: [...state.selectedInsights],
+        insightOptions: [...state.insightOptions],
       };
     }
 
