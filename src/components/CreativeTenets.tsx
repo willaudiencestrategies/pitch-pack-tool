@@ -71,6 +71,19 @@ export function CreativeTenets({
     setTenets(updated);
   };
 
+  const handleRemoveTenet = (index: number) => {
+    if (tenets.length <= 1) return;
+    setTenets(tenets.filter((_, i) => i !== index));
+  };
+
+  const handleAddTenet = () => {
+    if (tenets.length >= 5) return;
+    setTenets([
+      ...tenets,
+      { headline: '', explanation: [''], differentiator: '' },
+    ]);
+  };
+
   const handleRegenerate = () => {
     setGenerated(false);
     setIntro('');
@@ -316,7 +329,7 @@ export function CreativeTenets({
             Tenets
           </h3>
           <span className="text-xs text-[var(--text-muted)]">
-            Click any field to edit
+            Click any field to edit — keep the tenets that work, remove or rewrite the ones that don't
           </span>
         </div>
 
@@ -415,32 +428,53 @@ export function CreativeTenets({
                   </div>
                 </div>
 
-                {/* Edit indicator */}
-                <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                  style={{
-                    backgroundColor: 'var(--bg-tertiary)',
-                    color: 'var(--text-muted)',
-                  }}
-                >
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                {/* Edit indicator + remove tenet */}
+                <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      backgroundColor: 'var(--bg-tertiary)',
+                      color: 'var(--text-muted)',
+                    }}
                   >
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                  </svg>
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </div>
+                  {tenets.length > 1 && (
+                    <button
+                      onClick={() => handleRemoveTenet(index)}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--status-red)] hover:bg-[var(--status-red-bg)] opacity-0 group-hover:opacity-100 transition-all text-xs"
+                      title="Remove this tenet"
+                    >
+                      ✕
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
           </div>
         ))}
+
+        {/* Add your own tenet */}
+        {tenets.length < 5 && (
+          <button
+            onClick={handleAddTenet}
+            className="w-full p-3 rounded-xl border-2 border-dashed border-[var(--border-color)] text-sm text-[var(--text-muted)] hover:border-[var(--expedia-navy)]/50 hover:text-[var(--expedia-navy)] transition-all"
+          >
+            + Add your own tenet
+          </button>
+        )}
       </div>
 
       {/* Actions */}
@@ -479,7 +513,7 @@ export function CreativeTenets({
                 <polyline points="1 20 1 14 7 14" />
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
               </svg>
-              <span>Regenerate</span>
+              <span>Regenerate all</span>
             </>
           )}
         </button>

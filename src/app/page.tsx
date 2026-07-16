@@ -1061,16 +1061,20 @@ function SectionStepContent({
         )}
       </div>
 
-      {/* Continue Button */}
-      <div className="pt-4 border-t border-[var(--border-color)]">
-        <button
-          onClick={onNext}
-          className="btn-secondary flex items-center gap-2 hover:shadow-sm transition-shadow"
-        >
-          {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
-          <span>→</span>
-        </button>
-      </div>
+      {/* Continue Button — hidden on the budget section, where ProductionBudget's
+          own Confirm Budget is the only advance path. A second generic button here
+          skipped the budget capture, silently dropping typed figures. */}
+      {section.key !== 'budget' && (
+        <div className="pt-4 border-t border-[var(--border-color)]">
+          <button
+            onClick={onNext}
+            className="btn-secondary flex items-center gap-2 hover:shadow-sm transition-shadow"
+          >
+            {sectionIndex < totalSections - 1 ? 'Confirm & Continue' : 'Finish Sections'}
+            <span>→</span>
+          </button>
+        </div>
+      )}
 
       {/* Animation keyframes */}
       <style jsx>{`
@@ -2752,16 +2756,27 @@ export default function Home() {
                       onChange={() => toggleInsight(insight)}
                       className="mt-1 h-4 w-4 accent-[var(--expedia-navy)]"
                     />
-                    <div className="flex-1">
-                      <input
-                        type="text"
+                    <div className="flex-1 min-w-0">
+                      {/* Textarea, not input: long insights must wrap, not scroll off-screen */}
+                      <textarea
+                        ref={(el) => {
+                          if (el) {
+                            el.style.height = 'auto';
+                            el.style.height = `${el.scrollHeight}px`;
+                          }
+                        }}
+                        onInput={(e) => {
+                          e.currentTarget.style.height = 'auto';
+                          e.currentTarget.style.height = `${e.currentTarget.scrollHeight}px`;
+                        }}
                         value={insight.text}
                         onChange={(e) => {
                           e.stopPropagation();
                           updateInsightText(insight.id, e.target.value);
                         }}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-full bg-transparent text-sm text-[var(--text-primary)] focus:outline-none"
+                        rows={1}
+                        className="w-full bg-transparent text-sm text-[var(--text-primary)] focus:outline-none resize-none overflow-hidden break-words leading-relaxed"
                       />
                     </div>
                   </div>
