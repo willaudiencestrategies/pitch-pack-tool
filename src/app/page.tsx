@@ -1235,7 +1235,10 @@ export default function Home() {
 
     if (isGate1Sections) {
       const canGoBack = state.currentSectionIndex > 0;
-      const canGoForward = state.currentSectionIndex < gate1Sections.length - 1;
+      // Budget must be left via its own Confirm Budget button (which captures
+      // the typed figures) — the floating arrow must not offer a bypass
+      const currentIsBudget = gate1Sections[state.currentSectionIndex]?.key === 'budget';
+      const canGoForward = state.currentSectionIndex < gate1Sections.length - 1 && !currentIsBudget;
 
       return (
         <div className="fixed bottom-4 right-4 flex gap-2 z-40">
@@ -1251,7 +1254,7 @@ export default function Home() {
             onClick={goToNextGate1Section}
             disabled={!canGoForward}
             className="p-2 rounded-lg bg-white border border-[var(--border-color)] shadow-sm disabled:opacity-40 hover:bg-[var(--bg-secondary)] transition-colors"
-            title={canGoForward ? `Next: ${gate1Sections[state.currentSectionIndex + 1]?.name}` : 'Last section'}
+            title={canGoForward ? `Next: ${gate1Sections[state.currentSectionIndex + 1]?.name}` : (currentIsBudget ? 'Use Confirm Budget to continue' : 'Last section')}
           >
             →
           </button>
@@ -2585,7 +2588,20 @@ export default function Home() {
                 personification: { ...state.personification!, narrative: editedNarrative },
                 audienceBranches: updatedBranches,
               });
-              handleGenerateInsights();
+              // Revisit: restore this branch's saved insight options rather than
+              // regenerating — selected ids are only meaningful against the
+              // options they were picked from. Regenerate stays available on
+              // the insights screen for a deliberate refresh.
+              const storedBranch = state.audienceBranches[state.currentBranchIndex];
+              if (storedBranch?.insightOptions?.length) {
+                updateState({
+                  insightOptions: storedBranch.insightOptions,
+                  selectedInsights: storedBranch.insights ?? [],
+                  step: 'gate2_insights',
+                });
+              } else {
+                handleGenerateInsights();
+              }
             }}
             onBack={() => {
               if (isSubsequentBranch) {

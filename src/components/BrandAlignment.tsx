@@ -58,6 +58,10 @@ export function BrandAlignment({
       const response = await fetch('/api/brand-fit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Timeout: a hung fit call previously left the Continue button
+        // disabled forever ("can't reliably pick the EG brand"). On timeout
+        // the catch auto-acknowledges and the user can proceed.
+        signal: AbortSignal.timeout(45_000),
         body: JSON.stringify({
           brand,
           briefAudienceContent: briefAudienceContent || '',
