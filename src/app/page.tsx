@@ -51,6 +51,7 @@ import { GoodExamplePrompt } from '@/components/GoodExamplePrompt';
 import { getSuggestedPrompts, ResearchPrompt } from '@/lib/research-prompts';
 import { fetchWithRetry, isNetworkError, CONNECTION_DROPPED_MESSAGE } from '@/lib/fetch-with-retry';
 import { exportToWord } from '@/lib/word-export';
+import { ensureTenetsProvenance } from '@/lib/output-postprocess';
 import { logAnalytics, captureBriefScore } from '@/lib/analytics';
 import { LoadingProgress } from '@/components/LoadingProgress';
 import { TRIAGE_STAGES, AUDIENCE_STAGES, INSIGHTS_STAGES } from '@/lib/loading-config';
@@ -1148,7 +1149,9 @@ export default function Home() {
   const restoreSession = () => {
     const stored = loadSession();
     if (stored) {
-      setState(stored.state);
+      // Merge over defaults so sessions stored before newer state fields
+      // existed can't restore an object with fields missing
+      setState({ ...createInitialState(), ...stored.state });
     }
     setShowRestorePrompt(false);
   };
@@ -1796,11 +1799,16 @@ export default function Home() {
       // Log analytics when output is generated
       logAnalytics(captureBriefScore(state));
 
+      // Deterministic guarantee (not left to the compile LLM): with secondary
+      // audiences present, the tenets section must state its primary provenance
+      const primaryName = state.audienceBranches[0]?.segment.name || state.selectedAudienceSegment?.name || '';
+      const markdown = ensureTenetsProvenance(data.markdown, primaryName, state.audienceBranches.length > 1);
+
       // Store markdown for inline display
       updateState({
         step: 'output',
         loading: false,
-        outputMarkdown: data.markdown,
+        outputMarkdown: markdown,
       });
     } catch (err) {
       updateState({
@@ -2568,6 +2576,7 @@ export default function Home() {
                   currentBranchIndex: prevIndex,
                   selectedAudienceSegment: prevBranch.segment,
                   personification: prevBranch.personification,
+                  insightOptions: prevBranch.insightOptions ?? [],
                   selectedInsights: prevBranch.insights,
                   step: 'gate2_insights',
                 });
@@ -2783,29 +2792,38 @@ export default function Home() {
                   audienceBranches: [...state.audienceBranches],
                 });
 
-                // Save insights to current branch
+                // Save insights + their generated options to current branch.
+                // Options must live with the branch: selected ids are only
+                // meaningful against the options they were picked from.
                 const updatedBranches = [...state.audienceBranches];
                 if (updatedBranches[state.currentBranchIndex]) {
                   updatedBranches[state.currentBranchIndex] = {
                     ...updatedBranches[state.currentBranchIndex],
                     insights: [...state.selectedInsights],
+                    insightOptions: [...state.insightOptions],
                   };
                 }
 
-                // Check if there are more branches to process
+                // Walk to the next branch only if another branch still needs
+                // insights. On a revisit (all other branches already confirmed)
+                // go straight to the merge path so the walk cannot re-arm.
                 const nextBranchIndex = state.currentBranchIndex + 1;
-                const hasMoreBranches = nextBranchIndex < state.audienceBranches.length;
+                const otherBranchesComplete = state.audienceBranches.every(
+                  (b, i) => i === state.currentBranchIndex || b.insights.length > 0
+                );
+                const hasMoreBranches = nextBranchIndex < state.audienceBranches.length && !otherBranchesComplete;
 
                 if (hasMoreBranches) {
-                  // Move to next branch - go back to audience step for personification
+                  // Move to next branch - restore its saved work if it has any,
+                  // otherwise reset for a fresh personification + insights pass
                   const nextBranch = state.audienceBranches[nextBranchIndex];
                   updateState({
                     audienceBranches: updatedBranches,
                     currentBranchIndex: nextBranchIndex,
                     selectedAudienceSegment: nextBranch.segment,
-                    personification: null, // Reset for new branch
-                    insightOptions: [], // Reset for new branch
-                    selectedInsights: [], // Reset for new branch
+                    personification: nextBranch.personification ?? null,
+                    insightOptions: nextBranch.insightOptions ?? [],
+                    selectedInsights: nextBranch.insights ?? [],
                     step: 'gate2_audience', // Go back to generate personification for next segment
                   });
                 } else {
@@ -2859,6 +2877,7 @@ export default function Home() {
                     currentBranchIndex: 0,
                     selectedAudienceSegment: primaryBranch?.segment ?? state.selectedAudienceSegment,
                     personification: primaryBranch?.personification ?? state.personification,
+                    insightOptions: primaryBranch?.insightOptions ?? state.insightOptions,
                     selectedInsights: primaryBranch?.insights ?? state.selectedInsights,
                     step: 'gate2_tenets',
                   });
@@ -2867,7 +2886,8 @@ export default function Home() {
               disabled={state.selectedInsights.length === 0}
               className="btn-secondary flex items-center gap-2"
             >
-              {state.currentBranchIndex < state.audienceBranches.length - 1 && state.audienceBranches.length > 1
+              {state.currentBranchIndex < state.audienceBranches.length - 1 &&
+              state.audienceBranches.some((b, i) => i !== state.currentBranchIndex && b.insights.length === 0)
                 ? `Confirm & Next Audience`
                 : 'Confirm & Continue'}
               <span>→</span>

@@ -17,19 +17,25 @@ interface ExportData {
 
 /**
  * Parse a line of markdown text into TextRun elements.
- * Handles **bold** markers.
+ * Handles ***bold italic***, **bold** and *italic* markers.
  */
 function parseInlineMarkdown(text: string): TextRun[] {
   const runs: TextRun[] = [];
-  const boldRegex = /\*\*(.+?)\*\*/g;
+  const emphasisRegex = /\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|\*(.+?)\*/g;
   let lastIndex = 0;
   let match;
 
-  while ((match = boldRegex.exec(text)) !== null) {
+  while ((match = emphasisRegex.exec(text)) !== null) {
     if (match.index > lastIndex) {
       runs.push(new TextRun({ text: text.slice(lastIndex, match.index) }));
     }
-    runs.push(new TextRun({ text: match[1], bold: true }));
+    if (match[1] !== undefined) {
+      runs.push(new TextRun({ text: match[1], bold: true, italics: true }));
+    } else if (match[2] !== undefined) {
+      runs.push(new TextRun({ text: match[2], bold: true }));
+    } else {
+      runs.push(new TextRun({ text: match[3], italics: true }));
+    }
     lastIndex = match.index + match[0].length;
   }
 
@@ -84,10 +90,26 @@ function markdownToParagraphs(content: string): Paragraph[] {
       continue;
     }
 
+    // Horizontal rules become spacing, not literal dashes
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      paragraphs.push(new Paragraph({ text: '', spacing: { before: 120, after: 120 } }));
+      continue;
+    }
+
     if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       const bulletText = trimmed.replace(/^[-*]\s+/, '');
       paragraphs.push(new Paragraph({
         children: [new TextRun({ text: '• ' }), ...parseInlineMarkdown(bulletText)],
+        spacing: { before: 60, after: 60 },
+        indent: { left: 360 },
+      }));
+      continue;
+    }
+
+    const numbered = trimmed.match(/^(\d+)[.)]\s+(.*)$/);
+    if (numbered) {
+      paragraphs.push(new Paragraph({
+        children: [new TextRun({ text: `${numbered[1]}. ` }), ...parseInlineMarkdown(numbered[2])],
         spacing: { before: 60, after: 60 },
         indent: { left: 360 },
       }));

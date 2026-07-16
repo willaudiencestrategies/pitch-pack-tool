@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (audience) {
-      userMessage += `## Primary Audience\nName: ${audience.name}\nDescription: ${audience.description}\n`;
+      // AudienceSegment carries needsValues (Segment's description is legacy)
+      const description = (audience as { description?: string }).description || audience.needsValues || '';
+      userMessage += `## Primary Audience\nName: ${audience.name}\nDescription: ${description}\n`;
       if (personification) {
         userMessage += `Personification: ${personification}\n`;
       }
