@@ -98,6 +98,7 @@ export function Gate2AudienceStep() {
                 currentBranchIndex: prevIndex,
                 selectedAudienceSegment: prevBranch.segment,
                 personification: prevBranch.personification,
+                insightOptions: prevBranch.insightOptions ?? [],
                 selectedInsights: prevBranch.insights,
                 step: 'gate2_insights',
               });

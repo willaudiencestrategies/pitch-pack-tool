@@ -461,7 +461,9 @@ export default function Home() {
   const restoreSession = () => {
     const stored = loadSession();
     if (stored) {
-      setState(stored.state);
+      // Merge over defaults so sessions stored before newer state fields
+      // existed can't restore an object with fields missing
+      setState({ ...createInitialState(), ...stored.state });
     }
     setShowRestorePrompt(false);
   };

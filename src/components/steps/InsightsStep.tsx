@@ -185,29 +185,38 @@ export function InsightsStep() {
                 audienceBranches: [...state.audienceBranches],
               });
 
-              // Save insights to current branch
+              // Save insights + their generated options to current branch.
+              // Options must live with the branch: selected ids are only
+              // meaningful against the options they were picked from.
               const updatedBranches = [...state.audienceBranches];
               if (updatedBranches[state.currentBranchIndex]) {
                 updatedBranches[state.currentBranchIndex] = {
                   ...updatedBranches[state.currentBranchIndex],
                   insights: [...state.selectedInsights],
+                  insightOptions: [...state.insightOptions],
                 };
               }
 
-              // Check if there are more branches to process
+              // Walk to the next branch only if another branch still needs
+              // insights. On a revisit (all other branches already confirmed)
+              // go straight to the merge path so the walk cannot re-arm.
               const nextBranchIndex = state.currentBranchIndex + 1;
-              const hasMoreBranches = nextBranchIndex < state.audienceBranches.length;
+              const otherBranchesComplete = state.audienceBranches.every(
+                (b, i) => i === state.currentBranchIndex || b.insights.length > 0
+              );
+              const hasMoreBranches = nextBranchIndex < state.audienceBranches.length && !otherBranchesComplete;
 
               if (hasMoreBranches) {
-                // Move to next branch - go back to audience step for personification
+                // Move to next branch - restore its saved work if it has any,
+                // otherwise reset for a fresh personification + insights pass
                 const nextBranch = state.audienceBranches[nextBranchIndex];
                 updateState({
                   audienceBranches: updatedBranches,
                   currentBranchIndex: nextBranchIndex,
                   selectedAudienceSegment: nextBranch.segment,
-                  personification: null, // Reset for new branch
-                  insightOptions: [], // Reset for new branch
-                  selectedInsights: [], // Reset for new branch
+                  personification: nextBranch.personification ?? null,
+                  insightOptions: nextBranch.insightOptions ?? [],
+                  selectedInsights: nextBranch.insights ?? [],
                   step: 'gate2_audience', // Go back to generate personification for next segment
                 });
               } else {
@@ -261,6 +270,7 @@ export function InsightsStep() {
                   currentBranchIndex: 0,
                   selectedAudienceSegment: primaryBranch?.segment ?? state.selectedAudienceSegment,
                   personification: primaryBranch?.personification ?? state.personification,
+                  insightOptions: primaryBranch?.insightOptions ?? state.insightOptions,
                   selectedInsights: primaryBranch?.insights ?? state.selectedInsights,
                 });
                 // Route through the handler: persists insights to the current
@@ -272,7 +282,8 @@ export function InsightsStep() {
             disabled={state.selectedInsights.length === 0}
             className="btn-secondary flex items-center gap-2"
           >
-            {state.currentBranchIndex < state.audienceBranches.length - 1 && state.audienceBranches.length > 1
+            {state.currentBranchIndex < state.audienceBranches.length - 1 &&
+            state.audienceBranches.some((b, i) => i !== state.currentBranchIndex && b.insights.length === 0)
               ? `Confirm & Next Audience`
               : 'Confirm & Continue'}
             <span>→</span>

@@ -304,7 +304,7 @@ export interface TruthsResponse {
 
 export interface OutputRequest {
   sections: Section[];
-  audience?: Segment;
+  audience?: AudienceSegment;
   personification?: string;
   selectedInsights?: Truth[];
   includeResearchStimuli?: boolean;
@@ -435,6 +435,10 @@ export interface AudienceBranch {
   segment: AudienceSegment;
   personification: PersonificationResponse | null;
   insights: Truth[];
+  // Generated insight options, persisted per branch so revisiting a branch
+  // restores ITS options (selected ids are only meaningful against these).
+  // Optional for backward compat with sessions stored before this field.
+  insightOptions?: Truth[];
 }
 
 // Loading progress stages

@@ -25,6 +25,7 @@ import {
   createInitialState,
 } from '../types';
 import { logAnalytics, captureBriefScore } from '../analytics';
+import { ensureTenetsProvenance } from '../output-postprocess';
 import { encodeResumeToken, buildResumeUrl } from '../vault-resume-token';
 import { parseUsdBudget } from '../parse-budget';
 import { exportVaultPack } from '../word-export';
@@ -644,11 +645,16 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       // Log analytics when output is generated
       logAnalytics(captureBriefScore(state));
 
+      // Deterministic guarantee (not left to the compile LLM): with secondary
+      // audiences present, the tenets section must state its primary provenance
+      const primaryName = state.audienceBranches[0]?.segment.name || state.selectedAudienceSegment?.name || '';
+      const markdown = ensureTenetsProvenance(data.markdown, primaryName, state.audienceBranches.length > 1);
+
       // Store markdown for inline display
       updateState({
         step: 'output',
         loading: false,
-        outputMarkdown: data.markdown,
+        outputMarkdown: markdown,
       });
     } catch (err) {
       updateState({
@@ -798,7 +804,10 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     // Pass derived values explicitly so the setTimeout callback doesn't depend
     // on a stale closure view of `state`.
     setTimeout(
-      () => { fireBackgroundMatcher({ partnerType, productionBudgetUsd }); },
+      // branchInsights passed explicitly: the closure fallback reads the
+      // branch's pre-persist insights ([]), so the preview would otherwise
+      // always be computed with zero insights.
+      () => { fireBackgroundMatcher({ partnerType, productionBudgetUsd, branchInsights: [...state.selectedInsights] }); },
       0
     );
   };
