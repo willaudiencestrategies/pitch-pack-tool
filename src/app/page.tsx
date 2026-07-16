@@ -1712,6 +1712,11 @@ export default function Home() {
       const objectiveSection = state.sections.find((s) => s.key === 'objective');
       const objective = objectiveSection?.content || '';
 
+      // Tenets are built solely from the primary audience + its insights.
+      // Secondaries and brand alignment are passed as context so the model
+      // sees the full picture of prior confirmed decisions.
+      const secondaryAudiences = state.audienceBranches.slice(1).map((b) => b.segment.name);
+
       const response = await fetch('/api/generate/tenets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1720,6 +1725,8 @@ export default function Home() {
           objective,
           audience: state.selectedAudienceSegment,
           insights: state.selectedInsights,
+          secondaryAudiences,
+          brandAlignment: state.brandAlignment || undefined,
           additionalContext: state.additionalContext,
         }),
       });
@@ -1744,7 +1751,11 @@ export default function Home() {
     const updatedSections = [...state.sections];
     const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
     if (tenetsIndex >= 0) {
-      const content = tenets.map((t) => {
+      const primaryName = state.audienceBranches[0]?.segment.name || state.selectedAudienceSegment?.name;
+      const attribution = state.audienceBranches.length > 1 && primaryName
+        ? `*Built solely from the primary audience: ${primaryName}*\n\n`
+        : '';
+      const content = attribution + tenets.map((t) => {
         const dots = t.explanation.map((e) => `- ${e}`).join('\n');
         return `**${t.headline}**\n${dots}\nDifferentiator: ${t.differentiator}`;
       }).join('\n\n');
@@ -1774,6 +1785,7 @@ export default function Home() {
           personification: state.personification?.narrative || '',
           selectedInsights: state.selectedInsights,
           includeResearchStimuli: state.includeResearchStimuli,
+          brandAlignment: state.brandAlignment || undefined,
         }),
       });
 
@@ -2797,23 +2809,24 @@ export default function Home() {
                     step: 'gate2_audience', // Go back to generate personification for next segment
                   });
                 } else {
-                  // All branches done - merge insights and proceed to tenets
-                  // Collect all insights from all branches
-                  const allInsights = updatedBranches.flatMap(b => b.insights);
+                  // All branches done - restore the PRIMARY branch as the working
+                  // context. Creative Tenets build solely off the primary audience
+                  // and its insights; secondaries are report-only in the output.
+                  const primaryBranch = updatedBranches[0];
 
                   // Update the audience_insights section
                   const updatedSections = [...state.sections];
                   const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
                   if (insightsIndex >= 0) {
-                    // Group insights by audience if multiple branches
+                    // Group insights by audience if multiple branches, primary first
                     let content = '';
                     if (updatedBranches.length > 1) {
-                      content = updatedBranches.map(branch => {
+                      content = updatedBranches.map((branch, i) => {
                         const branchInsights = branch.insights.map((t) => `- ${t.text}`).join('\n');
-                        return `**${branch.segment.name}:**\n${branchInsights}`;
+                        return `**${branch.segment.name} (${i === 0 ? 'Primary' : 'Secondary'}):**\n${branchInsights}`;
                       }).join('\n\n');
                     } else {
-                      content = allInsights.map((t) => `- ${t.text}`).join('\n');
+                      content = (primaryBranch?.insights ?? state.selectedInsights).map((t) => `- ${t.text}`).join('\n');
                     }
                     updatedSections[insightsIndex] = {
                       ...updatedSections[insightsIndex],
@@ -2822,13 +2835,13 @@ export default function Home() {
                     };
                   }
 
-                  // Update audience section with all audiences
+                  // Update audience section with all audiences, primary first
                   const audienceIndex = updatedSections.findIndex((s) => s.key === 'audience');
                   if (audienceIndex >= 0) {
                     let audienceContent = '';
                     if (updatedBranches.length > 1) {
-                      audienceContent = updatedBranches.map(branch => {
-                        return `**${branch.segment.name}**\n${branch.segment.needsValues}\n\n${branch.personification?.narrative || ''}`;
+                      audienceContent = updatedBranches.map((branch, i) => {
+                        return `**${branch.segment.name} (${i === 0 ? 'Primary' : 'Secondary'})**\n${branch.segment.needsValues}\n\n${branch.personification?.narrative || ''}`;
                       }).join('\n\n---\n\n');
                     } else if (state.selectedAudienceSegment) {
                       audienceContent = `**${state.selectedAudienceSegment.name}**\n\n${state.selectedAudienceSegment.needsValues}\n\n${state.personification?.narrative || ''}`;
@@ -2843,7 +2856,10 @@ export default function Home() {
                   updateState({
                     sections: updatedSections,
                     audienceBranches: updatedBranches,
-                    selectedInsights: allInsights, // Keep all for tenets generation
+                    currentBranchIndex: 0,
+                    selectedAudienceSegment: primaryBranch?.segment ?? state.selectedAudienceSegment,
+                    personification: primaryBranch?.personification ?? state.personification,
+                    selectedInsights: primaryBranch?.insights ?? state.selectedInsights,
                     step: 'gate2_tenets',
                   });
                 }

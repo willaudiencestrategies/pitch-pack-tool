@@ -9,7 +9,7 @@ import { getBrandContextForPrompt } from '@/lib/brand-criteria';
 export async function POST(request: NextRequest) {
   try {
     const body: CreativeTenetsRequest = await request.json();
-    const { brief, objective, audience, insights, additionalContext } = body;
+    const { brief, objective, audience, insights, additionalContext, secondaryAudiences } = body;
 
     // Validate required fields
     if (!objective || !audience || !insights || insights.length === 0) {
@@ -36,12 +36,15 @@ export async function POST(request: NextRequest) {
 
     const userMessage = `INPUTS:
 - Objective: ${objective}
-- Audience: ${audience.name} - ${audience.needsValues}
+- Primary Audience: ${audience.name} - ${audience.needsValues}
 - Demographics: ${audience.demographics}
-- Selected Insights:
+- Primary Audience Insights:
 ${insights.map((i: any, idx: number) => `  ${idx + 1}. ${i.text}`).join('\n')}
+${secondaryAudiences && secondaryAudiences.length > 0 ? `- Secondary Audiences (context only, reported elsewhere in the brief): ${secondaryAudiences.join(', ')}` : ''}
 ${additionalContext ? `- Additional Context: ${additionalContext}` : ''}
 ${brief ? `- Original Brief Context: ${brief.substring(0, 500)}...` : ''}
+
+Build the tenets SOLELY from the Primary Audience and their insights above. Secondary audiences must NOT shape, dilute or redirect the tenets — do not blend their perspective in.
 
 Generate exactly 3 Creative Tenets. Return JSON with:
 - "intro": 1-2 sentences connecting tenets to audience work
