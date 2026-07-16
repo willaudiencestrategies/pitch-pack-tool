@@ -1,7 +1,6 @@
 {
   "section": "audience_insights",
   "displayName": "Audience Insights",
-
   "assess": {
     "role": "You are a Brief Quality Specialist evaluating Audience Insights.",
     "task": "Check if the brief contains psychological insights that bridge audience to creative direction.",
@@ -19,7 +18,6 @@
     "examples": [],
     "escapeHatch": "This will almost always be RED. Note that generation is needed."
   },
-
   "reassess": {
     "role": "You are a Brief Quality Specialist.",
     "task": "Re-evaluate audience insights given new information.",
@@ -38,11 +36,10 @@
     "examples": [],
     "escapeHatch": "Recommend generation if still missing."
   },
-
   "generate": {
     "role": "You are a cultural anthropologist and behavioural psychologist specialising in the human psychology of travel. You observe how people move through the world, what drives their choices, what they're running from or toward, and the emotional contracts they make with themselves. You don't study travel from a distance - you get close, interpret patterns, decode tensions, and surface the unspoken needs beneath observable behaviour.",
     "task": "Generate exactly 12 audience insights that reveal deeper motivations, tensions, and payoffs driving a given audience segment. These should inspire campaign platforms, not tactical executions.\n\n{brandContext}\n\nEnsure insights feel authentic to this specific brand's target audience, not generic travellers.",
-    "logic": "What Makes a Strong Audience Insight:\n- A tension or trade-off between competing desires, values, or behaviours\n- A shift in priorities - what matters now vs what used to matter\n- The emotional, intellectual, or social payoff of that shift\n- An implicit creative lever - a question raised, permission granted, challenge issued, or reframe offered\n\nProgression Architecture (BOLD FIRST):\n- Insights 1-4 (Bolder Zone): Provocative, potentially divisive, uncompromising stances. Lead with differentiation.\n- Insights 5-8 (Sharper Zone): Clearer trade-offs, stronger perspective, more specificity.\n- Insights 9-12 (Safer Zone): Broad appeal, gentle contrast, accessible tension. Safe fallbacks.\n\nStructural Variety:\n- Vary sentence structures and rhythms\n- Use different forms: statements, questions, imperatives, conditionals\n- At least 2 insights should be rhetorical questions\n\nLength: 10-20 words per insight, max 14 for punchiest lines\n\nLanguage:\n- For insights 1-8: Avoid clichés; push for fresher, sharper language\n- For insights 9-12: Travel clichés OK (authentic, unique, unforgettable, hidden gem, off the beaten track, wanderlust, immerse, discover)\n- No demographics, no travel poetry - speak directly to behaviour and motivation\n- Write ALL insights in third person about the audience segment. Never use 'you' or 'your'. Frame insights as observations about the segment's behaviour, tensions, and motivations (e.g. 'Soul Seekers choose discomfort over convenience' not 'You choose discomfort over convenience')\n- Ground each insight in observable travel behaviour or destination context, not abstract philosophy",
+    "logic": "What Makes a Strong Audience Insight:\n- A tension or trade-off between competing desires, values, or behaviours\n- A shift in priorities - what matters now vs what used to matter\n- The emotional, intellectual, or social payoff of that shift\n- An implicit creative lever - a question raised, permission granted, challenge issued, or reframe offered\n\nProgression Architecture (BOLD FIRST):\n- Insights 1-4 (Bolder Zone): Provocative, potentially divisive, uncompromising stances. Lead with differentiation.\n- Insights 5-8 (Sharper Zone): Clearer trade-offs, stronger perspective, more specificity.\n- Insights 9-12 (Safer Zone): Broad appeal, gentle contrast, accessible tension. Safe fallbacks.\n\nStructural Variety:\n- Vary sentence structures and rhythms\n- Use different forms: statements, questions, imperatives, conditionals\n- At least 2 insights should be rhetorical questions\n\nLength: 10-20 words per insight, max 14 for punchiest lines\n\nLanguage:\n- For insights 1-8: Avoid clichés; push for fresher, sharper language\n- For insights 9-12: Travel clichés OK (authentic, unique, unforgettable, hidden gem, off the beaten track, wanderlust, immerse, discover)\n- No demographics, no travel poetry - speak directly to behaviour and motivation\n- Write ALL insights in third person about the audience segment. Never use 'you' or 'your'. Frame insights as observations about the segment's behaviour, tensions, and motivations (e.g. 'Soul Seekers choose discomfort over convenience' not 'You choose discomfort over convenience')\n- Ground each insight in observable travel behaviour or destination context, not abstract philosophy\n\nObjective fit: when a confirmed campaign objective is provided, insights must be usable against it — an insight that fights the stated objective is a bad insight, however sharp it sounds.",
     "inputs": {
       "brief": "Original brief",
       "audiencePersonification": "The personified audience description",
@@ -53,8 +50,14 @@
       "insights": "Array of exactly 12 insight strings (NOT numbered - just the text), progressing from bolder (index 0-3) to sharper (index 4-7) to safer (index 8-11)"
     },
     "examples": [
-      { "zone": "bolder", "insight": "If locals can't teach you something uncomfortable about yourself, pick easier destinations." },
-      { "zone": "safer", "insight": "Stop filling every hour; start leaving space; regain pace; reframe: empty time counts." }
+      {
+        "zone": "bolder",
+        "insight": "If locals can't teach you something uncomfortable about yourself, pick easier destinations."
+      },
+      {
+        "zone": "safer",
+        "insight": "Stop filling every hour; start leaving space; regain pace; reframe: empty time counts."
+      }
     ],
     "escapeHatch": "If segment description is too vague, ask: What do they actually DO differently? What do they choose over what? What tensions exist in their decision-making?"
   }

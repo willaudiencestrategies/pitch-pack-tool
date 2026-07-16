@@ -1307,21 +1307,27 @@ export default function Home() {
   // API Handlers
   // ============================================
 
-  const handleTriage = async () => {
+  // contextOverride: the freshly merged additional context. Passed explicitly
+  // because the caller's updateState is async and state.additionalContext may
+  // still be stale when this runs.
+  const handleTriage = async (contextOverride?: string) => {
     if (!state.brief.trim()) {
       updateState({ error: 'Please paste your brief first' });
       return;
     }
 
     updateState({ loading: true, error: null });
-    setLastAction(() => handleTriage);
+    setLastAction(() => () => handleTriage(contextOverride));
     triageProgress.runSimulatedProgress();
 
     try {
       const response = await fetchWithRetry('/api/triage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brief: state.brief }),
+        body: JSON.stringify({
+          brief: state.brief,
+          additionalContext: contextOverride ?? state.additionalContext,
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to assess brief');
@@ -1670,6 +1676,8 @@ export default function Home() {
         body: JSON.stringify({
           audience: state.selectedAudienceSegment,
           personification: state.personification.narrative,
+          objective: state.sections.find((s) => s.key === 'objective')?.content || undefined,
+          brandAlignment: state.brandAlignment || undefined,
         }),
       });
 
@@ -1733,6 +1741,7 @@ export default function Home() {
           audience: state.selectedAudienceSegment,
           insights: state.selectedInsights,
           secondaryAudiences,
+          personification: state.personification?.narrative || undefined,
           brandAlignment: state.brandAlignment || undefined,
           additionalContext: state.additionalContext,
         }),
@@ -1793,6 +1802,7 @@ export default function Home() {
           selectedInsights: state.selectedInsights,
           includeResearchStimuli: state.includeResearchStimuli,
           brandAlignment: state.brandAlignment || undefined,
+          budgetDetails: state.budgetDetails || undefined,
         }),
       });
 
@@ -1978,15 +1988,17 @@ export default function Home() {
     }
 
     const handleAssessBrief = () => {
-      // Merge preTellMeMoreContext into additionalContext before triage
+      // Merge preTellMeMoreContext into additionalContext before triage,
+      // and hand the merged string to handleTriage directly (updateState is
+      // async, so reading state inside handleTriage would see the old value)
+      let mergedContext = state.additionalContext;
       if (state.preTellMeMoreContext.trim()) {
-        updateState({
-          additionalContext: state.additionalContext
-            ? state.additionalContext + '\n\n' + state.preTellMeMoreContext
-            : state.preTellMeMoreContext,
-        });
+        mergedContext = state.additionalContext
+          ? state.additionalContext + '\n\n' + state.preTellMeMoreContext
+          : state.preTellMeMoreContext;
+        updateState({ additionalContext: mergedContext });
       }
-      handleTriage();
+      handleTriage(mergedContext);
     };
 
     return (
@@ -2360,9 +2372,13 @@ export default function Home() {
         onBack={() => updateState({ step: 'gate_transition' })}
         initialValue={state.brandAlignment}
         briefAudienceContent={
+          // Prefer the user-confirmed Gate 1 content over the pre-confirmation
+          // triage synthesis; fall back to synthesis for unedited sections
+          state.sections.find((s) => s.key === 'audience')?.content ||
           state.triageResult?.triageAssessment.find((s) => s.key === 'audience')?.synthesizedContent || ''
         }
         briefObjectiveContent={
+          state.sections.find((s) => s.key === 'objective')?.content ||
           state.triageResult?.triageAssessment.find((s) => s.key === 'objective')?.synthesizedContent || ''
         }
       />

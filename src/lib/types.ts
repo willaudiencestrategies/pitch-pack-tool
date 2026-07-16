@@ -259,6 +259,7 @@ export interface AudienceResponse {
 export interface TruthsRequest {
   audience: Segment;
   personification: string;
+  objective?: string;
   brandAlignment?: BrandAlignment;
 }
 
@@ -273,6 +274,7 @@ export interface OutputRequest {
   selectedInsights?: Truth[];
   includeResearchStimuli?: boolean;
   brandAlignment?: BrandAlignment;
+  budgetDetails?: BudgetDetails;
 }
 
 export interface OutputResponse {
@@ -379,6 +381,7 @@ export interface CreativeTenetsRequest {
   audience: AudienceSegment;
   insights: Truth[];
   secondaryAudiences?: string[];
+  personification?: string;
   additionalContext?: string;
   brandAlignment?: BrandAlignment;
 }

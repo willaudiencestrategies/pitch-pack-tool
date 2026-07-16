@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (!body.sections || !Array.isArray(body.sections)) {
       return NextResponse.json({ error: 'sections array is required' }, { status: 400 });
     }
-    const { sections, audience, personification, selectedInsights, includeResearchStimuli, brandAlignment } = body;
+    const { sections, audience, personification, selectedInsights, includeResearchStimuli, brandAlignment, budgetDetails } = body;
 
     // Filter out research_stimuli if not included
     const filteredSections = includeResearchStimuli
@@ -42,6 +42,14 @@ export async function POST(request: NextRequest) {
       for (const insight of selectedInsights) {
         userMessage += `- ${insight.text}\n`;
       }
+      userMessage += '\n';
+    }
+
+    if (budgetDetails && (budgetDetails.totalBudget || budgetDetails.productionBudget)) {
+      userMessage += `## Confirmed Budget (typed by the CP — authoritative over any conflicting figures in the budget section text)\n`;
+      userMessage += `Currency: ${budgetDetails.currency || 'USD'}\n`;
+      if (budgetDetails.totalBudget) userMessage += `Total campaign budget: ${budgetDetails.totalBudget}\n`;
+      if (budgetDetails.productionBudget) userMessage += `Production budget: ${budgetDetails.productionBudget}\n`;
       userMessage += '\n';
     }
 

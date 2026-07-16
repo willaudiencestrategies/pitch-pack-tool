@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
 - Objective: ${objective}
 - Primary Audience: ${audience.name} - ${audience.needsValues}
 - Demographics: ${audience.demographics}
+${body.personification ? `- Personification (confirmed by the user — the persona these tenets must speak to):\n${body.personification}` : ''}
 - Primary Audience Insights:
 ${insights.map((i: any, idx: number) => `  ${idx + 1}. ${i.text}`).join('\n')}
 ${secondaryAudiences && secondaryAudiences.length > 0 ? `- Secondary Audiences (context only, reported elsewhere in the brief): ${secondaryAudiences.join(', ')}` : ''}
