@@ -140,7 +140,7 @@ export function CreativeTenets({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-[var(--text-primary)] mb-1">
-                  Confirmed Audience
+                  Primary Audience
                 </p>
                 <p className="text-sm text-[var(--text-secondary)]">
                   {audience.name}
@@ -172,7 +172,7 @@ export function CreativeTenets({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-[var(--text-primary)] mb-2">
-                  Selected Insights ({insights.length})
+                  Primary Audience Insights ({insights.length})
                 </p>
                 <div className="space-y-2">
                   {insights.map((insight, index) => (

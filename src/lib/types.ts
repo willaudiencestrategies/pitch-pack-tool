@@ -414,6 +414,7 @@ export interface CreativeTenetsRequest {
   objective: string;
   audience: AudienceSegment;
   insights: Truth[];
+  secondaryAudiences?: string[];
   additionalContext?: string;
   brandAlignment?: BrandAlignment;
 }

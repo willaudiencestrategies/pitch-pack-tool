@@ -143,6 +143,7 @@ export function OutputStep() {
           </button>
           <button
             onClick={() => exportToWord({
+              markdown: state.outputMarkdown || undefined,
               sections: state.sections,
               audience: state.selectedAudienceSegment || undefined,
               personification: state.personification?.narrative,

@@ -9,6 +9,10 @@ interface ExportData {
   insights?: Truth[];
   brandAlignment?: BrandAlignment;
   briefFilename?: string;
+  /** Compiled output markdown. When present, the Word doc is rendered from
+   *  this — the same source as Copy to Clipboard / Download as Markdown —
+   *  instead of being rebuilt from raw sections. */
+  markdown?: string;
 }
 
 /**
@@ -71,6 +75,15 @@ function markdownToParagraphs(content: string): Paragraph[] {
       continue;
     }
 
+    if (trimmed.startsWith('# ')) {
+      paragraphs.push(new Paragraph({
+        text: trimmed.replace(/^# /, ''),
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 400, after: 200 },
+      }));
+      continue;
+    }
+
     if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
       const bulletText = trimmed.replace(/^[-*]\s+/, '');
       paragraphs.push(new Paragraph({
@@ -104,7 +117,19 @@ function markdownToParagraphs(content: string): Paragraph[] {
 }
 
 export async function exportToWord(data: ExportData): Promise<void> {
-  const { sections, audience, personification, insights, brandAlignment, briefFilename } = data;
+  const { sections, audience, personification, insights, brandAlignment, briefFilename, markdown } = data;
+
+  if (markdown) {
+    // Single source of truth: render the compiled brief exactly as the
+    // clipboard/markdown exports see it. No rebuilding from raw sections.
+    const doc = new Document({ sections: [{ properties: {}, children: markdownToParagraphs(markdown) }] });
+    const blob = await Packer.toBlob(doc);
+    const exportName = briefFilename
+      ? briefFilename.replace(/\.[^/.]+$/, '') + ' — Enhanced'
+      : 'creative-brief';
+    saveAs(blob, `${exportName}.docx`);
+    return;
+  }
 
   const children: Paragraph[] = [
     new Paragraph({ text: 'Creative Brief', heading: HeadingLevel.TITLE }),

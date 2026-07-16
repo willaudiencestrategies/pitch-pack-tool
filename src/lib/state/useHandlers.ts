@@ -560,6 +560,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
       const objectiveSection = state.sections.find((s) => s.key === 'objective');
       const objective = objectiveSection?.content || '';
 
+      // Tenets are built solely from the primary audience + its insights.
+      // Secondaries and brand alignment are passed as context so the model
+      // sees the full picture of prior confirmed decisions.
+      const secondaryAudiences = state.audienceBranches.slice(1).map((b) => b.segment.name);
+
       const response = await fetch('/api/generate/tenets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -568,6 +573,8 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
           objective,
           audience: state.selectedAudienceSegment,
           insights: state.selectedInsights,
+          secondaryAudiences,
+          brandAlignment: state.brandAlignment || undefined,
           additionalContext: state.additionalContext,
         }),
       });
@@ -592,7 +599,11 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
     const updatedSections = [...state.sections];
     const tenetsIndex = updatedSections.findIndex((s) => s.key === 'creative_tenets');
     if (tenetsIndex >= 0) {
-      const content = tenets.map((t) => {
+      const primaryName = state.audienceBranches[0]?.segment.name || state.selectedAudienceSegment?.name;
+      const attribution = state.audienceBranches.length > 1 && primaryName
+        ? `*Built solely from the primary audience: ${primaryName}*\n\n`
+        : '';
+      const content = attribution + tenets.map((t) => {
         const dots = t.explanation.map((e) => `- ${e}`).join('\n');
         return `**${t.headline}**\n${dots}\nDifferentiator: ${t.differentiator}`;
       }).join('\n\n');
@@ -622,6 +633,7 @@ export function useHandlers(deps: UseHandlersDeps): UseHandlersReturn {
           personification: state.personification?.narrative || '',
           selectedInsights: state.selectedInsights,
           includeResearchStimuli: state.includeResearchStimuli,
+          brandAlignment: state.brandAlignment || undefined,
         }),
       });
 

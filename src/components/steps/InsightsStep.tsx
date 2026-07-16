@@ -211,23 +211,24 @@ export function InsightsStep() {
                   step: 'gate2_audience', // Go back to generate personification for next segment
                 });
               } else {
-                // All branches done - merge insights and proceed to tenets
-                // Collect all insights from all branches
-                const allInsights = updatedBranches.flatMap(b => b.insights);
+                // All branches done - restore the PRIMARY branch as the working
+                // context. Creative Tenets build solely off the primary audience
+                // and its insights; secondaries are report-only in the output.
+                const primaryBranch = updatedBranches[0];
 
                 // Update the audience_insights section
                 const updatedSections = [...state.sections];
                 const insightsIndex = updatedSections.findIndex((s) => s.key === 'audience_insights');
                 if (insightsIndex >= 0) {
-                  // Group insights by audience if multiple branches
+                  // Group insights by audience if multiple branches, primary first
                   let content = '';
                   if (updatedBranches.length > 1) {
-                    content = updatedBranches.map(branch => {
+                    content = updatedBranches.map((branch, i) => {
                       const branchInsights = branch.insights.map((t) => `- ${t.text}`).join('\n');
-                      return `**${branch.segment.name}:**\n${branchInsights}`;
+                      return `**${branch.segment.name} (${i === 0 ? 'Primary' : 'Secondary'}):**\n${branchInsights}`;
                     }).join('\n\n');
                   } else {
-                    content = allInsights.map((t) => `- ${t.text}`).join('\n');
+                    content = (primaryBranch?.insights ?? state.selectedInsights).map((t) => `- ${t.text}`).join('\n');
                   }
                   updatedSections[insightsIndex] = {
                     ...updatedSections[insightsIndex],
@@ -236,13 +237,13 @@ export function InsightsStep() {
                   };
                 }
 
-                // Update audience section with all audiences
+                // Update audience section with all audiences, primary first
                 const audienceIndex = updatedSections.findIndex((s) => s.key === 'audience');
                 if (audienceIndex >= 0) {
                   let audienceContent = '';
                   if (updatedBranches.length > 1) {
-                    audienceContent = updatedBranches.map(branch => {
-                      return `**${branch.segment.name}**\n${branch.segment.needsValues}\n\n${branch.personification?.narrative || ''}`;
+                    audienceContent = updatedBranches.map((branch, i) => {
+                      return `**${branch.segment.name} (${i === 0 ? 'Primary' : 'Secondary'})**\n${branch.segment.needsValues}\n\n${branch.personification?.narrative || ''}`;
                     }).join('\n\n---\n\n');
                   } else if (state.selectedAudienceSegment) {
                     audienceContent = `**${state.selectedAudienceSegment.name}**\n\n${state.selectedAudienceSegment.needsValues}\n\n${state.personification?.narrative || ''}`;
@@ -257,7 +258,10 @@ export function InsightsStep() {
                 updateState({
                   sections: updatedSections,
                   audienceBranches: updatedBranches,
-                  selectedInsights: allInsights, // Keep all for tenets generation
+                  currentBranchIndex: 0,
+                  selectedAudienceSegment: primaryBranch?.segment ?? state.selectedAudienceSegment,
+                  personification: primaryBranch?.personification ?? state.personification,
+                  selectedInsights: primaryBranch?.insights ?? state.selectedInsights,
                 });
                 // Route through the handler: persists insights to the current
                 // branch, derives partnerType/productionBudgetUsd, advances to

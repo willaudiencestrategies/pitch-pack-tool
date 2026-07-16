@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (audience) {
-      userMessage += `## Selected Audience\nName: ${audience.name}\nDescription: ${audience.description}\n`;
+      userMessage += `## Primary Audience\nName: ${audience.name}\nDescription: ${audience.description}\n`;
       if (personification) {
         userMessage += `Personification: ${personification}\n`;
       }
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (selectedInsights && selectedInsights.length > 0) {
-      userMessage += `## Selected Audience Insights\n`;
+      userMessage += `## Primary Audience Insights\n`;
       for (const insight of selectedInsights) {
         userMessage += `- ${insight.text}\n`;
       }
