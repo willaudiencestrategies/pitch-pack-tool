@@ -642,3 +642,73 @@ Team agreements as of July 2026. These are process facts, not code facts.
 - **Fausto is expected to own the tool at Expedia eventually** — the likely receiving developer/owner as it moves in-house.
 - **Phil (Expedia) has a pending request to bring the CBB into Expedia's environment** — the v3 path in the version language above.
 - **Known bug reporters**: Dave reported the audience bug (fixed 16 July, section 5); Kirsty reports the network drops and generally chases user-facing glitches (the Chrome/EG-network triage failures in section 7 are her territory).
+
+## 19. July 2026 engagement changelog — complete record of what changed and why
+
+This section is the authoritative record of Will's final engagement week (15-17 July 2026). It is written so that an AI assistant reading it cold can reconstruct the reasoning behind every change, know exactly which behaviour is new, and avoid re-fixing or accidentally reverting any of it. Commits are on `main` unless noted; every one was merged to `vault-build` the same day (merge commits ebcd45e, ea52666, 9dd0861, a06e8ef, 3bca9c2, 8222802), with page.tsx changes hand-ported into `src/components/steps/*` and `src/lib/state/useHandlers.ts` because the branches structure that code differently (see section 2).
+
+### 19.1 The audience-priority bug (Dave's bug) — commit ab0e4b8, hardened in 6d51110
+
+**Symptom:** with a primary + secondary audience selected, the Creative Tenets step showed the secondary audience as "Confirmed Audience", blended both audiences' insights into one list, and generated tenets for the secondary. The final output partially recovered, which made the bug look intermittent.
+
+**Root cause:** the audience flow walks `audienceBranches` one at a time (index 0 = primary, always). Each branch overwrote the single working-state fields (`selectedAudienceSegment`, `personification`, `selectedInsights`), and after the LAST branch (a secondary) nothing restored the primary. Every downstream consumer read the contaminated working state. `audiencePrioritisation` (the only structure that knows which segment is primary) was written once at selection and never read again.
+
+**Fix mechanics (all still in force — do not revert any of these):**
+- Final branch confirm restores branch 0 (segment, personification, insight options, insights) as working state before entering tenets. Main: the insights confirm handler in `src/app/page.tsx`; vault-build: `src/components/steps/InsightsStep.tsx`.
+- Tenets generation sends ONLY the primary audience and its insights, plus `secondaryAudiences` (names, labelled context-only) and an explicit instruction in `src/app/api/generate/tenets/route.ts`: build solely from the primary, do not blend.
+- The `audience` and `audience_insights` sections are written primary-first with explicit `(Primary)` / `(Secondary)` labels per audience.
+- The compiled output's CREATIVE TENETS section is guaranteed to carry a "built solely from the primary audience" statement by `ensureTenetsProvenance` (`src/lib/output-postprocess.ts`) — a deterministic post-processor, because the compile is an LLM call and prompt adherence is not a guarantee. Unit tested (`src/lib/__tests__/output-postprocess.test.ts`).
+- The tenets step cards read "Primary Audience" / "Primary Audience Insights" (`src/components/CreativeTenets.tsx`).
+
+**Hardening (6d51110), after adversarial review found a re-contamination path:** `insightOptions` now persist per branch (`AudienceBranch.insightOptions`, optional for old sessions) and restore on every branch entry — forward, back, and final. Insight ids are 1-12 per generation, so selections are only meaningful against the options they were picked from; before this, revisiting the insights screen after finishing showed the primary's selections ticked against the last secondary's option texts. The confirm button also goes straight to the merge path when every other branch already has confirmed insights (`otherBranchesComplete`), so a revisit can never re-arm the full branch walk.
+
+### 19.2 Export divergence — commit 98ee0cd
+
+Word export previously rebuilt the document from raw sections and appended its own audience/personification/insights blocks (from the contaminated working state, compounding 19.1), so Word and Copy-to-Clipboard produced different briefs. `exportToWord` now renders the compiled `outputMarkdown` — the identical string the clipboard and markdown download use — whenever it exists; the raw-sections path survives only as a fallback. The markdown renderer (`markdownToParagraphs`) was extended across the week to cover H1-H4 headings, bullets, numbered lists, bold/italic/bold-italic, horizontal rules and the Differentiator prefix. Still NOT covered: tables and blockquotes.
+
+### 19.3 Live user-feedback fixes (Richard's tracker, 16 July) — commit df8a8f5, completed in 5124b11
+
+- **Budget silently dropped (Maddy):** `ProductionBudget` holds typed figures in local component state and only writes `state.budgetDetails` via its own "Confirm Budget" button. Two other advance paths skipped that capture: the generic section footer "Confirm & Continue" (hidden on the budget section in df8a8f5) and the floating bottom-right forward arrow (disabled on the budget section in 5124b11, with tooltip "Use Confirm Budget to continue"). Rule for the future: any new Gate 1 advance path must be gated the same way on `section.key === 'budget'`.
+- **Crash on back-navigation (Maddy):** never reproduced; structural protection added instead. `src/app/error.tsx` is a Next.js route error boundary — render errors now show "Something went wrong / Your work is safe" with Try again and Reload & restore, instead of a white screen. Recovery is real because sessions auto-save every second. If Maddy's exact repro steps ever surface, the underlying error will be visible in that screen's message.
+- **Insight text cut off (Maddy):** insight options rendered in single-line `<input type="text">`, so long text scrolled horizontally off-screen. Replaced with auto-resizing, wrapping `<textarea>` (main `renderInsightsStep`; vault-build `InsightsStep.tsx`).
+- **Tenets all-or-nothing (Elena):** tenets were already click-to-edit (headline, dot points, differentiator), which was a discoverability failure, not a feature gap. Added: per-tenet remove (✕ on card hover, minimum 1 kept), "+ Add your own tenet" (maximum 5), a clearer hint line, and the destructive button relabelled "Regenerate all". This implements Richard's chosen direction (human-curated editing) rather than per-tenet AI regeneration, which remains unbuilt — see 19.6.
+
+### 19.4 Context threading — commit de9a7f7 ("the LLM feels confused" fix), plus 5124b11
+
+The client's core complaint was that the model doesn't factor in what the user has already decided. A full audit of every LLM call site found the tenets fix (19.1) had closed one instance of this fallacy but four earlier calls and one data path still had it. All fixed; the matrix after the fixes:
+
+| Call | Now receives (new items in bold) |
+|---|---|
+| `/api/triage` | brief + **additionalContext from the tell-me-more screen** (was silently discarded by the route while the UI promised it would be used; merged context is passed as a function argument because React's setState is async and reading state immediately after would see the stale value — preserve that pattern) |
+| `/api/generate/audience` (personify) | brief, segment, **additionalContext**, **secondarySegments** (client sent both for months; the route dropped them; the prompt's secondaryNote logic could never fire) |
+| `/api/generate/truths` (insights) | audience, personification, **confirmed objective** (from the Gate 1 section), **brandAlignment** (route supported it since February, no client ever sent it — the same accepted-but-never-sent pattern as the original tenets bug; grep for this pattern when adding any route field) |
+| `/api/generate/tenets` | objective, primary audience, primary insights, secondaryAudiences, brandAlignment, **personification narrative** (the confirmed persona was previously absent from tenets generation) |
+| `/api/brand-fit` | **user-confirmed Gate 1 audience/objective content** (was the pre-confirmation triage synthesis; falls back to synthesis only when the section is unedited) |
+| `/api/output` (compile) | sections, primary audience, personification, primary insights, brandAlignment, **budgetDetails typed by the user, marked authoritative** (previously the typed figures NEVER reached the final document — only stale section text did; the compile now renders them under BUDGET & CONSTRAINTS and is instructed they override conflicting section text) |
+
+Prompt changes in the same commits: `prompts/output.json` heading changed from "PITCH PACK:" to "CREATIVE BRIEF:" (the dead product name was still mandated in the compiled document), plus a budget-authority rule; `prompts/audience-insights.json` gained an objective-fit rule ("an insight that fights the objective is a bad insight").
+
+### 19.5 Reliability fixes — 5124b11 and the vault-build merges
+
+- **Brand-fit timeout (Tim's bug 6, mitigated):** the fit check fetch now aborts after 45s (`AbortSignal.timeout`), and the existing error path auto-acknowledges, so a hung call can no longer leave the Continue button disabled forever — the most plausible mechanism behind "can't reliably pick the EG brand". Marked mitigated, not confirmed, because the original report was never reproduced.
+- **Personification re-confirm no longer regenerates insights** when the branch already has saved options (both branches): it restores the branch's saved options + selections; Regenerate remains on the insights screen as a deliberate action.
+- **vault-build only:** `handleConfirmInsights` now persists `insightOptions` alongside insights (its later setState was overwriting the branch record without them — a port bug caught by audit), and the background vault matcher receives `branchInsights` explicitly (its closure fallback read the pre-persist empty array, so match previews were computed with zero insights).
+- **Session restore** merges stored state over `createInitialState()` on both branches, so sessions saved before newer state fields existed cannot restore with fields missing.
+
+### 19.6 Explicitly NOT done — product decisions parked for Richard
+
+1. Sending triage coherence tensions into the compiled client-facing document (prompt promises honesty; wiring exists nowhere; whether sellers want contradictions printed is a product call).
+2. Brand-aware audience segment menus (menu is generated one step after brand confirmation but brand-blind; ~10-line change once approved, changes creative output character).
+3. Re-checking brand fit against the confirmed audience segment (ordering is correct today; nothing revisits fit after audience confirmation).
+4. Per-tenet AI regeneration (Elena's literal ask; Richard chose editability instead — if users still want it, it is an LLM call taking the kept tenets as context).
+Also unaddressed: Chrome/EG root fix on main is the vault-build NDJSON streaming port (section 7); the two-page output cap remains prompt-only; tables/blockquotes in Word.
+
+### 19.7 Verification evidence
+
+- Unit tests: main 74/74, vault-build 150/150, clean production builds on both, after every commit above.
+- Two full live end-to-end runs against a real two-audience Nashville brief (all 7 LLM calls in client order): primary-first TARGET AUDIENCE, per-audience attributed insights, tenets provenance statement present, tenets content verifiably primary-only; second run additionally confirmed the tell-me-more call note visibly shaped the triage assessment, the typed budget (USD 135,000 production) appeared in BUDGET & CONSTRAINTS with a derived media remainder, and no "PITCH PACK" heading.
+- Three independent code audits (adversarial review, 26-item requirements audit, LLM context-threading audit); every actionable finding fixed same-day and re-verified.
+
+### 19.8 Deployment state at handover
+
+`steadman-ai/expedia-cbb` (canonical) holds everything above on both branches. Production Railway deploys from the LEGACY repo `willaudiencestrategies/pitch-pack-tool` `main` (section 8). Whether the July work is live depends on whether that legacy main has been pushed — check `git log origin/main` against this changelog's commits before assuming.
