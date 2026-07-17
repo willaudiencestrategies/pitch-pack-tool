@@ -132,7 +132,12 @@ Node 20+ is required (`engines` in `package.json`, `.nvmrc`, and `railway.toml` 
 
 Deployment is Railway, configured by `railway.toml` (Nixpacks builder, healthcheck on `/` with a 300 second timeout because Claude calls are long, restart on failure). `prompts/README.md` describes the working loop: commit to GitHub, Railway auto-deploys in about two minutes.
 
-The production Railway service watches the **legacy repo `willaudiencestrategies/pitch-pack-tool`, branch `main`** — every push to that main goes live roughly two minutes later. The new canonical repo `github.com/steadman-ai/expedia-cbb` (branches `main` and `vault-build`, full history) is a mirror as of July 2026 and does not trigger deploys yet. Until the Railway service is re-pointed at the Steadman repo, a fix only reaches production when pushed to the legacy `origin` main, so push to both. [TODO: Will to hand over Railway project access, confirm the service's source and region in the dashboard (Settings → Source), and re-point it at steadman-ai/expedia-cbb so the legacy repo can be retired.]
+There are **two Railway services in the one project**, both watching the legacy repo `willaudiencestrategies/pitch-pack-tool`:
+
+- **Production**: watches branch `main`, serves `pitch-pack-tool-production.up.railway.app`. Every push to legacy main goes live roughly two minutes later. Treat any push there as a production deploy.
+- **Vault Preview (staging)**: watches branch `vault-build`, serves `creative-brief-builder-vault-production.up.railway.app`, and shows a yellow "Vault Preview" pill in the header (driven by `NEXT_PUBLIC_DEPLOY_LABEL`, inlined at build time). Pushing legacy `vault-build` is therefore a safe staging deploy — this is where Tim and Richard can review work live before it ships. Because vault-build always contains everything on main plus the Vault, the preview is a superset of the next production build.
+
+The new canonical repo `github.com/steadman-ai/expedia-cbb` (branches `main` and `vault-build`, full history) is a mirror as of July 2026 and does not trigger deploys. Until the Railway services are re-pointed at the Steadman repo, a change only reaches production/preview when pushed to the legacy `origin`, so push to both remotes. [TODO: Will to hand over Railway project access, confirm both services' sources and region in the dashboard (Settings → Source), and re-point them at steadman-ai/expedia-cbb so the legacy repo can be retired.]
 
 The canonical repo going forward is **github.com/steadman-ai/expedia-cbb**. Push there.
 
@@ -711,4 +716,4 @@ Also unaddressed: Chrome/EG root fix on main is the vault-build NDJSON streaming
 
 ### 19.8 Deployment state at handover
 
-`steadman-ai/expedia-cbb` (canonical) holds everything above on both branches. Production Railway deploys from the LEGACY repo `willaudiencestrategies/pitch-pack-tool` `main` (section 8). Whether the July work is live depends on whether that legacy main has been pushed — check `git log origin/main` against this changelog's commits before assuming.
+`steadman-ai/expedia-cbb` (canonical) holds everything above on both branches. Production Railway deploys from the LEGACY repo `willaudiencestrategies/pitch-pack-tool` `main` (section 8). Whether the July work is live depends on whether that legacy main has been pushed — check `git log origin/main` against this changelog's commits before assuming. As of 17 July 2026: the **Vault Preview staging service carries all of this changelog** (legacy `vault-build` pushed and deploy verified via bundle markers); **production does not** (legacy main still at cb2a4cf, 4 June). Going live = pushing legacy `main`.
