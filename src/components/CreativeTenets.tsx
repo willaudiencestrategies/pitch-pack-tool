@@ -329,7 +329,7 @@ export function CreativeTenets({
             Tenets
           </h3>
           <span className="text-xs text-[var(--text-muted)]">
-            Click any field to edit — keep the tenets that work, remove or rewrite the ones that don't
+            Click any field to edit. Regenerate all replaces every tenet, so copy the ones you want to keep first, then add them back with "Add your own tenet"
           </span>
         </div>
 

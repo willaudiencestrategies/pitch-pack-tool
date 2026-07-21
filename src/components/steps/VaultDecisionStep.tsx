@@ -1,6 +1,9 @@
 'use client';
 
 import { useBriefState } from '@/lib/state/BriefStateContext';
+import { deriveProductionBudgetUsd } from '@/lib/state/useHandlers';
+
+const CURRENCY_SYMBOLS: Record<string, string> = { USD: '$', GBP: '£', EUR: '€', AUD: 'A$' };
 
 type SignalKey = 'strong' | 'plausible' | 'stretch' | 'none';
 
@@ -44,9 +47,18 @@ export function VaultDecisionStep() {
 
   const objective = state.sections.find(s => s.key === 'objective')?.content?.slice(0, 200) || '—';
   const audienceName = state.selectedAudienceSegment?.name || '—';
-  const budgetDisplay = state.productionBudgetUsd
-    ? `$${state.productionBudgetUsd.toLocaleString()}`
-    : 'to be confirmed';
+  // The vault matcher needs the production split specifically, which is only
+  // asked for later if Gate 1 captured just a total — fall back to showing the
+  // upstream total so an entered budget never reads as "to be confirmed".
+  const productionBudgetUsd =
+    state.productionBudgetUsd ?? deriveProductionBudgetUsd(state);
+  const totalBudget = state.budgetDetails?.totalBudget?.trim();
+  const currencySymbol = CURRENCY_SYMBOLS[state.budgetDetails?.currency ?? 'USD'] ?? '$';
+  const budgetDisplay = productionBudgetUsd
+    ? `$${productionBudgetUsd.toLocaleString()}`
+    : totalBudget
+      ? `${currencySymbol}${totalBudget} total (production split to be confirmed)`
+      : 'to be confirmed';
 
   return (
     <div className="space-y-6">
