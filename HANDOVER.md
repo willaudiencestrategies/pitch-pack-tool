@@ -714,6 +714,15 @@ Also unaddressed: Chrome/EG root fix on main is the vault-build NDJSON streaming
 - Two full live end-to-end runs against a real two-audience Nashville brief (all 7 LLM calls in client order): primary-first TARGET AUDIENCE, per-audience attributed insights, tenets provenance statement present, tenets content verifiably primary-only; second run additionally confirmed the tell-me-more call note visibly shaped the triage assessment, the typed budget (USD 135,000 production) appeared in BUDGET & CONSTRAINTS with a derived media remainder, and no "PITCH PACK" heading.
 - Three independent code audits (adversarial review, 26-item requirements audit, LLM context-threading audit); every actionable finding fixed same-day and re-verified.
 
-### 19.8 Deployment state at handover
+### 19.8 Richard's 20 July review flags — commit e2da602 [vault-build only]
+
+Richard's 20 July email confirmed all nine 19.1–19.5 fixes working on the preview and flagged two items, both fixed same-day:
+
+- **Vault recap budget (his 2a):** the "Vault or Creative Tenets?" recap showed Production Budget "to be confirmed" despite an upstream budget. Not version drift (main is fully merged into vault-build) — `VaultDecisionStep` read only `state.productionBudgetUsd`, which the vault flow captures a step later, while Gate 1 stores typed budgets in `budgetDetails` (total + optional production split, and users commonly type only the total). The recap now falls back to `deriveProductionBudgetUsd` and, failing that, displays the entered total with the production split marked as pending. The compiled document was never affected.
+- **Tenets hint honesty (his 2b):** the hint promised "remove or rewrite" but the only regeneration control is Regenerate all. Reworded per Richard's language-fix steer to coach copying keepers out before regenerating (no per-tenet regeneration built — see 19.6 item 4, unchanged).
+
+His Part 3 (Gate 1 confirmed audience not carried into Gate 2 segment generation, and overwritten in the audience section by the chosen segment at the end of the insights step) is confirmed accurate against the code — `useHandlers.handleGenerateAudience` sends only brief/additionalContext/feedback, and `InsightsStep` overwrites the `audience` section content — but is an open product question with Tim, deliberately not built.
+
+### 19.9 Deployment state at handover
 
 `steadman-ai/expedia-cbb` (canonical) holds everything above on both branches. Production Railway deploys from the LEGACY repo `willaudiencestrategies/pitch-pack-tool` `main` (section 8). Whether the July work is live depends on whether that legacy main has been pushed — check `git log origin/main` against this changelog's commits before assuming. As of 17 July 2026: the **Vault Preview staging service carries all of this changelog** (legacy `vault-build` pushed and deploy verified via bundle markers); **production does not** (legacy main still at cb2a4cf, 4 June). Going live = pushing legacy `main`.
